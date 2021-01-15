@@ -147,7 +147,7 @@ namespace Catamagne.Commands
                         var users = clan.spreadsheetUsers.ToList();
                         users.OrderBy(t => t.steamName);
 
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan,users, "Users on spreadsheet for " + clan.clanName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.clanName + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
@@ -155,7 +155,7 @@ namespace Catamagne.Commands
                         users.OrderBy(t => t.steamName);
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.clanName + ":");
-                        
+
                     }
                     else
                     {
@@ -233,17 +233,21 @@ namespace Catamagne.Commands
             discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "You're not allowed to run that command.");
             await ctx.RespondAsync(discordEmbed);
             return ErrorCode.UnqualifyRole;
-            }
-            public static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
+        }
+        static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
+        {
+            var clan = BungieTools.GetClanFromTag(clanTag);
+            if (clan != null)
             {
-                if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
-                {
-                    return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
-                }
+                return clan;
+            }
+            else
+            {
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "The clan you provided is invalid!");
                 await ctx.RespondAsync(discordEmbed);
                 return null;
             }
+        }
     }
 
     public class UserInteractionsModule : BaseCommandModule

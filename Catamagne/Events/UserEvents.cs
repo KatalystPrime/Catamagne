@@ -18,13 +18,11 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-                var _ = SpreadsheetTools.CheckUserAgainstSpreadsheet(e.Member.Id.ToString());
-                if (_ != null)
+                var member = SpreadsheetTools.CheckUserAgainstSpreadsheet(e.Member.Id.ToString());
+                if (member != null)
                 {
-                    var a = e.Member.Username;
-                    var b = e.Member.Discriminator;
-                    var c = e.Member.Id;
-                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
+                    var clan = BungieTools.GetClanFromTag(member.clanTag);
+                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, clan.clanName + " Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
                     DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.alertsChannel, discordEmbed);
                     //DiscordMessage message = await CatamagneCore.SendAlert(string.Format("User detected leaving discord server; was on spreadsheet, id = {0}", e.Member.Id.ToString()));
                 }

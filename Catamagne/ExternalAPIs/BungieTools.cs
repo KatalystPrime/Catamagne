@@ -7,6 +7,8 @@ using BungieSharper.Schema.User;
 using BungieSharper.Schema;
 using BungieSharper.Schema.GroupsV2;
 using Catamagne.Configuration;
+using Discord.Commands;
+using DSharpPlus.Entities;
 
 namespace Catamagne.API
 {
@@ -243,6 +245,14 @@ namespace Catamagne.API
                     rejoiners.Remove(member);
                 }
             });;
+        }
+        public static Clan GetClanFromTag(string clanTag)
+        {
+            if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
+            {
+                return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
+            }
+            else return null;
         }
     }
 }
