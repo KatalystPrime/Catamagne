@@ -435,15 +435,15 @@ namespace Catamagne.API
             //});
             if (ConfigValues.clansList.Any(clan => clan.Users.Select(t => t.discordID).Contains(userID)))
             {
-                var clan = (Clan)ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID));
+                var clan = ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID)).ToList();
                 //var _ = clan.clanUsers.FindIndex(t => t.discordID == userID);
-                var _ = clan.Users.FindIndex(t => t.discordID == userID);
+                var _ = clan.FirstOrDefault().Users.FindIndex(t => t.discordID == userID);
                 if (_ != -1)
                 {
-                    User workingUser = clan.Users[_];
+                    User workingUser = clan.FirstOrDefault().Users[_];
                     workingUser.UserStatus = UserStatus.LeftDiscord;
-                    clan.Users[_] = workingUser;
-                    Write(clan);
+                    clan.FirstOrDefault().Users[_] = workingUser;
+                    Write(clan.FirstOrDefault());
 
                     return workingUser;
                 }
