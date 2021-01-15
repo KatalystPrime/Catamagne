@@ -25,11 +25,12 @@ namespace Catamagne.Events
                     }
                     for (int i = 0; i < clans.Count; i++)
                     {
-                        if (DateTime.UtcNow > referenceTime + (interval * i))
+                        if (DateTime.UtcNow > (referenceTime + (interval * i)))
                         {
                             await action.Invoke(clans[i]);
                         }
                     }
+                    Thread.Sleep(interval);
                }
             }).Start();  
         }
