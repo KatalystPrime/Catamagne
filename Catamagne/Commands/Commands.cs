@@ -127,112 +127,42 @@ namespace Catamagne.Commands
         //        }).Start();
         //    }
         //}
-        //[Command("displayUsers")]
-        //[Description("Output all stored users")]
-        //[Aliases("users")]
-        //public async Task DisplayUsers(CommandContext ctx, [RemainingText] string args)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        new Thread(async () =>
-        //        {
-        //            if (args == "spreadsheet" || args == "sheet")
-        //            {
-        //                await Catamagne.API.SpreadsheetTools.ReadSheet();
-        //                List<Field> fields = new List<Field>();
-        //                List<SpreadsheetTools.User> users = SpreadsheetTools.users.ToList();
-        //                users.OrderBy(t => t.steamName);
-        //                foreach (SpreadsheetTools.User user in users)
-        //                {
-        //                    if (!string.IsNullOrEmpty(user.bungieProfile))
-        //                    {
-        //                        var _ = new Field(user.steamName, user.discordID);
-        //                        fields.Add(_);
-        //                    }
+        [Command("displayUsers")]
+        [Description("Output all stored users")]
+        [Aliases("users")]
+        public async Task DisplayUsers(CommandContext ctx, string clanTag, string mode)
+        {
+            var roles = ctx.Member.Roles.ToList();
+            var verification = await IsVerifiedAsync(ctx, true);
+            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
+            {
+                new Thread(async () =>
+                {
+                    if (mode == "spreadsheet" || mode == "sheet" || string.IsNullOrEmpty(mode))
+                    {
+                        await SpreadsheetTools.Read(clan);
+                        List<SpreadsheetTools.User> users = clan.spreadsheetUsers.ToList();
+                        users.OrderBy(t => t.steamName);
 
-        //                }
+                        Core.Core.SendFancyListMessage(clan,users, "Users on spreadsheet for " + clan.clanName + ":");
+                    }
+                    else if (mode == "saved data" || mode == "saved" || mode == "file")
+                    {
+                        List<SpreadsheetTools.User> users = clan.Users;
+                        users.OrderBy(t => t.steamName);
 
-        //                List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-        //                if (fields.Count < 25)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, fields.Count)));
-        //                }
-        //                else if (fields.Count < 50)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, fields.Count)));
-        //                }
-        //                else if (fields.Count < 75)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(50, fields.Count)));
-        //                }
-        //                else
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(50, 75)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(75, fields.Count)));
-        //                }
-        //                List<DiscordMessage> messages = new List<DiscordMessage>();
-        //                foreach (DiscordEmbed embed in embeds)
-        //                {
-        //                    messages.Add(await Core.Core.SendFancyMessage(ctx.Channel, embed));
-        //                }
-        //            }
-        //            else if (args == "saved data" || args == "saved" || args == "file")
-        //            {
-        //                List<Field> fields = new List<Field>();
-        //                List<SpreadsheetTools.User> users = SpreadsheetTools.users;
-        //                users.OrderBy(t => t.steamName);
-        //                foreach (SpreadsheetTools.User user in users)
-        //                {
-        //                    if (user.discordID != null)
-        //                    {
-        //                        var _ = new Field(user.steamName, user.discordID);
-        //                        fields.Add(_);
-        //                    }
-
-        //                }
-
-        //                List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-        //                if (fields.Count < 25)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, fields.Count)));
-        //                }
-        //                else if (fields.Count < 50)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, fields.Count)));
-        //                }
-        //                else if (fields.Count < 75)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(50, fields.Count)));
-        //                }
-        //                else
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(0, 25)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(50, 75)));
-        //                    embeds.Add(GetUsersToDisplayInRange(fields, new Range(75, fields.Count)));
-
-        //                }
-        //                List<DiscordMessage> messages = new List<DiscordMessage>();
-        //                embeds.ForEach(async embed => messages.Add(await Core.Core.SendFancyMessage(ctx.Channel, embed)));
-        //            }
-        //            else
-        //            {
-        //                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "Additional arguments required. eithe use:\ndisplayusers sheet or displayusers saved");
-        //                await ctx.RespondAsync(discordEmbed);
-        //            }
-        //        }).Start();
-        //    }
-        //}
+                        Core.Core.SendFancyListMessage(clan, users, "Users for " + clan.clanName + ":");
+                        
+                    }
+                    else
+                    {
+                        var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "Additional arguments required. eithe use:\ndisplayusers sheet or displayusers saved");
+                        await ctx.RespondAsync(discordEmbed);
+                    }
+                }).Start();
+            }
+        }
         //[Command("checkleavers")]
         //[Description("Check if any users have left the clan.")]
         //[Aliases("leavers", "checkleaves", "leaves")]
@@ -335,12 +265,14 @@ namespace Catamagne.Commands
             await ctx.RespondAsync(discordEmbed);
             return ErrorCode.UnqualifyRole;
         }
-        public static Clan GetClan(string clanTag)
+        public static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
         {
             if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
             {
                 return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
             }
+            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "The clan you provided is invalid!");
+            await ctx.RespondAsync(discordEmbed);
             return null;
         }
 
