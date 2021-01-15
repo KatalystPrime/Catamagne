@@ -130,11 +130,13 @@ namespace Catamagne.Commands
         [Command("displayUsers")]
         [Description("Output all stored users")]
         [Aliases("users")]
-        public async Task DisplayUsers(CommandContext ctx, string clanTag, string mode)
+        public async Task DisplayUsers(CommandContext ctx, string clanTag, [RemainingText] string mode)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
             var clan = await GetClanFromTagAsync(ctx, clanTag);
+            mode = mode.ToLower();
+            clanTag = clanTag.ToLower();
             if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
             {
                 new Thread(async () =>

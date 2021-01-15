@@ -77,12 +77,12 @@ namespace Catamagne.API
                 var invalidMembers = members.invalidMembers;
                 validMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
                     workingList.Add(_);
                 });
                 invalidMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
                     workingList.Add(_);
                 });
                 forceBulkUpdate = true;
@@ -99,27 +99,27 @@ namespace Catamagne.API
                             case 0:
                                 break;
                             case 1:
-                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.OK, clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 2:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.OK, clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.OK, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 3:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.OK, clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.OK, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 4:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.OK, clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.OK, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 5:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 6:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), (UserStatus) Enum.Parse(typeof(UserStatus),spreadsheetData[i][5].ToString()), clan);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), (UserStatus) Enum.Parse(typeof(UserStatus),spreadsheetData[i][5].ToString()), clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             default:
@@ -128,7 +128,7 @@ namespace Catamagne.API
                                 {
                                     extraColumns.Add(spreadsheetData[i][index].ToString());
                                 }
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan, extraColumns);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan.clanTag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }
@@ -249,7 +249,7 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
-                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan, extraColumns));
+                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
                     }
                     else
                     {
@@ -287,7 +287,7 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
-                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan, extraColumns));
+                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
                     }
                 }
             }
@@ -320,8 +320,8 @@ namespace Catamagne.API
                         string bungieName = bungieUser.displayName;
                         string steamName = steamUser.displayname;
                         string discordID = addedUser.discordID;
-                        Clan userClan = addedUser.UserClan;
-                        workingUser = new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, userClan);
+                        string userClanTag = addedUser.clanTag;
+                        workingUser = new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, userClanTag);
                         _.Add(workingUser);
 
                     }
@@ -341,7 +341,7 @@ namespace Catamagne.API
                         {
                             extraColumns = addedUser.ExtraColumns;
                         }
-                        _.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan, extraColumns));
+                        _.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
                     }
                 }
             }
@@ -465,14 +465,14 @@ namespace Catamagne.API
             public string bungieID; public string steamProfile; 
             public string steamID; public string steamName; 
             public string discordID; public UserStatus UserStatus; 
-            public List<string> ExtraColumns; 
-            public Clan UserClan;
+            public List<string> ExtraColumns;
+            public string clanTag;
 
             public User()
             {
             }
 
-            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus userStatus, Clan userClan,List<string> ExtraColumns = null)
+            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus userStatus, string userClanTag,List<string> ExtraColumns = null)
             {
                 this.bungieProfile = bungieLink; 
                 this.bungieName = bungieName; 
@@ -482,7 +482,7 @@ namespace Catamagne.API
                 this.steamName = steamName; 
                 this.discordID = discordID; 
                 this.UserStatus = userStatus; 
-                this.UserClan = userClan; 
+                this.clanTag = userClanTag; 
                 this.ExtraColumns = ExtraColumns;
             }
             
