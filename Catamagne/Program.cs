@@ -32,7 +32,7 @@ namespace Catamagne.Core
         static void Main(string[] args)
         {
 
-            ConfigValues.configValues.LoadConfig();
+            ConfigValues.configValues.LoadConfig(false);
             ConfigValues.configValues.LoadConfig(true);
             Console.Title = "Catamagne | Watcher of Umbral";
             Log.Logger = new LoggerConfiguration().WriteTo.Console()
@@ -78,7 +78,6 @@ namespace Catamagne.Core
         static async Task MainAsync()
         {
             await SpreadsheetTools.SetUpSheet();
-            await SpreadsheetTools.Read(ConfigValues.clansList.FirstOrDefault());
             PauseEvents = false;
 
             startTime = DateTime.UtcNow;
@@ -302,7 +301,6 @@ namespace Catamagne.Configuration
             ShortInterval = TimeSpan.FromMinutes(5);
             LongInterval = TimeSpan.FromHours(6);
             Folderpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CatamagneMULT");
-            Filepath = Path.Combine(Folderpath, "userData.dat");
             SpreadsheetID = "ENTER SHEET ID HERE";
             BungieAPIKey = "ENTER BUNGIE API KEY HERE";
             DiscordToken = "ENTER DISCORD BOT TOKEN HERE";

@@ -138,18 +138,18 @@ namespace Catamagne.API
 
             clan.spreadsheetUsers = workingList;
 
-            if (File.Exists(ConfigValues.configValues.Filepath))
-            {
-                clan.Users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(ConfigValues.configValues.Filepath));
-            }
-            else
-            {
-                forceBulkUpdate = true;
-            }
+            //if (File.Exists(ConfigValues.configValues.Filepath))
+            //{
+            //    clan.Users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(ConfigValues.configValues.Filepath));
+            //}
+            //else
+            //{
+            //    forceBulkUpdate = true;
+            //}
 
             if (forceBulkUpdate)
             {
-                Console.WriteLine("Spreadsheet is empty, generating (will take 10 minutes)");
+                Console.WriteLine("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
                 await BulkUpdate(clan, true);
 
             }
@@ -218,7 +218,7 @@ namespace Catamagne.API
         }
         public static async Task BulkUpdate(Clan clan, bool skipRead = false)
         {
-            if (!skipRead) await Read(ConfigValues.clansList.FirstOrDefault());
+            if (!skipRead) await Read(clan);
             //ShowLoading("processing...");
             Core.Core.PauseEvents = true;
             var _ = clan.spreadsheetUsers;
@@ -293,11 +293,12 @@ namespace Catamagne.API
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
             workingList.OrderBy(t => t.steamName);
             clan.Users = workingList;
-            Write(ConfigValues.clansList.FirstOrDefault());
+            Write(clan);
             Core.Core.PauseEvents = false;
         }
         public static async Task SelectiveUpdate(Clan clan, Changes changes)
         {
+            await Read(clan);
             var _ = clan.Users;
             
             foreach (User addedUser in changes.addedUsers)
@@ -357,12 +358,12 @@ namespace Catamagne.API
             _.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
             _.OrderBy(t => t.steamName);
             clan.Users = _;
-            Write(ConfigValues.clansList.FirstOrDefault());
+            Write(clan);
             Core.Core.PauseEvents = false;
         }
         public static async Task<Changes> CheckForChangesAsync(Clan clan)
         {
-            await Read(ConfigValues.clansList.FirstOrDefault());
+            await Read(clan);
             List<User> addedUsers = new List<User>(); List<User> removedUsers = new List<User>(); List<User> updatedUsers = new List<User>();
             for (int i = 0; i < clan.Users.Count; i++)
             {
@@ -449,7 +450,7 @@ namespace Catamagne.API
                     User workingUser = clan.Users[_];
                     workingUser.UserStatus = UserStatus.LeftDiscord;
                     clan.Users[_] = workingUser;
-                    Write(ConfigValues.clansList.FirstOrDefault());
+                    Write(clan);
 
                     return workingUser;
                 }
@@ -682,14 +683,14 @@ namespace Catamagne.API
                         clan.Users[_] = workingMember;
                     }
                     ConfigValues.configValues.SaveConfig(true);
-                    SpreadsheetTools.Write(ConfigValues.clansList.FirstOrDefault());
+                    SpreadsheetTools.Write(clan);
 
                     return leavers;
                 }
             }
             else
             {
-                await SpreadsheetTools.Read(ConfigValues.clansList.FirstOrDefault());
+                await SpreadsheetTools.Read(clan);
                 List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                 var ClanMembers = await GetClanMembers(clan);
                 clan.Users.ForEach(member => {
@@ -705,7 +706,7 @@ namespace Catamagne.API
                     }
                 });
 
-                SpreadsheetTools.Write(ConfigValues.clansList.FirstOrDefault());
+                SpreadsheetTools.Write(clan);
                 return leavers;
             }
            

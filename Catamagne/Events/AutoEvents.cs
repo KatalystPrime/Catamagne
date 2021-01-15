@@ -59,6 +59,10 @@ namespace Catamagne.Events
         //        }
         //    }).Start();
         //}
+        public static async Task AutoReadAsync(Clan clan)
+        {
+            await SpreadsheetTools.Read(clan);
+        }
         public static async Task AutoBulkUpdateAsync(Clan clan)
         {
             Console.WriteLine("Bulk updating for " + clan.clanName);
