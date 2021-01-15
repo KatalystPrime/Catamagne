@@ -67,42 +67,42 @@ namespace Catamagne.Commands
                 }).Start();
             }
         }
-        //[Command("updatesheet")]
-        //[Description("Scan for changed data.")]
-        //[Aliases("update")]
-        //public async Task UpdateSpreadSheet(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
+        [Command("updatesheet")]
+        [Description("Scan for changed data.")]
+        [Aliases("update")]
+        public async Task UpdateSpreadSheet(CommandContext ctx, string clanTag)
+        {
+            var roles = ctx.Member.Roles.ToList();
+            var verification = await IsVerifiedAsync(ctx, true);
+            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            clanTag = clanTag.ToLower();
 
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Turquoise, "Scanning for Changes...");
-        //        DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            //call bulkupdate method
-        //            await SpreadsheetTools.ReadSheet();
-        //            var _ = await SpreadsheetTools.CheckForChangesAsync();
-        //            if (_.TotalChanges > 0)
-        //            {
-        //                TimeSpan t = TimeSpan.FromSeconds(_.TotalChanges * 5);
-        //                discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
-        //                await msg.ModifyAsync(discordEmbed);
-        //                await SpreadsheetTools.SelectiveUpdateSheet(_);
-        //                discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
-        //                await msg.ModifyAsync(discordEmbed);
-        //            }
-        //            else
-        //            {
-        //                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "No changes found", "To update steam names, please run a bulk update.");
-        //                await msg.ModifyAsync(discordEmbed);
-        //            }
+            if (verification == ErrorCode.Qualify)
+            {
+                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Turquoise, "Scanning for Changes...");
+                DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
+                new Thread(async () =>
+                {
+                    await SpreadsheetTools.Read(clan);
+                    var _ = await SpreadsheetTools.CheckForChangesAsync(clan);
+                    if (_.TotalChanges > 0)
+                    {
+                        TimeSpan t = TimeSpan.FromSeconds(_.TotalChanges * 5);
+                        discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
+                        await msg.ModifyAsync(discordEmbed);
+                        await SpreadsheetTools.SelectiveUpdate(clan, _);
+                        discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
+                        await msg.ModifyAsync(discordEmbed);
+                    }
+                    else
+                    {
+                        var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "No changes found", "To update steam names, please run a bulk update.");
+                        await msg.ModifyAsync(discordEmbed);
+                    }
 
-        //        }).Start();
-        //    }
-        //}
+                }).Start();
+            }
+        }
         //[Command("bulkupdate")]
         //[Description("Update all the data in the sheets. This takes upwards of 10 minutes")]
         //[Aliases("bulk")]
@@ -135,26 +135,26 @@ namespace Catamagne.Commands
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
             var clan = await GetClanFromTagAsync(ctx, clanTag);
-            mode = mode.ToLower();
             clanTag = clanTag.ToLower();
+
             if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
             {
                 new Thread(async () =>
                 {
-                    if (mode == "spreadsheet" || mode == "sheet" || string.IsNullOrEmpty(mode))
+                    if (string.IsNullOrEmpty(mode) || mode == "spreadsheet" || mode == "sheet")
                     {
                         await SpreadsheetTools.Read(clan);
-                        List<SpreadsheetTools.User> users = clan.spreadsheetUsers.ToList();
+                        var users = clan.spreadsheetUsers.ToList();
                         users.OrderBy(t => t.steamName);
 
-                        Core.Core.SendFancyListMessage(clan,users, "Users on spreadsheet for " + clan.clanName + ":");
+                        Core.Core.SendFancyListMessage(ctx.Channel, clan,users, "Users on spreadsheet for " + clan.clanName + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
                         List<SpreadsheetTools.User> users = clan.Users;
                         users.OrderBy(t => t.steamName);
 
-                        Core.Core.SendFancyListMessage(clan, users, "Users for " + clan.clanName + ":");
+                        Core.Core.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.clanName + ":");
                         
                     }
                     else
@@ -165,72 +165,39 @@ namespace Catamagne.Commands
                 }).Start();
             }
         }
-        //[Command("checkleavers")]
-        //[Description("Check if any users have left the clan.")]
-        //[Aliases("leavers", "checkleaves", "leaves")]
-        //public async Task CheckForLeavers(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
+        [Command("checkleavers")]
+        [Description("Check if any users have left the clan.")]
+        [Aliases("leavers", "checkleaves", "leaves")]
+        public async Task CheckForLeavers(CommandContext ctx, string clanTag)
+        {
+            var roles = ctx.Member.Roles.ToList();
+            var verification = await IsVerifiedAsync(ctx, true);
+            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            clanTag = clanTag.ToLower();
 
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Turquoise, "Checking for leavers...");
-        //        DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            //call bulkupdate method
-        //            var Leavers = await BungieTools.CheckForLeaves(ConfigValues.configValues.BungieGroupID, true);
-        //            if (Leavers.Count > 0)
-        //            {
-        //                await msg.DeleteAsync();
-        //                List<Field> fields = new List<Field>();
-        //                foreach (SpreadsheetTools.User user in Leavers)
-        //                {
-        //                    if (user.discordID != null)
-        //                    {
-        //                        var _ = new Field(user.steamName, user.discordID);
-        //                        fields.Add(_);
-        //                    }
+            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
+            {
+                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Turquoise, "Checking for leavers...");
+                DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
+                new Thread(async () =>
+                {
+                    var leavers = await BungieTools.CheckForLeaves(clan, true);
+                    if (leavers.Count > 0)
+                    {
+                        await msg.DeleteAsync();
+                        var fields = new List<Field>();
+                        Core.Core.SendFancyListMessage(ctx.Channel, clan, leavers, "Users found leaving " + clan.clanName + ":");
 
-        //                }
+                    }
+                    else
+                    {
+                        var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "No leavers found", "No one to remove from sheet <:unipeepo:601277029459034112>");
+                        await msg.ModifyAsync(discordEmbed);
+                    }
 
-        //                List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-        //                if (fields.Count < 25)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, fields.Count), "Users found leaving:"));
-        //                }
-        //                else if (fields.Count < 50)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, 25), "Users found leaving:"));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, fields.Count)));
-        //                }
-        //                else if (fields.Count < 75)
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, 25), "Users found leaving:"));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(50, fields.Count)));
-        //                }
-        //                else
-        //                {
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, 25), "Users found leaving:"));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, 50)));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(50, 75)));
-        //                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(75, fields.Count)));
-
-        //                }
-        //                List<DiscordMessage> messages = new List<DiscordMessage>();
-        //                embeds.ForEach(async embed => messages.Add(await Core.Core.SendFancyMessage(ctx.Channel, embed)));
-        //            }
-        //            else
-        //            {
-        //                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "No leavers found", "No one to kick <:unipeepo:601277029459034112>");
-        //                await msg.ModifyAsync(discordEmbed);
-        //            }
-
-        //        }).Start();
-        // }
+                }).Start();
+            }
+        }
 
         public static async Task<ErrorCode> IsVerifiedAsync(CommandContext ctx, bool isAdminCommand = false, bool isAvailableEverywhere = false)
         {
@@ -266,20 +233,18 @@ namespace Catamagne.Commands
             discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "You're not allowed to run that command.");
             await ctx.RespondAsync(discordEmbed);
             return ErrorCode.UnqualifyRole;
-        }
-        public static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
-        {
-            if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
-            {
-                return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
             }
-            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "The clan you provided is invalid!");
-            await ctx.RespondAsync(discordEmbed);
-            return null;
-        }
-
+            public static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
+            {
+                if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
+                {
+                    return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
+                }
+                var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "The clan you provided is invalid!");
+                await ctx.RespondAsync(discordEmbed);
+                return null;
+            }
     }
-
 
     public class UserInteractionsModule : BaseCommandModule
     {

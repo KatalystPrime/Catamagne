@@ -92,7 +92,7 @@ namespace Catamagne.API
                 for (int i = 0; i < spreadsheetData.Count; i++)
                 {
                     var _ = new User();
-                    if (!string.IsNullOrEmpty(spreadsheetData[i].FirstOrDefault().ToString()))
+                    if (spreadsheetData[i] != null)
                     {
                         switch (spreadsheetData[i].Count)
                         {
@@ -658,6 +658,7 @@ namespace Catamagne.API
                     }
                     oldLeavers.AddRange(leavers);
                     ConfigValues.configValues.SaveConfig(true);
+                    SpreadsheetTools.Write(clan);
 
                     return leavers;
                 }
@@ -698,14 +699,17 @@ namespace Catamagne.API
                     {
                         if (member.bungieID != null)
                         {
-                            var _ = clan.Users.FindIndex(t => t.bungieProfile == member.bungieProfile);
-                            member.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
-                            clan.Users[_] = member;
                             leavers.Add(member);
                         }
                     }
                 });
-
+                foreach (var member in leavers)
+                {
+                    var workingMember = member;
+                    var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
+                    workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
+                    clan.Users[_] = workingMember;
+                }
                 SpreadsheetTools.Write(clan);
                 return leavers;
             }

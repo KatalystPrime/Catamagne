@@ -201,14 +201,14 @@ namespace Catamagne.Core
             }
             return CreateFancyMessage(color, _);
         }
-        public static void SendFancyListMessage(Clan clan, List<SpreadsheetTools.User> Users, string title)
+        public static void SendFancyListMessage(DiscordChannel channel, Clan clan, List<SpreadsheetTools.User> Users, string title)
         {
             if (Users.Count > 0)
             {
                 List<Field> fields = new List<Field>();
                 foreach (SpreadsheetTools.User user in Users)
                 {
-                    if (user.discordID != null)
+                    if (!string.IsNullOrEmpty(user.discordID))
                     {
                         var _ = new Field("Steam name: " + user.steamName, "Discord ID: " + user.discordID);
                         fields.Add(_);
@@ -216,15 +216,19 @@ namespace Catamagne.Core
                     else
                     {
                         var _ = new Field("Steam name: " + user.steamName, "Discord ID: N/A");
+                        fields.Add(_);
                     }
                 }
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-                embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title + " " + clan.clanName + ":"));
-                if (fields.Count < 50)
+                if (fields.Count < 25)
+                {
+                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title + " " + clan.clanName + ":"));
+                }
+                else if (fields.Count < 50)
                 {
                     embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, fields.Count)));
                 }
-                if (fields.Count < 75)
+                else if (fields.Count < 75)
                 {
                     embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, 50)));
                     embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(50, fields.Count)));
@@ -237,7 +241,7 @@ namespace Catamagne.Core
 
                 }
                 List<DiscordMessage> messages = new List<DiscordMessage>();
-                embeds.ForEach(async embed => messages.Add(await SendFancyMessage(alertsChannel, embed)));
+                embeds.ForEach(async embed => messages.Add(await SendFancyMessage(channel, embed)));
             }
         }
     }

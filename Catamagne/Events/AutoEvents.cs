@@ -96,7 +96,7 @@ namespace Catamagne.Events
             Console.WriteLine("checking");
             var Leavers = await BungieTools.CheckForLeaves(clan);
 
-            Core.Core.SendFancyListMessage(clan, Leavers, "Users found leaving " + clan.clanName + ":");
+            Core.Core.SendFancyListMessage(Core.Core.alertsChannel ,clan, Leavers, "Users found leaving " + clan.clanName + ":");
         }
         //public static void AutoScanForChanges()
         //{
