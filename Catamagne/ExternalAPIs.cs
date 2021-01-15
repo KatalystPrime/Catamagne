@@ -149,7 +149,7 @@ namespace Catamagne.API
 
             if (forceBulkUpdate)
             {
-                Console.WriteLine("User data file does not exist, generating (will take 10 minutes)");
+                Console.WriteLine("Spreadsheet is empty, generating (will take 10 minutes)");
                 await BulkUpdate(clan, true);
 
             }
@@ -214,8 +214,7 @@ namespace Catamagne.API
 
             // Prints the names and majors of students in a sample spreadsheet:
             var response = requestUpdate.Execute();
-            Directory.CreateDirectory(ConfigValues.configValues.Folderpath);
-            File.WriteAllText(ConfigValues.configValues.Filepath, JsonConvert.SerializeObject(clan.Users, Formatting.Indented));
+            ConfigValues.configValues.SaveConfig(true);
         }
         public static async Task BulkUpdate(Clan clan, bool skipRead = false)
         {
@@ -657,7 +656,7 @@ namespace Catamagne.API
                         clan.Users[_] = workingMember;
                     }
                     oldLeavers.AddRange(leavers);
-                    ConfigValues.configValues.SaveConfigToFile(true);
+                    ConfigValues.configValues.SaveConfig(true);
 
                     return leavers;
                 }
@@ -682,7 +681,7 @@ namespace Catamagne.API
                         workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
                         clan.Users[_] = workingMember;
                     }
-                    ConfigValues.configValues.SaveConfigToFile(true);
+                    ConfigValues.configValues.SaveConfig(true);
                     SpreadsheetTools.Write(ConfigValues.clansList.FirstOrDefault());
 
                     return leavers;

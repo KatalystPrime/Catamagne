@@ -60,7 +60,7 @@ namespace Catamagne.Commands
 
 
                     //call bulkupdate method
-                    ConfigValues.configValues.TryLoadConfigFromFile();
+                    ConfigValues.configValues.LoadConfig(false);
                     await Core.Core.UpdateChannels();
                     discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully updated configuration files");
                     await message.ModifyAsync(discordEmbed);
@@ -345,7 +345,7 @@ namespace Catamagne.Commands
                                             _.Add(response);
                                         }
                                         ConfigValues.configValues.Responses = _.ToArray();
-                                        ConfigValues.configValues.SaveConfigToFile();
+                                        ConfigValues.configValues.SaveConfig();
                                         Embed = Core.Core.CreateFancyMessage(DiscordColor.CornflowerBlue, "Added", "Successfully added response to pool.");
                                         var message = await Core.Core.SendFancyMessage(ctx.Channel, Embed);
 
@@ -416,7 +416,7 @@ namespace Catamagne.Commands
                                             }
 
                                             ConfigValues.configValues.Responses = _.ToArray();
-                                            ConfigValues.configValues.SaveConfigToFile();
+                                            ConfigValues.configValues.SaveConfig();
                                             Embed = Core.Core.CreateFancyMessage(DiscordColor.CornflowerBlue, "Updated", "Successfully updated response.");
                                             await message.ModifyAsync(Embed);
 
@@ -458,7 +458,7 @@ namespace Catamagne.Commands
                                 var _ = ConfigValues.configValues.Responses.ToList();
                                 _.Remove(ConfigValues.configValues.Responses.ToList().Find(t => t.trigger == text));
                                 ConfigValues.configValues.Responses = _.ToArray();
-                                ConfigValues.configValues.SaveConfigToFile();
+                                ConfigValues.configValues.SaveConfig();
                                 Embed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Removed", "Successfully removed response from pool.");
                                 message = await message.ModifyAsync(Embed);
                             }
