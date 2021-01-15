@@ -1,25 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BungieSharper.Schema.User;
+using Catamagne.Configuration;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Text.RegularExpressions;
-using BungieSharper.Client;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using BungieSharper.Schema.User;
-using BungieSharper.Schema;
-using Newtonsoft.Json;
-using HtmlAgilityPack;
-using BungieSharper.Schema.GroupsV2;
-using Catamagne.Configuration;
 
 namespace Catamagne.API
 {
+
     public class SpreadsheetTools
     {
         // If modifying these scopes, delete your previously saved credentials
@@ -85,6 +80,7 @@ namespace Catamagne.API
                     _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
                     workingList.Add(_);
                 });
+                Console.WriteLine("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
                 forceBulkUpdate = true;
             }
             else
@@ -119,7 +115,7 @@ namespace Catamagne.API
                                 workingList.Add(_);
                                 break;
                             case 6:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), (UserStatus) Enum.Parse(typeof(UserStatus),spreadsheetData[i][5].ToString()), clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), (UserStatus)Enum.Parse(typeof(UserStatus), spreadsheetData[i][5].ToString()), clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             default:
@@ -137,28 +133,20 @@ namespace Catamagne.API
             }
 
             clan.spreadsheetUsers = workingList;
-
-            //if (File.Exists(ConfigValues.configValues.Filepath))
-            //{
-            //    clan.Users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(ConfigValues.configValues.Filepath));
-            //}
-            //else
-            //{
-            //    forceBulkUpdate = true;
-            //}
+            if (clan.Users == null || clan.Users.Count == 0)
+            {
+                forceBulkUpdate = true;
+                Console.WriteLine("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+            }
 
             if (forceBulkUpdate)
             {
-                Console.WriteLine("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
                 await BulkUpdate(clan, true);
 
             }
         }
         public static void Write(Clan clan)
         {
-            //ShowLoading("writing data...");
-            // Create Google Sheets API service.
-            // Define requestRead parameters.
             String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
             String range = clan.clanSheetRange;
             ValueRange valueRange = new ValueRange();
@@ -236,14 +224,14 @@ namespace Catamagne.API
                         string bungieProfile = user.bungieProfile;
                         string bungieID = workingUser.bungieID;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
-                        SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
+                        SteamTools.SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
                         string steamID = SteamTools.GetSteamID(bungieProfile);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
                         string steamName = steamUser.displayname;
                         string discordID = user.discordID;
                         UserStatus userStatus = user.UserStatus;
-                        
+
                         if (user.ExtraColumns != null)
                         {
                             extraColumns = user.ExtraColumns;
@@ -300,7 +288,7 @@ namespace Catamagne.API
         {
             await Read(clan);
             var _ = clan.Users;
-            
+
             foreach (User addedUser in changes.addedUsers)
             {
                 var workingUser = new User();
@@ -314,7 +302,7 @@ namespace Catamagne.API
                         string bungieID = workingUser.bungieID;
                         UserStatus userStatus = addedUser.UserStatus;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
-                        SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
+                        SteamTools.SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
                         string steamID = SteamTools.GetSteamID(bungieProfile);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
@@ -399,6 +387,11 @@ namespace Catamagne.API
                             workingUser.UserStatus = clan.spreadsheetUsers[i].UserStatus;
                             userUpdated = true;
                         }
+                        if (_.FirstOrDefault().discordID != clan.spreadsheetUsers[i].discordID)
+                        {
+                            workingUser.discordID = clan.spreadsheetUsers[i].discordID;
+                            userUpdated = true;
+                        }
                         if (clan.spreadsheetUsers[i].ExtraColumns != null)
                         {
                             if (_.FirstOrDefault().ExtraColumns != null)
@@ -442,7 +435,7 @@ namespace Catamagne.API
             //});
             if (ConfigValues.clansList.Any(clan => clan.Users.Select(t => t.discordID).Contains(userID)))
             {
-                var clan = (Clan) ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID));
+                var clan = (Clan)ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID));
                 //var _ = clan.clanUsers.FindIndex(t => t.discordID == userID);
                 var _ = clan.Users.FindIndex(t => t.discordID == userID);
                 if (_ != -1)
@@ -460,11 +453,11 @@ namespace Catamagne.API
         }
         public class User
         {
-            public string bungieProfile; 
-            public string bungieName; 
-            public string bungieID; public string steamProfile; 
-            public string steamID; public string steamName; 
-            public string discordID; public UserStatus UserStatus; 
+            public string bungieProfile;
+            public string bungieName;
+            public string bungieID; public string steamProfile;
+            public string steamID; public string steamName;
+            public string discordID; public UserStatus UserStatus;
             public List<string> ExtraColumns;
             public string clanTag;
 
@@ -472,20 +465,20 @@ namespace Catamagne.API
             {
             }
 
-            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus userStatus, string userClanTag,List<string> ExtraColumns = null)
+            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus userStatus, string userClanTag, List<string> ExtraColumns = null)
             {
-                this.bungieProfile = bungieLink; 
-                this.bungieName = bungieName; 
-                this.bungieID = bungieID; 
-                this.steamProfile = steamProfile; 
-                this.steamID = steamID; 
-                this.steamName = steamName; 
-                this.discordID = discordID; 
-                this.UserStatus = userStatus; 
-                this.clanTag = userClanTag; 
+                this.bungieProfile = bungieLink;
+                this.bungieName = bungieName;
+                this.bungieID = bungieID;
+                this.steamProfile = steamProfile;
+                this.steamID = steamID;
+                this.steamName = steamName;
+                this.discordID = discordID;
+                this.UserStatus = userStatus;
+                this.clanTag = userClanTag;
                 this.ExtraColumns = ExtraColumns;
             }
-            
+
         }
         public enum UserStatus : ushort
         {
@@ -501,284 +494,6 @@ namespace Catamagne.API
                 this.addedUsers = addedUsers; this.removedUsers = removedUsers; this.updatedUsers = updatedUsers; this.TotalChanges = addedUsers.Count + removedUsers.Count + updatedUsers.Count;
             }
             public List<User> addedUsers; public List<User> removedUsers; public List<User> updatedUsers; public int TotalChanges;
-        }
-    }
-    
-    public class Clan
-    {
-        public string clanID;
-        public string clanName;
-        public string clanTag;
-        public string clanSheetRange;
-        public List<SpreadsheetTools.User> spreadsheetUsers;
-        public List<SpreadsheetTools.User> Users;
-        public List<SpreadsheetTools.User> Leavers;
-        public Clan(string clanID, string clanSheetRange, string clanName, string clanTag, List<SpreadsheetTools.User> spreadsheetUsers, List<SpreadsheetTools.User> clanUsers)
-        {
-            this.clanID = clanID; this.clanName = clanName; this.clanTag = clanTag ; this.clanSheetRange = clanSheetRange; this.spreadsheetUsers = spreadsheetUsers; this.Users = clanUsers;
-        }
-    }
-    class BungieTools
-    {
-        static BungieApiClient bungieApi = new BungieApiClient(ConfigValues.configValues.BungieAPIKey);
-        public static async Task<long?> GetBungieUserID(string profileLink)
-        {
-            UserMembershipData user = null;
-            long? _ = GetMemberIDFromLink(profileLink);
-            if (_.HasValue)
-            {
-                long profileID = (long)_;
-                if (profileLink.Length > 0)
-                {
-                    switch (Convert.ToInt32(profileLink.Split('/')[5]))
-                    {
-                        case (int)BungieMembershipType.BungieNext:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.BungieNext);
-                            break;
-                        case (int)BungieMembershipType.TigerBlizzard:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerBlizzard);
-                            break;
-                        case (int)BungieMembershipType.TigerDemon:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerDemon);
-                            break;
-                        case (int)BungieMembershipType.TigerPsn:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerPsn);
-                            break;
-                        case (int)BungieMembershipType.TigerStadia:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerStadia);
-                            break;
-                        case (int)BungieMembershipType.TigerSteam:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerSteam);
-                            break;
-                        case (int)BungieMembershipType.TigerXbox:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerXbox);
-                            break;
-                    }
-                }
-                if (user.bungieNetUser != null)
-                {
-                    return (user).bungieNetUser.membershipId;
-                }
-
-            }
-
-            return null;
-        }
-        public static async Task<GeneralUser> GetBungieUser(long id)
-        {
-            var user = await bungieApi.ApiEndpoints.User_GetBungieNetUserById(id);
-            return user;
-        }
-        public static async Task<GeneralUser> GetBungieUser(string profileLink)
-        {
-            return await GetBungieUser((long)await GetBungieUserID(profileLink));
-        }
-        public static async Task<SteamUser> GetSteamUser(string profileLink)
-        {
-            long? _ = GetMemberIDFromLink(profileLink);
-            if (_.HasValue)
-            {
-                long profileID = (long)_;
-                //var _ = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieSharper.Schema.BungieMembershipType.BungieNext);
-                var profile = await bungieApi.ApiEndpoints.Destiny2_GetLinkedProfiles(profileID, BungieSharper.Schema.BungieMembershipType.TigerSteam, true);
-                ulong steamID = (ulong)profile.profiles.FirstOrDefault().membershipId;
-                string steamName = profile.profiles.FirstOrDefault().displayName;
-                return new SteamUser(steamName, steamID);
-            }
-            else return null;
-        }
-        public static long? GetMemberIDFromLink(string profileLink)
-        {
-            //Regex TypeandID = new Regex(@"\d.+(/)");
-            //string _ = TypeandID.Match(profileLink).Value;
-            //Regex ID = new Regex(@"/\b(.+)");
-            //_ = ID.Match(_).Value;
-            //_ = _.Substring(1, _.Length - 2);
-            //return Convert.ToInt64(_);
-            if (profileLink.Length > 0)
-            {
-                var _ = Convert.ToInt64(profileLink.Split('/')[6]);
-                return _;
-            }
-            return null;
-        }
-        public static async Task<(List<UserInfoCard> validMembers, List<GroupUserInfoCard> invalidMembers)> GetClanMembers(Clan clan)
-        {
-            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.clanID));
-            var groupList = group.results.ToList();
-            var validMembers = groupList.Where(t => t.bungieNetUserInfo != null).Select(t => t.bungieNetUserInfo).ToList();
-            var invalidMembers = groupList.Where(t => t.bungieNetUserInfo == null).Select(t => t.destinyUserInfo).ToList();
-            return (validMembers, invalidMembers);
-        }
-        public static string GetBungieProfileLink(UserInfoCard bungieUser)
-        {
-            var membershipType = bungieUser.membershipType;
-            var membershipId = bungieUser.membershipId;
-
-            return "https://www.bungie.net/en/Profile/" + Convert.ToInt32(membershipType) + "/" + membershipId.ToString();
-        }
-        public static string GetBungieProfileLink(GroupUserInfoCard bungieUser)
-        {
-            var membershipType = bungieUser.membershipType;
-            var membershipId = bungieUser.membershipId;
-
-            return "https://www.bungie.net/en/Profile/" + Convert.ToInt32(membershipType) + "/" + membershipId.ToString();
-        }
-        public static async Task<List<SpreadsheetTools.User>> CheckForLeaves(Clan clan, bool DontWrite = false)
-        {
-            if (!DontWrite)
-            {
-                if (clan.Leavers != null)
-                {
-                    await CheckForRejoiners(clan);
-                    List<SpreadsheetTools.User> oldLeavers = ConfigValues.clansList.Find(t => t == clan).Leavers;
-                    List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                    var ClanMembers = await GetClanMembers(clan);
-                    clan.Users.ForEach(member =>
-                    {
-
-                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
-                        {
-                            if (!oldLeavers.Select(t => t.bungieID).Contains(member.bungieID))
-                            {
-                                if (member.bungieID != null)
-                                {
-
-                                    leavers.Add(member);
-                                }
-                            }
-                        }
-                    });
-                    foreach (var member in leavers)
-                    {
-                        var workingMember = member;
-                        var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
-                        clan.Users[_] = workingMember;
-                    }
-                    oldLeavers.AddRange(leavers);
-                    ConfigValues.configValues.SaveConfig(true);
-                    SpreadsheetTools.Write(clan);
-
-                    return leavers;
-                }
-                else
-                {
-                    List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                    var ClanMembers = await GetClanMembers(clan);
-                    clan.Users.ForEach(member =>
-                    {
-                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
-                        {
-                            if (member.bungieID != null)
-                            {
-                                leavers.Add(member);
-                            }
-                        }
-                    });
-                    foreach (var member in leavers)
-                    {
-                        var workingMember = member;
-                        var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
-                        clan.Users[_] = workingMember;
-                    }
-                    ConfigValues.configValues.SaveConfig(true);
-                    SpreadsheetTools.Write(clan);
-
-                    return leavers;
-                }
-            }
-            else
-            {
-                await SpreadsheetTools.Read(clan);
-                List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                var ClanMembers = await GetClanMembers(clan);
-                clan.Users.ForEach(member => {
-                    if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
-                    {
-                        if (member.bungieID != null)
-                        {
-                            leavers.Add(member);
-                        }
-                    }
-                });
-                foreach (var member in leavers)
-                {
-                    var workingMember = member;
-                    var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                    workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
-                    clan.Users[_] = workingMember;
-                }
-                SpreadsheetTools.Write(clan);
-                return leavers;
-            }
-           
-
-        }
-        public static async Task CheckForRejoiners(Clan clan)
-        {
-            await SpreadsheetTools.Read(clan);
-            List<SpreadsheetTools.User> rejoiners = clan.Leavers;
-            var ClanMembers = await GetClanMembers(clan);
-            //SpreadsheetTools.savedUsers.ToList().ForEach(member => {
-            //    if (!ClanMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
-            //    {
-            //        if (!oldLeavers.Select(t => t.bungieID).Contains(member.bungieID))
-            //        {
-            //            if (member.bungieID != null) leavers.Add(member);
-            //        }
-            //    }
-            //});
-            rejoiners.ForEach(member =>
-            {
-                if (ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
-                {
-                    rejoiners.Remove(member);
-                }
-            });;
-        }
-    }
-    class SteamTools
-    {
-        public static string GetSteamID(string url)
-        {
-            var pattern = new Regex(@"(\(ID: (.*[0-9])\))");
-            var web = new HtmlWeb();
-            var doc = web.Load(url);
-            var removedspace = doc.DocumentNode.InnerText.Split('\n').Select(s => s.Trim());
-            string filteredString = string.Concat(removedspace.Where(t => !string.IsNullOrEmpty(t)).ToArray());
-            string result = pattern.Match(filteredString).Value;
-            result = result[5..^1];
-            if (!string.IsNullOrEmpty(result))
-            {
-                return result;
-            }
-            return null;
-            //foreach (var line in filteredArray)
-            //{
-            //    lineNumber++;
-            //    if (line.Length > 4)
-            //    {
-            //        //Console.WriteLine(line.Substring(0, 5));
-            //        if (line.Substring(0, 5) == "(ID: ")
-            //        {
-            //            Console.WriteLine(line.Substring(5, line.Length-6));
-            //            return line;
-            //        }
-            //    }
-            //}
-
-            //Console.WriteLine(filteredArray[160]);
-        }
-    }
-    class SteamUser
-    {
-        public string displayname;
-        public ulong steamID64;
-        public SteamUser(string username, ulong steamID)
-        {
-            displayname = username; steamID64 = steamID;
         }
     }
 }
