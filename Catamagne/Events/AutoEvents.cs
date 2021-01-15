@@ -19,13 +19,13 @@ namespace Catamagne.Events
                TimeSpan interval = timeSpan / (clans.Count + 1);
                while (true)
                {
-                    if (DateTime.UtcNow > (referenceTime + timeSpan))
+                    if (DateTime.UtcNow >= (referenceTime + timeSpan))
                     {
                         referenceTime = DateTime.UtcNow;
                     }
                     for (int i = 0; i < clans.Count; i++)
                     {
-                        if (DateTime.UtcNow > (referenceTime + (interval * i)))
+                        if (DateTime.UtcNow >= (referenceTime + (interval * i)))
                         {
                             await action.Invoke(clans[i]);
                         }

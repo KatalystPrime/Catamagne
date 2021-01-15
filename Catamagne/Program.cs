@@ -307,7 +307,7 @@ namespace Catamagne.Configuration
             BungieAPIKey = "ENTER BUNGIE API KEY HERE";
             DiscordToken = "ENTER DISCORD BOT TOKEN HERE";
             Responses = new Response[] { new Response("cataisnuts", "Our <#627494111821430794> channel is used to chat and talk about the game as a whole.\nYou can pick up activity-specific roles from over at <#686486603711119360>. With these roles you can ping and be pinged for their respective activities. For example, you can ping `@Strikes D2` to find players for strikes, and be pinged for other players doing strikes.\n<#628753173959671829> is used to matchmake and talk about PVE activities, with the same applying for <#628753046712614912>.\nFor hosted activities, you can sign up to raids and other activities hosted by your fellow gladiators in <#779175016611971123>. Furthermore, you can host your own activities by typing `!event` in <#342214163323551744>. \nLastly, the standalone <#628753070846640174> channel is used for spontaneous raids, discussions about raids and communication between raiders.", "Message to welcome and introduce new members to the destiny channels!") };
-            clansList = new List<Clan>() { new Clan("3928553", "Testing!A2:F101", "Xenolith", "xg", new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>()) };
+            clansList = new List<Clan>() { new Clan("3928553", "Xenolith!A2:F101", "Xenolith", "xg", new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>()), new Clan("3872177", "Zodiac!A2:F101", "Zodiac", "zog", new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>()) };
         }
         public void SaveConfig(bool? clanMode = false)
         {
@@ -343,7 +343,7 @@ namespace Catamagne.Configuration
             string clanspath = Path.Combine(folderpath, "clans.json");
             if (clanMode.HasValue)
             {
-                if (clanMode.Value)
+                if (!clanMode.Value)
                 {
                     if (File.Exists(configpath))
                     {
