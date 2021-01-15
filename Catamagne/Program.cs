@@ -201,7 +201,7 @@ namespace Catamagne.Core
             }
             return CreateFancyMessage(color, _);
         }
-        public static void SendFancyListMessage(Clan clan, List<SpreadsheetTools.User> Users)
+        public static void SendFancyListMessage(Clan clan, List<SpreadsheetTools.User> Users, string title)
         {
             if (Users.Count > 0)
             {
@@ -219,7 +219,7 @@ namespace Catamagne.Core
                     }
                 }
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-                embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), "Users found leaving " + clan.clanName + ":"));
+                embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title + " " + clan.clanName + ":"));
                 if (fields.Count < 50)
                 {
                     embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, fields.Count)));

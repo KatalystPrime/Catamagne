@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="credentials.dat" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BungieSharper" Version="0.3.3" />
     <PackageReference Include="Discord.InteractivityAddon" Version="2.1.1" />
     <PackageReference Include="Discord.Net" Version="2.2.0" />
@@ -30,6 +26,12 @@
     <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="credentials.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
