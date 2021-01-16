@@ -27,6 +27,5 @@ namespace Catamagne.Core
             await Discord.SetupClient();
             await Task.Delay(-1);
         }
-       
     }  
 }
