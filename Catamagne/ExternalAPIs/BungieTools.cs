@@ -165,6 +165,7 @@ namespace Catamagne.API
                         clan.Users[_] = workingMember;
                     }
                     oldLeavers.AddRange(leavers);
+                    clan.Leavers = oldLeavers;
                     ConfigValues.configValues.SaveConfig(true);
                     SpreadsheetTools.Write(clan);
 
@@ -191,6 +192,7 @@ namespace Catamagne.API
                         workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
                         clan.Users[_] = workingMember;
                     }
+                    clan.Leavers = leavers;
                     ConfigValues.configValues.SaveConfig(true);
                     SpreadsheetTools.Write(clan);
 
@@ -227,7 +229,7 @@ namespace Catamagne.API
         public static async Task CheckForRejoiners(Clan clan)
         {
             await SpreadsheetTools.Read(clan);
-            List<SpreadsheetTools.User> rejoiners = clan.Leavers;
+            List<SpreadsheetTools.User> leavers = clan.Leavers;
             var ClanMembers = await GetClanMembers(clan);
             //SpreadsheetTools.savedUsers.ToList().ForEach(member => {
             //    if (!ClanMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
@@ -238,13 +240,16 @@ namespace Catamagne.API
             //        }
             //    }
             //});
-            rejoiners.ForEach(member =>
+            leavers.ForEach(member =>
             {
                 if (ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                 {
-                    rejoiners.Remove(member);
+                    leavers.Remove(member);
                 }
             });;
+            clan.Leavers = leavers;
+            ConfigValues.configValues.SaveConfig(true);
+
         }
         public static Clan GetClanFromTag(string clanTag)
         {
@@ -253,6 +258,17 @@ namespace Catamagne.API
                 return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
             }
             else return null;
+        }
+        public static async Task<List<SpreadsheetTools.User>> GetInactiveUsersAsync(Clan clan, int threshold = 14)
+        {
+            var clanMembers = await GetClanMembers(clan);
+            foreach (var member in clanMembers.validMembers)
+            {
+                //Console.WriteLine(string.Format("Destiny2/{0}/Profile/{1}/", member.membershipType, member.membershipId));
+                var destinyMember = await bungieApi.ApiEndpoints.Destiny2_GetProfile(member.membershipId, member.membershipType);
+                //var a = destinyMember.characterActivities.data.Values;
+            }
+            throw new NotImplementedException("not finished.");
         }
     }
 }
