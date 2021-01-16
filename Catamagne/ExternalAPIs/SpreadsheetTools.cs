@@ -323,6 +323,31 @@ namespace Catamagne.API
                         string bungieName = "N/A";
                         string steamName = "N/A";
                         string discordID = addedUser.discordID;
+                        if (addedUser.bungieID != "N/A" || addedUser.bungieID != null)
+                        {
+                            bungieID = addedUser.bungieID;
+                        }
+                        if (addedUser.steamID != "N/A" || addedUser.steamID != null)
+                        {
+                            steamID = addedUser.steamID;
+                        }
+                        if (addedUser.steamProfile != "N/A" || addedUser.steamProfile != null)
+                        {
+                            steamProfile = addedUser.steamProfile;
+                        }
+                        if (addedUser.bungieName != "N/A" || addedUser.bungieName != null)
+                        {
+                            steamID = addedUser.bungieName;
+                        }
+                        if (addedUser.steamName != "N/A" || addedUser.steamName != null)
+                        {
+                            steamProfile = addedUser.steamName;
+                        }
+
+                        if (addedUser.ExtraColumns != null)
+                        {
+                            extraColumns = addedUser.ExtraColumns;
+                        }
                         UserStatus userStatus = addedUser.UserStatus;
 
                         if (addedUser.ExtraColumns != null)
@@ -390,6 +415,21 @@ namespace Catamagne.API
                         if (_.FirstOrDefault().discordID != clan.spreadsheetUsers[i].discordID)
                         {
                             workingUser.discordID = clan.spreadsheetUsers[i].discordID;
+                            userUpdated = true;
+                        }
+                        if (_.FirstOrDefault().steamName != clan.spreadsheetUsers[i].steamName)
+                        {
+                            workingUser.steamName = clan.spreadsheetUsers[i].steamName;
+                            userUpdated = true;
+                        }
+                        if (_.FirstOrDefault().steamProfile != clan.spreadsheetUsers[i].steamProfile)
+                        {
+                            workingUser.steamProfile = clan.spreadsheetUsers[i].steamProfile;
+                            userUpdated = true;
+                        }
+                        if (_.FirstOrDefault().bungieName != clan.spreadsheetUsers[i].bungieName)
+                        {
+                            workingUser.bungieName = clan.spreadsheetUsers[i].bungieName;
                             userUpdated = true;
                         }
                         if (clan.spreadsheetUsers[i].ExtraColumns != null)
