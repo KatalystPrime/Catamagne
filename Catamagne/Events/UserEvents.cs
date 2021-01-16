@@ -32,11 +32,13 @@ namespace Catamagne.Events
         {
             await Task.Run(() =>
             {
-                DateTime startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
-                DateTime startTimeShort = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 4;
+                var startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
+                var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 4;
+                var activityTimeSpan = TimeSpan.FromMinutes(5) * ConfigValues.clansList.Count;
                 AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
                 AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , ConfigValues.clansList, AutoEvents.AutoScanForChangesAsync);
                 AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoCheckForLeavers);
+                AutoEvents.EventScheduler(startTimeShort, activityTimeSpan, ConfigValues.clansList, Core.Discord.RotateActivity);
                // AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, ConfigValues.clansList, AutoEvents.AutoReadAsync, false);
                 //AutoEvents.AutoScanForChanges();
                 //AutoEvents.AutoBulkUpdate();

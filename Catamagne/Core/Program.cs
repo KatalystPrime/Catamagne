@@ -15,7 +15,7 @@ namespace Catamagne.Core
 
             ConfigValues.configValues.LoadConfig(false);
             ConfigValues.configValues.LoadConfig(true);
-            Console.Title = "Catamagne | Watcher of Umbral";
+            Console.Title = "Catamagne | Watcher of Destiny";
             MainAsync().GetAwaiter().GetResult();
         }
         static async Task MainAsync()

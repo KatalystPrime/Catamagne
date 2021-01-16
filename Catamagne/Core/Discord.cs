@@ -229,6 +229,16 @@ namespace Catamagne.Core
                 embeds.ForEach(async embed => messages.Add(await SendFancyMessage(channel, embed)));
             }
         }
+        public static Task RotateActivity(Clan clan)
+        {
+            var activity = new DiscordActivity()
+            {
+                Name = string.Format("over {0}...", clan.clanName),
+                ActivityType = ActivityType.Watching,
+            };
+            discord.UpdateStatusAsync(activity);
+            return Task.CompletedTask;
+        }
     }
     public struct Field
     {
