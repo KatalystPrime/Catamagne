@@ -73,12 +73,12 @@ namespace Catamagne.API
                 var invalidMembers = members.invalidMembers;
                 validMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
                     workingList.Add(_);
                 });
                 invalidMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
                     workingList.Add(_);
                 });
                 Log.Information("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
@@ -96,28 +96,28 @@ namespace Catamagne.API
                             case 0:
                                 break;
                             case 1:
-                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 2:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.OK, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.ok, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 3:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.OK, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.ok, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 4:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.OK, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.ok, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 5:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.ok, clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             case 6:
                                 var userStatus = Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString());
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString()), clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             default:
@@ -126,7 +126,7 @@ namespace Catamagne.API
                                 {
                                     extraColumns.Add(spreadsheetData[i][index].ToString());
                                 }
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString()), clan.clanTag, extraColumns);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.clanTag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }
@@ -484,7 +484,7 @@ namespace Catamagne.API
                 if (_ != -1)
                 {
                     User workingUser = clan.FirstOrDefault().Users[_];
-                    workingUser.UserStatus = UserStatus.LeftDiscord;
+                    workingUser.UserStatus = UserStatus.leftdiscord;
                     clan.FirstOrDefault().Users[_] = workingUser;
                     Write(clan.FirstOrDefault());
 
@@ -525,10 +525,10 @@ namespace Catamagne.API
         }
         public enum UserStatus : ushort
         {
-            OK,
-            LeftClan,
-            LeftDiscord,
-            Lobby
+            ok,
+            leftclan,
+            leftdiscord,
+            lobby
         }
         public struct Changes
         {

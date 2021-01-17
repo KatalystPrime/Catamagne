@@ -161,7 +161,7 @@ namespace Catamagne.API
                     {
                         var workingMember = member;
                         var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
+                        workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
                         clan.Users[_] = workingMember;
                     }
                     oldLeavers.AddRange(leavers);
@@ -189,7 +189,7 @@ namespace Catamagne.API
                     {
                         var workingMember = member;
                         var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
+                        workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
                         clan.Users[_] = workingMember;
                     }
                     clan.Leavers = leavers;
@@ -217,7 +217,7 @@ namespace Catamagne.API
                 {
                     var workingMember = member;
                     var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                    workingMember.UserStatus = SpreadsheetTools.UserStatus.LeftClan;
+                    workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
                     clan.Users[_] = workingMember;
                 }
                 SpreadsheetTools.Write(clan);
