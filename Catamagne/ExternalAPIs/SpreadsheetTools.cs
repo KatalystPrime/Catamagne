@@ -5,6 +5,7 @@ using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,7 +81,7 @@ namespace Catamagne.API
                     _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.OK, clan.clanTag);
                     workingList.Add(_);
                 });
-                Console.WriteLine("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+                Log.Information("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
                 forceBulkUpdate = true;
             }
             else
@@ -115,7 +116,8 @@ namespace Catamagne.API
                                 workingList.Add(_);
                                 break;
                             case 6:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), (UserStatus)Enum.Parse(typeof(UserStatus), spreadsheetData[i][5].ToString()), clan.clanTag);
+                                var userStatus = Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString());
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString()), clan.clanTag);
                                 workingList.Add(_);
                                 break;
                             default:
@@ -124,7 +126,7 @@ namespace Catamagne.API
                                 {
                                     extraColumns.Add(spreadsheetData[i][index].ToString());
                                 }
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.OK, clan.clanTag, extraColumns);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString()), clan.clanTag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }
@@ -136,7 +138,8 @@ namespace Catamagne.API
             if (clan.Users == null || clan.Users.Count == 0)
             {
                 forceBulkUpdate = true;
-                Console.WriteLine("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+                Log.Information("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+                //Console.WriteLine("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
             }
 
             if (forceBulkUpdate)

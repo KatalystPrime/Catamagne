@@ -4,6 +4,7 @@ using System.Threading;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Catamagne.Events
 {
@@ -48,7 +49,8 @@ namespace Catamagne.Events
         }
         public static async Task AutoBulkUpdateAsync(Clan clan)
         {
-            Console.WriteLine("Bulk updating for " + clan.clanName);
+            Log.Information("Bulk updating for " + clan.clanName);
+            //Console.WriteLine("Bulk updating for " + clan.clanName);
             var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.clanName, "Automatically updating every spreadsheet element.");
             DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.updatesChannel, discordEmbed);
             await SpreadsheetTools.BulkUpdate(clan);
@@ -57,7 +59,7 @@ namespace Catamagne.Events
         }
         public static async Task AutoScanForChangesAsync(Clan clan)
         {
-            Console.WriteLine("Scanning for changes for " + clan.clanName);
+            Log.Information("Scanning for changes for " + clan.clanName);
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
             if (changed.TotalChanges > 0)
             {
@@ -76,7 +78,7 @@ namespace Catamagne.Events
         }
         public static async Task AutoCheckForLeavers(Clan clan)
         {
-            Console.WriteLine("checking");
+            Log.Information("Checking for leavers for " + clan.clanName);
             var Leavers = await BungieTools.CheckForLeaves(clan);
 
             Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.clanName + ":");

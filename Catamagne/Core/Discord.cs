@@ -236,6 +236,7 @@ namespace Catamagne.Core
                 Name = string.Format("over {0}...", clan.clanName),
                 ActivityType = ActivityType.Watching,
             };
+            Log.Information("Rotating status to " + clan.clanName);
             discord.UpdateStatusAsync(activity);
             return Task.CompletedTask;
         }
