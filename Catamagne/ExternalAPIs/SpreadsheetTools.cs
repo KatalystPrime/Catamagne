@@ -116,7 +116,6 @@ namespace Catamagne.API
                                 workingList.Add(_);
                                 break;
                             case 6:
-                                var userStatus = Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString());
                                 _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.clanTag);
                                 workingList.Add(_);
                                 break;

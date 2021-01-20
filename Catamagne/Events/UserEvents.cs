@@ -41,7 +41,7 @@ namespace Catamagne.Events
                 AutoEvents.EventScheduler(startTimeLong, dailyTimeSpan, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
                 AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , ConfigValues.clansList, AutoEvents.AutoScanForChangesAsync);
                 AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoCheckForLeavers);
-                AutoEvents.EventScheduler(startTimeShort, activityTimeSpan, ConfigValues.clansList, Core.Discord.RotateActivity);
+                AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, ConfigValues.clansList, Core.Discord.RotateActivity);
                // AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, ConfigValues.clansList, AutoEvents.AutoReadAsync, false);
                 //AutoEvents.AutoScanForChanges();
                 //AutoEvents.AutoBulkUpdate();
@@ -49,17 +49,17 @@ namespace Catamagne.Events
                 return Task.CompletedTask;
             });
         }
-        public static async Task Discord_MessageCreated(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs e)
+        public static async Task Discord_MessageCreated(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs messageArgs)
         {
             new Thread(async () =>
             {
-                var _ = ConfigValues.configValues.Responses.ToList();
-                if (_.Select(t => t.trigger).Contains(e.Message.Content))
+                var responses = ConfigValues.configValues.Responses.ToList();
+                if (responses.Select(response => response.trigger).Contains(messageArgs.Message.Content))
                 {
-                    Response response = _.Find(t => t.trigger == e.Message.Content);
-                    if (response.allowedChannels.Contains(e.Channel) || response.allowedChannels == null)
+                    Response response = responses.Find(r => r.trigger == messageArgs.Message.Content);
+                    if (response.allowedChannels.Contains(messageArgs.Channel) || response.allowedChannels == null)
                     {
-                        await e.Message.RespondAsync(response.response);
+                        await messageArgs.Message.RespondAsync(response.response);
                     }
                 }
             }).Start();
