@@ -142,9 +142,8 @@ namespace Catamagne.API
                     List<SpreadsheetTools.User> oldLeavers = ConfigValues.clansList.Find(t => t == clan).Leavers;
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                     var ClanMembers = await GetClanMembers(clan);
-                    clan.Users.ForEach(member =>
+                    foreach (var member in clan.Users)
                     {
-
                         if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                         {
                             if (!oldLeavers.Select(t => t.bungieID).Contains(member.bungieID))
@@ -156,7 +155,12 @@ namespace Catamagne.API
                                 }
                             }
                         }
-                    });
+                    }
+                    //clan.Users.ForEach(member =>
+                    //{
+
+                        
+                    //});
                     foreach (var member in leavers)
                     {
                         var workingMember = member;
@@ -240,7 +244,7 @@ namespace Catamagne.API
             //        }
             //    }
             //});
-            leavers.ForEach(member =>
+            clan.Leavers.ForEach(member =>
             {
                 if (ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                 {
