@@ -134,11 +134,14 @@ namespace Catamagne.API
         }
         public static async Task<List<SpreadsheetTools.User>> CheckForLeaves(Clan clan, bool DontWrite = false)
         {
+            if (clan.Leavers != null)
+            {
+                await CheckForRejoiners(clan);
+            }
             if (!DontWrite)
             {
                 if (clan.Leavers != null)
                 {
-                    await CheckForRejoiners(clan);
                     List<SpreadsheetTools.User> oldLeavers = ConfigValues.clansList.Find(t => t == clan).Leavers;
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                     var ClanMembers = await GetClanMembers(clan);
@@ -233,7 +236,7 @@ namespace Catamagne.API
         public static async Task CheckForRejoiners(Clan clan)
         {
             await SpreadsheetTools.Read(clan);
-            List<SpreadsheetTools.User> leavers = clan.Leavers;
+            List<SpreadsheetTools.User> rejoiners = new List<SpreadsheetTools.User>();
             var ClanMembers = await GetClanMembers(clan);
             //SpreadsheetTools.savedUsers.ToList().ForEach(member => {
             //    if (!ClanMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
@@ -244,14 +247,18 @@ namespace Catamagne.API
             //        }
             //    }
             //});
-            clan.Leavers.ForEach(member =>
+            //clan.Leavers.ForEach(member =>
+            //{
+                
+            //});;
+            foreach (var member in clan.Leavers)
             {
-                if (ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
+                if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                 {
-                    leavers.Remove(member);
+                    rejoiners.Add(member);
                 }
-            });;
-            clan.Leavers = leavers;
+            }
+            clan.Leavers = rejoiners;
             ConfigValues.configValues.SaveConfig(true);
 
         }
