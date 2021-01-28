@@ -10,40 +10,12 @@ using System.Threading;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
 using Catamagne.Configuration;
+using Catamagne.API.Models;
 
 namespace Catamagne.Commands
 {
     public class CoreModule : BaseCommandModule
     {
-        //[Command("help")]
-        //public async Task GiveHelp(CommandContext ctx)
-        //{
-        //    var _ = string.Join('\n', CatamagneCore.commandsList);
-        //    var text = string.Format("Commands List: \n{0}", _);
-        //    await ctx.RespondAsync(text);
-        //}
-        //[Command("readsheet")]
-        //[Description("Read the sheet. admin exclusive command.")]
-        //[Aliases("read")]
-        //public async Task ReadSheet(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Orange, "Reading sheet data...", "If this takes over a minute, it's generating data due to missing files.");
-        //            DiscordMessage message = await ctx.RespondAsync(discordEmbed);
-
-        //            //call bulkupdate method
-        //            await SpreadsheetTools.ReadSheet();
-        //            discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully read sheet data.");
-        //            await message.ModifyAsync(discordEmbed);
-        //        }).Start();
-        //    }
-        //}
         [Command("updateconfig")]
         [Description("Update configuration for the bot. Only admins can execute this.")]
         [Aliases("updateconf", "conf", "confupdate")]
@@ -103,30 +75,6 @@ namespace Catamagne.Commands
                 }).Start();
             }
         }
-        //[Command("bulkupdate")]
-        //[Description("Update all the data in the sheets. This takes upwards of 10 minutes")]
-        //[Aliases("bulk")]
-        //public async Task BulkUpdateSheet(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            //call bulkupdate method
-        //            await SpreadsheetTools.ReadSheet();
-        //            TimeSpan t = TimeSpan.FromSeconds(100 * 5);
-        //            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Yellow, "Bulk updating sheets", "This will update every single element in the spreadsheet", new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
-        //            DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-        //            await SpreadsheetTools.BulkUpdateSheet();
-
-        //            discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Successfully bulk updated data!");
-        //            await msg.ModifyAsync(discordEmbed);
-        //        }).Start();
-        //    }
-        //}
         [Command("displayUsers")]
         [Description("Output all stored users")]
         [Aliases("users")]
@@ -144,14 +92,14 @@ namespace Catamagne.Commands
                     if (string.IsNullOrEmpty(mode) || mode == "spreadsheet" || mode == "sheet")
                     {
                         await SpreadsheetTools.Read(clan);
-                        var users = clan.spreadsheetUsers.ToList();
+                        var users = clan.SpreadsheetUsers.ToList();
                         users.OrderBy(t => t.steamName);
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.clanName + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
-                        List<SpreadsheetTools.User> users = clan.Users;
+                        List<User> users = clan.Users;
                         users.OrderBy(t => t.steamName);
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.clanName + ":");
@@ -181,7 +129,7 @@ namespace Catamagne.Commands
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 new Thread(async () =>
                 {
-                    var leavers = await BungieTools.CheckForLeaves(clan, true);
+                    var leavers = await BungieTools.CheckForLeaves(clan);
                     if (leavers.Count > 0)
                     {
                         await msg.DeleteAsync();
@@ -212,7 +160,7 @@ namespace Catamagne.Commands
                 await ctx.RespondAsync(discordEmbed);
                 return ErrorCode.UnqualifyChannel;
             }
-            if (ctx.Member.Id == ConfigValues.configValues.CataID)
+            if (ctx.Member.Id == ConfigValues.configValues.DevID)
             {
                 return ErrorCode.Qualify;
             }
@@ -264,7 +212,7 @@ namespace Catamagne.Commands
             {
                 new Thread(async () =>
                 {
-                    Response[] responses = ConfigValues.configValues.Responses;
+                    var responses = ConfigValues.configValues.Responses;
                     bool fail = false;
                     if (args == "list")
                     {
@@ -314,7 +262,7 @@ namespace Catamagne.Commands
                                             _.Add(response);
                                         }
                                         ConfigValues.configValues.Responses = _.ToArray();
-                                        ConfigValues.configValues.SaveConfig();
+                                        ConfigValues.configValues.SaveConfig(false);
                                         Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Added", "Successfully added response to pool.");
                                         var message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
 
@@ -385,7 +333,7 @@ namespace Catamagne.Commands
                                             }
 
                                             ConfigValues.configValues.Responses = _.ToArray();
-                                            ConfigValues.configValues.SaveConfig();
+                                            ConfigValues.configValues.SaveConfig(false);
                                             Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Updated", "Successfully updated response.");
                                             await message.ModifyAsync(Embed);
 
@@ -427,7 +375,7 @@ namespace Catamagne.Commands
                                 var _ = ConfigValues.configValues.Responses.ToList();
                                 _.Remove(ConfigValues.configValues.Responses.ToList().Find(t => t.trigger == text));
                                 ConfigValues.configValues.Responses = _.ToArray();
-                                ConfigValues.configValues.SaveConfig();
+                                ConfigValues.configValues.SaveConfig(false);
                                 Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Removed", "Successfully removed response from pool.");
                                 message = await message.ModifyAsync(Embed);
                             }

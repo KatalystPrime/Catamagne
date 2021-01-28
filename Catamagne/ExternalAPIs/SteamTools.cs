@@ -20,21 +20,6 @@ namespace Catamagne.API
                 return result;
             }
             return null;
-            //foreach (var line in filteredArray)
-            //{
-            //    lineNumber++;
-            //    if (line.Length > 4)
-            //    {
-            //        //Console.WriteLine(line.Substring(0, 5));
-            //        if (line.Substring(0, 5) == "(ID: ")
-            //        {
-            //            Console.WriteLine(line.Substring(5, line.Length-6));
-            //            return line;
-            //        }
-            //    }
-            //}
-
-            //Console.WriteLine(filteredArray[160]);
         }
         public class SteamUser
         {

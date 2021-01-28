@@ -1,4 +1,5 @@
 ﻿using Catamagne.API;
+using Catamagne.API.Models;
 using Catamagne.Commands;
 using Catamagne.Configuration;
 using Catamagne.Events;
@@ -182,12 +183,12 @@ namespace Catamagne.Core
             }
             return CreateFancyMessage(color, _);
         }
-        public static void SendFancyListMessage(DiscordChannel channel, Clan clan, List<SpreadsheetTools.User> Users, string title)
+        public static void SendFancyListMessage(DiscordChannel channel, Clan clan, List<User> Users, string title)
         {
             if (Users.Count > 0)
             {
                 List<Field> fields = new List<Field>();
-                foreach (SpreadsheetTools.User user in Users)
+                foreach (User user in Users)
                 {
                     if (!string.IsNullOrEmpty(user.discordID))
                     {
@@ -201,7 +202,7 @@ namespace Catamagne.Core
                     }
                 }
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-                
+
                 if (fields.Count < 25)
                 {
                     embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title));
@@ -239,7 +240,7 @@ namespace Catamagne.Core
             Log.Information("Rotating status to " + clan.clanName);
             discord.UpdateStatusAsync(activity);
             return Task.CompletedTask;
-        }
+        } 
     }
     public struct Field
     {

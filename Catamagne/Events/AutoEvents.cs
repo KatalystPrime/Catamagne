@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
+using Catamagne.API.Models;
 
 namespace Catamagne.Events
 {
@@ -14,17 +15,17 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-               TimeSpan interval = timeSpan / (clans.Count + 1);
-               var done = false;
-               var index = 0;
-               var nextTime = DateTime.UtcNow;
-               while (!done)
-               {
+                TimeSpan interval = timeSpan / (clans.Count + 1);
+                var done = false;
+                var index = 0;
+                var nextTime = DateTime.UtcNow;
+                while (!done)
+                {
                     if (DateTime.UtcNow >= (referenceTime + timeSpan))
                     {
-                        if (repeat) 
-                        { 
-                            referenceTime = DateTime.UtcNow; 
+                        if (repeat)
+                        {
+                            referenceTime = DateTime.UtcNow;
                         }
                         else
                         {
@@ -34,14 +35,14 @@ namespace Catamagne.Events
                     nextTime = DateTime.UtcNow + interval;
                     if (DateTime.UtcNow >= (referenceTime + (interval * index)))
                     {
-                       
+
                         await action.Invoke(clans[index]);
                         index = (index + 1) % clans.Count;
                     }
-                    
+
                     Thread.Sleep(nextTime - DateTime.UtcNow);
-               }
-            }).Start();  
+                }
+            }).Start();
         }
         public static async Task AutoReadAsync(Clan clan)
         {
@@ -63,7 +64,7 @@ namespace Catamagne.Events
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
             if (changed.TotalChanges > 0)
             {
-                await SpreadsheetTools.SelectiveUpdate(clan,changed);
+                await SpreadsheetTools.SelectiveUpdate(clan, changed);
                 if (changed.TotalChanges == 1)
                 {
                     var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.clanName, "Automatically processed 1 entry.");
@@ -81,7 +82,7 @@ namespace Catamagne.Events
             Log.Information("Checking for leavers for " + clan.clanName);
             var Leavers = await BungieTools.CheckForLeaves(clan);
 
-            Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.clanName + ":");
+            Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel, clan, Leavers, "Users found leaving " + clan.clanName + ":");
         }
     }
 }
