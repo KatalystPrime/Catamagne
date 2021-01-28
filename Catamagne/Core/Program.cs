@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Catamagne.API;
-using Catamagne.Configuration;
 
 namespace Catamagne.Core
 {
@@ -13,14 +12,11 @@ namespace Catamagne.Core
         static void Main(string[] args)
         {
 
-            ConfigValues.configValues.LoadConfig(false);
-            ConfigValues.configValues.LoadConfig(true);
             Console.Title = "Catamagne | Watcher of Destiny";
             MainAsync().GetAwaiter().GetResult();
         }
         static async Task MainAsync()
         {
-            await SpreadsheetTools.SetUpSheet();
             PauseEvents = false;
 
             startTime = DateTime.UtcNow;
