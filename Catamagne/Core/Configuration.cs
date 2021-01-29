@@ -86,42 +86,42 @@ namespace Catamagne.Configuration
         }
     }
     [Serializable]
-    public class Clans
+    class Clans
     {
-        List<Clan> clans = new List<Clan>() {
+        public static List<Clan> clans = new List<Clan>() {
             new Clan(
-                new Clan.Details("4170189", "Umbral", "ug", "Umbral!A2:F101"),
+                new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101"),
                 new Clan.Members(new List<BungieUser>(), new List<SpreadsheetUser>(), new List<ClanLeaver>())
             )};
-        void SaveClanMembers(Clan clan)
+        public void SaveClanMembers(Clan clan)
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetClanName);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
             string clanFile = Path.Combine(clanFolder, "clan.dat");
 
             Directory.CreateDirectory(clanFolder);
             File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members, Formatting.Indented));
-            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetClanName, clanFile);
+            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFile);
         }
-        void LoadClanMembers(Clan clan)
+        public void LoadClanMembers(Clan clan)
         {
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetClanName);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
             string clanFile = Path.Combine(clanFolder, "clan.dat");
             if (File.Exists(clanFile))
             {
                 var _ = File.ReadAllText(clanFile);
-                clans[clans.FindIndex(t => t.details.BungieNetClanID == clan.details.BungieNetClanID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
-                Console.WriteLine("Read {0} members from {1}",clan.details.BungieNetClanName ,clanFile);
+                clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
+                Console.WriteLine("Read {0} members from {1}",clan.details.BungieNetName ,clanFile);
             }
             else
             {
                 SaveClanMembers(clan);
                 var _ = File.ReadAllText(clanFile);
-                clans[clans.FindIndex(t => t.details.BungieNetClanID == clan.details.BungieNetClanID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
-                Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetClanName, clanFile);
+                clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
+                Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFile);
             }
         }
-        void SaveClans()
+        public void SaveClans()
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
@@ -136,7 +136,7 @@ namespace Catamagne.Configuration
                 SaveClanMembers(clan);
             }
         }
-        void LoadClans()
+        public void LoadClans()
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
