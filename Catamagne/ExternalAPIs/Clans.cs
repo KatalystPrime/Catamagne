@@ -8,14 +8,14 @@ namespace Catamagne.API
     {
         public class Details
         {
-            public string BungieNetClanID;
-            public string BungieNetClanName;
-            public string ClanTag;
-            public string SpreadsheetClanRange;
+            public long BungieNetID;
+            public string BungieNetName;
+            public string Tag;
+            public string SpreadsheetRange;
 
-            public Details(string BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange)
+            public Details(long BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange)
             {
-                this.BungieNetClanID = BungieNetClanID; this.BungieNetClanName = BungieNetClanName; this.ClanTag = ClanTag; this.SpreadsheetClanRange = SpreadsheetClanRange;
+                this.BungieNetID = BungieNetClanID; this.BungieNetName = BungieNetClanName; this.Tag = ClanTag; this.SpreadsheetRange = SpreadsheetClanRange;
             }
         }
         public class Members
