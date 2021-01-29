@@ -172,8 +172,14 @@ namespace Catamagne.API
                         }
                         if (count > 6)
                         {
-
+                            List<string> extraColumns = new List<string>();
+                            for (int index = 6; index < spreadsheetData[i].Count; index++)
+                            {
+                                extraColumns.Add(spreadsheetData[i][index].ToString());
+                            }
+                            _.ExtraColumns = extraColumns.ToArray();
                         }
+                        workingList.Add(_);
                     }
                 }
             }
@@ -187,6 +193,67 @@ namespace Catamagne.API
             {
                 BulkUpdate(clan);
             }
+        }
+        public static async Task Write(Clan clan)
+        {
+            String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
+            String range = clan.details.SpreadsheetRange;
+            ValueRange valueRange = new ValueRange();
+            var table = new List<IList<object>>();
+
+            for (int c = 0; c < clan.members.BungieUsers.Count; c++)
+            {
+                List<object> _;
+                _ = new List<object>(6)
+                {
+                    clan.members.BungieUsers[c].BungieNetLink,
+                    clan.members.BungieUsers[c].BungieNetName,
+                    clan.members.BungieUsers[c].SteamLink,
+                    clan.members.BungieUsers[c].SteamName,
+                    clan.members.BungieUsers[c].DiscordID,
+                    UserStatus.ToString(clan.members.BungieUsers[c].UserStatus)
+                };
+                if (clan.members.BungieUsers[c].ExtraColumns != null)
+                {
+                    foreach (string column in clan.members.BungieUsers[c].ExtraColumns)
+                    {
+                        _.Add(column);
+                    }
+                    var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
+                    var a = char.ToUpper(letterStrings[0][0]) - 64;
+                    var b = char.ToUpper(letterStrings[1][0]) - 64;
+                    var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Length - 5;
+                    //clan.Users[c].ExtraColumns.Count() - 5;
+                    for (int i = 0; i < forRange; i++)
+                    {
+                        _.Add("");
+                    }
+                }
+                else
+                {
+                    var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
+                    var a = char.ToUpper(letterStrings[0][0]) - 64;
+                    var b = char.ToUpper(letterStrings[1][0]) - 64;
+                    var forRange = b - a - 5;
+                    for (int i = 0; i < forRange; i++)
+                    {
+                        _.Add("");
+                    }
+                }
+                table.Add(_);
+            }
+            for (int c = clan.members.BungieUsers.Count; c < 100; c++)
+            {
+                List<object> _ = new List<object>(5) { "", "", "", "", "", "" };
+                table.Add(_);
+            }
+            valueRange.Values = table;
+            SpreadsheetsResource.ValuesResource.UpdateRequest requestUpdate = service.Spreadsheets.Values.Update(valueRange, spreadsheetId, range);
+            requestUpdate.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+
+            // Prints the names and majors of students in a sample spreadsheet:
+            var response = requestUpdate.Execute();
+            Clans.SaveClanMembers(clan);
         }
     }
 }
