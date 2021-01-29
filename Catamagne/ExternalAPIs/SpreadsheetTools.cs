@@ -325,23 +325,23 @@ namespace Catamagne.API
                         string bungieName = "N/A";
                         string steamName = "N/A";
                         string discordID = addedUser.discordID;
-                        if (addedUser.bungieID != "N/A" || addedUser.bungieID != null)
+                        if (addedUser.bungieID != "N/A" || addedUser.bungieID != "")
                         {
                             bungieID = addedUser.bungieID;
                         }
-                        if (addedUser.steamID != "N/A" || addedUser.steamID != null)
+                        if (addedUser.steamID != "N/A" || addedUser.steamID != "")
                         {
                             steamID = addedUser.steamID;
                         }
-                        if (addedUser.steamProfile != "N/A" || addedUser.steamProfile != null)
+                        if (addedUser.steamProfile != "N/A" || addedUser.steamProfile != "")
                         {
                             steamProfile = addedUser.steamProfile;
                         }
-                        if (addedUser.bungieName != "N/A" || addedUser.bungieName != null)
+                        if (addedUser.bungieName != "N/A" || addedUser.bungieName != "")
                         {
                             steamID = addedUser.bungieName;
                         }
-                        if (addedUser.steamName != "N/A" || addedUser.steamName != null)
+                        if (addedUser.steamName != "N/A" || addedUser.steamName != "")
                         {
                             steamProfile = addedUser.steamName;
                         }

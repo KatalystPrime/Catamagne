@@ -36,32 +36,45 @@ namespace Catamagne.API
             if (_.HasValue)
             {
                 long profileID = (long)_;
+                string profileType = "";
                 if (profileLink.Length > 0)
                 {
-                    switch (Convert.ToInt32(profileLink.Split('/')[5]))
+                    int numcount = 0;
+                    var profileSplit = profileLink.Split('/');
+                    foreach (var part in profileSplit)
                     {
-                        case (int)BungieMembershipType.BungieNext:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.BungieNext);
-                            break;
-                        case (int)BungieMembershipType.TigerBlizzard:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerBlizzard);
-                            break;
-                        case (int)BungieMembershipType.TigerDemon:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerDemon);
-                            break;
-                        case (int)BungieMembershipType.TigerPsn:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerPsn);
-                            break;
-                        case (int)BungieMembershipType.TigerStadia:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerStadia);
-                            break;
-                        case (int)BungieMembershipType.TigerSteam:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerSteam);
-                            break;
-                        case (int)BungieMembershipType.TigerXbox:
-                            user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerXbox);
-                            break;
+                        int pType;
+                        if (int.TryParse(part, out pType) && numcount == 0)
+                        {
+                            numcount++;
+                            profileType = pType.ToString();
+                        }
                     }
+                    user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, Enum.Parse<BungieMembershipType>(profileType));
+                    //switch (Convert.ToInt32(profileLink.Split('/')[5]))
+                    //{
+                    //    case (int)BungieMembershipType.BungieNext:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.BungieNext);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerBlizzard:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerBlizzard);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerDemon:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerDemon);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerPsn:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerPsn);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerStadia:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerStadia);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerSteam:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerSteam);
+                    //        break;
+                    //    case (int)BungieMembershipType.TigerXbox:
+                    //        user = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieMembershipType.TigerXbox);
+                    //        break;
+                    //}
                 }
                 if (user.bungieNetUser != null)
                 {
@@ -105,8 +118,21 @@ namespace Catamagne.API
             //return Convert.ToInt64(_);
             if (profileLink.Length > 0)
             {
-                var _ = Convert.ToInt64(profileLink.Split('/')[6]);
-                return _;
+                var _ = profileLink.Split('/');
+                int numCount = 0;
+                foreach (var part in _)
+                {
+                    long numPart;
+                    if (long.TryParse(part, out numPart))
+                    {
+                        numCount++;
+                    }
+                    if (numCount == 2)
+                    {
+                        return Convert.ToInt64(numPart);
+                    }
+                }
+                return null;
             }
             return null;
         }

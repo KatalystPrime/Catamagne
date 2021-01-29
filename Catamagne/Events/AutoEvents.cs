@@ -63,7 +63,7 @@ namespace Catamagne.Events
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
             if (changed.TotalChanges > 0)
             {
-                await SpreadsheetTools.SelectiveUpdate(clan,changed);
+                await SpreadsheetTools.SelectiveUpdate(clan, changed);
                 if (changed.TotalChanges == 1)
                 {
                     var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.clanName, "Automatically processed 1 entry.");
