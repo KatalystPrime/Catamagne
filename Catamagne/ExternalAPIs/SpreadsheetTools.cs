@@ -3,8 +3,10 @@ using Catamagne.Configuration;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
 using Google.Apis.Util.Store;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -40,6 +42,10 @@ namespace Catamagne.API
             {
                 this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns;
             }
+            public SpreadsheetUser()
+            {
+                this.BungieNetLink = null; this.BungieNetName = null; this.SteamLink = null; this.SteamName = null; this.DiscordID = null; this.UserStatus = UserStatus.ok; this.ExtraColumns = null;
+            }
             public static explicit operator BungieUser(SpreadsheetUser s) => new BungieUser(s.BungieNetLink, null, s.BungieNetName, s.SteamLink, null, s.SteamName, s.DiscordID, s.UserStatus, s.ExtraColumns);
         }
         public class StringValueAttribute : Attribute
@@ -66,7 +72,7 @@ namespace Catamagne.API
 
 
     }
-    public class SpreadsheetTools
+    class SpreadsheetTools
     {
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
@@ -98,6 +104,25 @@ namespace Catamagne.API
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
-        }   
+        }
+        public static async Task ReadSheet(Clan clan)
+        {
+            var spreadsheetID = ConfigValues.configValues.SpreadsheetID;
+            string spreadsheetRange = clan.details.SpreadsheetRange;
+            SpreadsheetsResource.ValuesResource.GetRequest requestRead =
+                    service.Spreadsheets.Values.Get(spreadsheetID, spreadsheetRange);
+
+            // Prints the names and majors of students in a sample spreadsheet:
+            // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+            ValueRange response = requestRead.Execute();
+            var spreadsheetData = response.Values;
+            var workingList = new List<SpreadsheetUser>();
+            bool forceBulkUpdate = false;
+
+            if (spreadsheetData == null)
+            {
+                var _ = new SpreadsheetUser();
+            }
+        }
     }
 }
