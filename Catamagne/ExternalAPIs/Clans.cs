@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Catamagne.API
 {
-    class Clan
+    [Serializable] class Clan
     {
-        [Serializable] public class Details
+        public class Details
         {
             public string BungieNetClanID;
             public string BungieNetClanName;
@@ -18,15 +18,32 @@ namespace Catamagne.API
                 this.BungieNetClanID = BungieNetClanID; this.BungieNetClanName = BungieNetClanName; this.ClanTag = ClanTag; this.SpreadsheetClanRange = SpreadsheetClanRange;
             }
         }
-        public Details ClanDetails;
-
-        [NonSerialized] public List<Models.BungieUser> BungieUsers;
-        [NonSerialized] public List<Models.SpreadsheetUser> SpreadsheetUsers;
-        [NonSerialized] public List<Models.ClanLeaver> ClanLeavers;
-
-        public Clan(Details ClanDetails, List<Models.BungieUser> BungieUsers, List<Models.SpreadsheetUser> SpreadsheetUsers, List<Models.ClanLeaver> ClanLeavers)
+        public class Members
         {
-            this.ClanDetails = ClanDetails; this.BungieUsers = BungieUsers; this.SpreadsheetUsers = SpreadsheetUsers; this.ClanLeavers = ClanLeavers;
+            public List<Models.BungieUser> BungieUsers;
+            public List<Models.SpreadsheetUser> SpreadsheetUsers;
+            public List<Models.ClanLeaver> ClanLeavers;
+
+            public Members(List<Models.BungieUser> BungieUsers, List<Models.SpreadsheetUser> SpreadsheetUsers, List<Models.ClanLeaver> ClanLeavers)
+            {
+                this.BungieUsers = BungieUsers; this.SpreadsheetUsers = SpreadsheetUsers; this.ClanLeavers = ClanLeavers;
+            }
+            public Members()
+            {
+                this.BungieUsers = new List<Models.BungieUser>(); this.SpreadsheetUsers = new List<Models.SpreadsheetUser>(); this.ClanLeavers = new List<Models.ClanLeaver>();
+            }
         }
+
+        public Details details; public Members members;
+
+        public Clan(Details ClanDetails, Members ClanMembers)
+        {
+            this.details = ClanDetails; this.members = ClanMembers;
+        }
+
+        //public Clan(Details ClanDetails, List<Models.BungieUser> BungieUsers, List<Models.SpreadsheetUser> SpreadsheetUsers, List<Models.ClanLeaver> ClanLeavers)
+        //{
+        //    this.ClanDetails = ClanDetails; this.BungieUsers = BungieUsers; this.SpreadsheetUsers = SpreadsheetUsers; this.ClanLeavers = ClanLeavers;
+        //}
     }
 }

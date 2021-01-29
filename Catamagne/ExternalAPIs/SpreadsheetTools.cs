@@ -88,8 +88,8 @@ namespace Catamagne.API
                     Scopes,
                     "drive",
                     CancellationToken.None,
-                    new FileDataStore(Path.Combine(ConfigValues.configValues.Folderpath, "config", credPath), true));
-                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.Folderpath + credPath);
+                    new FileDataStore(Path.Combine(ConfigValues.configValues.FolderPath, "config", credPath), true));
+                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.FolderPath + credPath);
             }
 
             // Create Google Sheets API service.
