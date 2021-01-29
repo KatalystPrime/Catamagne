@@ -15,19 +15,42 @@ namespace Catamagne.API
 {
     namespace Models
     {
-        enum UserStatus : int
+        public static class UserStatus
         {
-            [StringValue("Okay")]
-            ok,
-            [StringValue("Left clan")]
-            leftClan,
-            [StringValue("Left discord")]
-            leftDiscord,
-            [StringValue("Left clan and discord")]
-            leftDiscordClan,
-            [StringValue("Lobby")]
-            lobby
+            public enum StatusEnum
+            {
+                ok,
+                leftClan,
+                leftDiscord,
+                leftDiscordClan,
+                lobby
+            }
+            public static string ToString(this StatusEnum status)
+            => status switch
+            {
+                StatusEnum.ok => "Okay",
+                StatusEnum.leftClan => "Left Clan",
+                StatusEnum.leftDiscord => "Left Discord",
+                StatusEnum.leftDiscordClan => "Left Discord & Clan",
+                StatusEnum.lobby => "Lobby"
+            };
+            public static StatusEnum ToEnum(this string status)
+            {
+                var lowered = status.ToLowerInvariant();
 
+                if (lowered == "okay")
+                    return StatusEnum.ok;
+                if (lowered == "left clan")
+                    return StatusEnum.leftClan;
+                if (lowered == "left discord")
+                    return StatusEnum.leftDiscord;
+                if (lowered == "left discord & clan")
+                    return StatusEnum.leftDiscordClan;
+                if (lowered == "lobby")
+                    return StatusEnum.lobby;
+
+                return StatusEnum.ok; //return your default value
+            }
         }
         class SpreadsheetUser
         {
@@ -36,41 +59,19 @@ namespace Catamagne.API
             public string SteamLink;
             public string SteamName;
             public ulong? DiscordID;
-            public UserStatus UserStatus;
+            public UserStatus.StatusEnum UserStatus;
             public string[] ExtraColumns;
-            public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus UserStatus = UserStatus.ok, string[] ExtraColumns = null)
+            public bool? Private;
+            public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus.StatusEnum UserStatus = Models.UserStatus.StatusEnum.ok, string[] ExtraColumns = null, bool? Private = false)
             {
-                this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns;
+                this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns; this.Private = Private;
             }
             public SpreadsheetUser()
             {
-                this.BungieNetLink = null; this.BungieNetName = null; this.SteamLink = null; this.SteamName = null; this.DiscordID = null; this.UserStatus = UserStatus.ok; this.ExtraColumns = null;
+                this.BungieNetLink = null; this.BungieNetName = null; this.SteamLink = null; this.SteamName = null; this.DiscordID = null; this.UserStatus = Models.UserStatus.StatusEnum.ok; this.ExtraColumns = null;
             }
             public static explicit operator BungieUser(SpreadsheetUser s) => new BungieUser(s.BungieNetLink, null, s.BungieNetName, s.SteamLink, null, s.SteamName, s.DiscordID, s.UserStatus, s.ExtraColumns);
         }
-        public class StringValueAttribute : Attribute
-        {
-            public string StringValue { get; protected set; }
-            public StringValueAttribute(string value)
-            {
-                this.StringValue = value;
-            }
-            public string GetStringValue()
-            {
-                Type type = GetType();
-                FieldInfo fieldInfo = type.GetField(ToString());
-
-                // Get the stringvalue attributes
-                StringValueAttribute[] attribs = fieldInfo.GetCustomAttributes(
-                    typeof(StringValueAttribute), false) as StringValueAttribute[];
-
-                // Return the first if there was a match.
-                return attribs.Length > 0 ? attribs[0].StringValue : null;
-            }
-
-        }
-
-
     }
     class SpreadsheetTools
     {
@@ -122,6 +123,69 @@ namespace Catamagne.API
             if (spreadsheetData == null)
             {
                 var _ = new SpreadsheetUser();
+                var members = await BungieTools.GetClanMembers(clan);
+                var publicMembers = members.publicMembers;
+                var privateMembers = members.privateMembers;
+
+                publicMembers.ForEach(async member =>
+                {
+                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default, default);
+                    workingList.Add(_);
+                });
+                privateMembers.ForEach(async member =>
+                {
+                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default, true);
+                });
+                forceBulkUpdate = true;
+            }
+            else
+            {
+                for (int i = 0; i < spreadsheetData.Count; i++)
+                {
+                    var _ = new SpreadsheetUser();
+                    if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0)
+                    {
+                        var count = spreadsheetData[i].Count;
+                        if (count == 1)
+                        {
+                            _.BungieNetLink = spreadsheetData[i][0].ToString();
+                        }
+                        if (count == 2)
+                        {
+                            _.BungieNetName = spreadsheetData[i][1].ToString();
+                        }
+                        if (count == 3)
+                        {
+                            _.SteamLink = spreadsheetData[i][2].ToString();
+                        }
+                        if (count == 4)
+                        {
+                            _.SteamName = spreadsheetData[i][3].ToString();
+                        }
+                        if (count == 5)
+                        {
+                            _.DiscordID = Convert.ToUInt64(spreadsheetData[i][4]);
+                        }
+                        if (count == 6)
+                        {
+                            _.UserStatus = UserStatus.ToEnum(spreadsheetData[i][5].ToString());
+                        }
+                        if (count > 6)
+                        {
+
+                        }
+                    }
+                }
+            }
+            clan.members.SpreadsheetUsers = workingList;
+            if (clan.members.BungieUsers == null || clan.members.BungieUsers.Count == 0)
+            {
+                forceBulkUpdate = true;
+            }
+
+            if (forceBulkUpdate)
+            {
+                BulkUpdate(clan);
             }
         }
     }
