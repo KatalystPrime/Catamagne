@@ -93,7 +93,7 @@ namespace Catamagne.Configuration
                 new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101"),
                 new Clan.Members(new List<BungieUser>(), new List<SpreadsheetUser>(), new List<ClanLeaver>())
             )};
-        public void SaveClanMembers(Clan clan)
+        public static void SaveClanMembers(Clan clan)
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
@@ -103,7 +103,7 @@ namespace Catamagne.Configuration
             File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members, Formatting.Indented));
             Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFile);
         }
-        public void LoadClanMembers(Clan clan)
+        public static void LoadClanMembers(Clan clan)
         {
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
             string clanFile = Path.Combine(clanFolder, "clan.dat");
@@ -121,7 +121,7 @@ namespace Catamagne.Configuration
                 Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFile);
             }
         }
-        public void SaveClans()
+        public static void SaveClans()
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
@@ -136,7 +136,7 @@ namespace Catamagne.Configuration
                 SaveClanMembers(clan);
             }
         }
-        public void LoadClans()
+        public static void LoadClans()
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
