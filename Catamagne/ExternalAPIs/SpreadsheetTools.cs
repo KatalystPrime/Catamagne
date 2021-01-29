@@ -13,66 +13,6 @@ using System.Threading;
 using System.Threading.Tasks;
 namespace Catamagne.API
 {
-    namespace Models
-    {
-        public static class UserStatus
-        {
-            public enum StatusEnum
-            {
-                ok,
-                leftClan,
-                leftDiscord,
-                leftDiscordClan,
-                lobby
-            }
-            public static string ToString(this StatusEnum status)
-            => status switch
-            {
-                StatusEnum.ok => "Okay",
-                StatusEnum.leftClan => "Left Clan",
-                StatusEnum.leftDiscord => "Left Discord",
-                StatusEnum.leftDiscordClan => "Left Discord & Clan",
-                StatusEnum.lobby => "Lobby"
-            };
-            public static StatusEnum ToEnum(this string status)
-            {
-                var lowered = status.ToLowerInvariant();
-
-                if (lowered == "okay")
-                    return StatusEnum.ok;
-                if (lowered == "left clan")
-                    return StatusEnum.leftClan;
-                if (lowered == "left discord")
-                    return StatusEnum.leftDiscord;
-                if (lowered == "left discord & clan")
-                    return StatusEnum.leftDiscordClan;
-                if (lowered == "lobby")
-                    return StatusEnum.lobby;
-
-                return StatusEnum.ok; //return your default value
-            }
-        }
-        class SpreadsheetUser
-        {
-            public string BungieNetLink;
-            public string BungieNetName;
-            public string SteamLink;
-            public string SteamName;
-            public ulong? DiscordID;
-            public UserStatus.StatusEnum UserStatus;
-            public string[] ExtraColumns;
-            public bool? Private;
-            public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus.StatusEnum UserStatus = Models.UserStatus.StatusEnum.ok, string[] ExtraColumns = null, bool? Private = false)
-            {
-                this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns; this.Private = Private;
-            }
-            public SpreadsheetUser()
-            {
-                this.BungieNetLink = null; this.BungieNetName = null; this.SteamLink = null; this.SteamName = null; this.DiscordID = null; this.UserStatus = Models.UserStatus.StatusEnum.ok; this.ExtraColumns = null;
-            }
-            public static explicit operator BungieUser(SpreadsheetUser s) => new BungieUser(s.BungieNetLink, null, s.BungieNetName, s.SteamLink, null, s.SteamName, s.DiscordID, s.UserStatus, s.ExtraColumns);
-        }
-    }
     class SpreadsheetTools
     {
         // If modifying these scopes, delete your previously saved credentials
@@ -223,7 +163,6 @@ namespace Catamagne.API
                     var a = char.ToUpper(letterStrings[0][0]) - 64;
                     var b = char.ToUpper(letterStrings[1][0]) - 64;
                     var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Length - 5;
-                    //clan.Users[c].ExtraColumns.Count() - 5;
                     for (int i = 0; i < forRange; i++)
                     {
                         _.Add("");

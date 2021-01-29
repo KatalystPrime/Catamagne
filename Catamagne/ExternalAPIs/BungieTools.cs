@@ -11,40 +11,6 @@ using BungieSharper.Schema.User;
 
 namespace Catamagne.API
 {
-    namespace Models
-    {
-        class BungieUser
-        {
-            public string BungieNetLink;
-            public ulong? BungieNetID;
-            public string BungieNetName;
-            public string SteamLink;
-            public ulong? SteamID;
-            public string SteamName;
-            public ulong? DiscordID;
-            public UserStatus.StatusEnum UserStatus;
-            public string[] ExtraColumns;
-            public bool? Private;
-            public BungieUser(string BungieNetLink, ulong? BungieNetID, string BungieNetName, string SteamLink, ulong? SteamID, string SteamName, ulong? DiscordID, UserStatus.StatusEnum UserStatus = Models.UserStatus.StatusEnum.ok, string[] ExtraColumns = null, bool? Private = false)
-            {
-                this.BungieNetLink = BungieNetLink; this.BungieNetID = BungieNetID; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamID = SteamID; this.SteamName = SteamName; this.DiscordID = DiscordID; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns; this.Private = true;
-            }
-            public static explicit operator SpreadsheetUser(BungieUser b) => new SpreadsheetUser(b.BungieNetLink, b.BungieNetName, b.SteamLink, b.SteamName, b.DiscordID, b.UserStatus, b.ExtraColumns);
-        }
-        class ClanLeaver
-        {
-            public string BungieNetLink;
-            public string SteamLink;
-            public ulong? DiscordID;
-            public string[] ExtraColumns;
-            public DateTime TimeLeft;
-            public ClanLeaver(string BungieNetLink, string SteamLink, ulong? DiscordID, string[] ExtraColumns)
-            {
-                this.BungieNetLink = BungieNetLink; this.SteamLink = SteamLink; this.DiscordID = DiscordID; this.ExtraColumns = ExtraColumns;
-            }
-            public static explicit operator ClanLeaver(BungieUser b) => new ClanLeaver(b.BungieNetLink, b.SteamLink, b.DiscordID, b.ExtraColumns);
-        }
-    }
     class BungieTools
     {
         static BungieApiClient bungieApi = new BungieApiClient(ConfigValues.configValues.BungieAPIKey);
