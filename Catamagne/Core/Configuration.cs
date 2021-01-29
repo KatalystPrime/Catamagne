@@ -15,6 +15,7 @@ namespace Catamagne.Configuration
         public DiscordActivity DiscordActivity;
         public string[] Prefixes;
         public TimeSpan ShortInterval;
+        public TimeSpan MediumInterval;
         public TimeSpan LongInterval;
         public string Folderpath;
         public string Filepath;

@@ -1,43 +1,103 @@
-﻿using Catamagne.Configuration;
+﻿using Catamagne.API.Models;
+using Catamagne.Configuration;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-public class SpreadsheetTools
+namespace Catamagne.API
 {
-    // If modifying these scopes, delete your previously saved credentials
-    // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
-    static string[] Scopes = { SheetsService.Scope.Spreadsheets };
-    static string ApplicationName = "Glads Automation Program";
-    //public static List<User> users;
-    static UserCredential credential;
-    static SheetsService service;
-    public static async Task SetUpSheet()
+    namespace Models
     {
-        using (var stream =
-            new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
+        enum UserStatus : int
         {
-            // The file token.json stores the user's access and refresh tokens, and is created
-            // automatically when the authorization flow completes for the first time.
-            string credPath = "token.json";
-            credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.Load(stream).Secrets,
-                Scopes,
-                "drive",
-                CancellationToken.None,
-                new FileDataStore(Path.Combine(ConfigValues.configValues.Folderpath, "config", credPath), true));
-            Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.Folderpath + credPath);
+            [StringValue("Okay")]
+            ok,
+            [StringValue("Left clan")]
+            leftClan,
+            [StringValue("Left discord")]
+            leftDiscord,
+            [StringValue("Left clan and discord")]
+            leftDiscordClan,
+            [StringValue("Lobby")]
+            lobby
+
+        }
+        class SpreadsheetUser
+        {
+            public string BungieNetLink;
+            public string BungieNetName;
+            public string SteamLink;
+            public string SteamName;
+            public ulong? DiscordID;
+            public UserStatus UserStatus;
+            public string[] ExtraColumns;
+            public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus UserStatus = UserStatus.ok, string[] ExtraColumns = null)
+            {
+                this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns;
+            }
+            public static explicit operator BungieUser(SpreadsheetUser s) => new BungieUser(s.BungieNetLink, null, s.BungieNetName, s.SteamLink, null, s.SteamName, s.DiscordID, s.UserStatus, s.ExtraColumns);
+        }
+        public class StringValueAttribute : Attribute
+        {
+            public string StringValue { get; protected set; }
+            public StringValueAttribute(string value)
+            {
+                this.StringValue = value;
+            }
+            public string GetStringValue()
+            {
+                Type type = GetType();
+                FieldInfo fieldInfo = type.GetField(ToString());
+
+                // Get the stringvalue attributes
+                StringValueAttribute[] attribs = fieldInfo.GetCustomAttributes(
+                    typeof(StringValueAttribute), false) as StringValueAttribute[];
+
+                // Return the first if there was a match.
+                return attribs.Length > 0 ? attribs[0].StringValue : null;
+            }
+
         }
 
-        // Create Google Sheets API service.
-        service = new SheetsService(new BaseClientService.Initializer()
+
+    }
+    public class SpreadsheetTools
+    {
+        // If modifying these scopes, delete your previously saved credentials
+        // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
+        static string[] Scopes = { SheetsService.Scope.Spreadsheets };
+        static string ApplicationName = "Glads Automation Program";
+        //public static List<User> users;
+        static UserCredential credential;
+        static SheetsService service;
+        public static async Task SetUpSheet()
         {
-            HttpClientInitializer = credential,
-            ApplicationName = ApplicationName,
-        });
+            using (var stream =
+                new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
+            {
+                // The file token.json stores the user's access and refresh tokens, and is created
+                // automatically when the authorization flow completes for the first time.
+                string credPath = "token.json";
+                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    Scopes,
+                    "drive",
+                    CancellationToken.None,
+                    new FileDataStore(Path.Combine(ConfigValues.configValues.Folderpath, "config", credPath), true));
+                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.Folderpath + credPath);
+            }
+
+            // Create Google Sheets API service.
+            service = new SheetsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+        }   
     }
 }

@@ -7,11 +7,11 @@ namespace Catamagne.Events
 {
     class AutoEvents
     {
-        public static void EventScheduler(DateTime referenceTime, TimeSpan timeSpan, List<object> objects, Func<object, Task> action, bool repeat = true)
+        public static void EventScheduler<T>(DateTime referenceTime, TimeSpan timeSpan, List<T> items, Func<T, Task> action, bool repeat = true)
         {
             new Thread(async () =>
             {
-                TimeSpan interval = timeSpan / (objects.Count + 1);
+                TimeSpan interval = timeSpan / (items.Count + 1);
                 var done = false;
                 var index = 0;
                 var nextTime = DateTime.UtcNow;
@@ -32,8 +32,8 @@ namespace Catamagne.Events
                     if (DateTime.UtcNow >= (referenceTime + (interval * index)))
                     {
 
-                        await action.Invoke(objects[index]);
-                        index = (index + 1) % objects.Count;
+                        await action.Invoke(items[index]);
+                        index = (index + 1) % items.Count;
                     }
 
                     Thread.Sleep(nextTime - DateTime.UtcNow);
