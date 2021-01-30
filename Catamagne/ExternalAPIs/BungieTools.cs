@@ -68,7 +68,6 @@ namespace Catamagne.API
                 if (user.bungieNetUser != null)
                 {
                     return user.bungieNetUser.membershipId;
-                    var a = user.destinyMemberships.FirstOrDefault().membershipId;
                 }
                 else
                 {
@@ -95,7 +94,6 @@ namespace Catamagne.API
                         return Convert.ToInt64(numPart);
                     }
                 }
-                return null;
             }
             return null;
         }

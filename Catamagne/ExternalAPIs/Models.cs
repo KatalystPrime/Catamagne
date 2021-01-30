@@ -50,10 +50,9 @@ namespace Catamagne.API.Models
         public ulong? DiscordID;
         public UserStatus.StatusEnum UserStatus;
         public string[] ExtraColumns;
-        public bool? Private;
-        public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus.StatusEnum UserStatus = Models.UserStatus.StatusEnum.ok, string[] ExtraColumns = null, bool? Private = false)
+        public SpreadsheetUser(string BungieNetLink, string BungieNetName, string SteamLink, string SteamName, ulong? DiscordID, UserStatus.StatusEnum UserStatus = Models.UserStatus.StatusEnum.ok, string[] ExtraColumns = null)
         {
-            this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns; this.Private = Private;
+            this.BungieNetLink = BungieNetLink; this.BungieNetName = BungieNetName; this.SteamLink = SteamLink; this.SteamName = SteamName; this.UserStatus = UserStatus; this.ExtraColumns = ExtraColumns;
         }
         public SpreadsheetUser()
         {

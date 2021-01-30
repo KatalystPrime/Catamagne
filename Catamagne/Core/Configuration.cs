@@ -14,9 +14,9 @@ namespace Catamagne.Configuration
     {
         [NonSerialized] public static ConfigValues configValues = new ConfigValues();
         
-        public ulong?[] RoleIDs;
-        public ulong?[] AdminRoleIDs;
-        public ulong?[] CommandChannels;
+        public List<ulong?> RoleIDs;
+        public List<ulong?> AdminRoleIDs;
+        public List<ulong?> CommandChannels;
         public ulong? AlertChannel;
         public ulong? UpdatesChannel;
         public DiscordActivity DiscordActivity;
@@ -34,8 +34,9 @@ namespace Catamagne.Configuration
         public ConfigValues()
         {
             DevID = 194439970797256706;
-            RoleIDs = null;
-            CommandChannels = null;
+            RoleIDs = new List<ulong?>();
+            CommandChannels = new List<ulong?>();
+            AdminRoleIDs = new List<ulong?>();
             AlertChannel = null;
             UpdatesChannel = null;
             DiscordActivity = new DiscordActivity()
@@ -43,7 +44,6 @@ namespace Catamagne.Configuration
                 Name = "over Destiny...",
                 ActivityType = ActivityType.Watching,
             };
-            AdminRoleIDs = null;
             Prefixes = new string[] { "ct!" };
             ShortInterval = TimeSpan.FromMinutes(15);
             LongInterval = TimeSpan.FromHours(6);
@@ -57,15 +57,17 @@ namespace Catamagne.Configuration
         public void SaveConfig()
         {
             Directory.CreateDirectory(configValues.ConfigFolder);
-            File.WriteAllText(configValues.ConfigFolder, JsonConvert.SerializeObject(this, Formatting.Indented));
+            var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
         public void LoadConfig()
         {
-            if (File.Exists(configValues.ConfigFolder))
+            var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            if (File.Exists(ConfigFile))
             {
-                var _ = File.ReadAllText(configValues.ConfigFolder);
+                var _ = File.ReadAllText(ConfigFile);
                 configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                Console.WriteLine("Read configuration values from {0}", configValues.ConfigFolder);
+                Console.WriteLine("Read configuration values from {0}", ConfigFile);
             }
             else
             {
@@ -79,9 +81,9 @@ namespace Catamagne.Configuration
                         notEnter = false;
                     }
                 }
-                var _ = File.ReadAllText(configValues.ConfigFolder);
+                var _ = File.ReadAllText(ConfigFile);
                 configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                Console.WriteLine("Read configuration values from {0}", configValues.ConfigFolder);
+                Console.WriteLine("Read configuration values from {0}", ConfigFile);
             }
         }
     }
@@ -96,30 +98,34 @@ namespace Catamagne.Configuration
         public static void SaveClanMembers(Clan clan)
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
-            string clanFile = Path.Combine(clanFolder, "clan.dat");
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+            string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+            string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
 
             Directory.CreateDirectory(clanFolder);
-            File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members, Formatting.Indented));
-            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFile);
+            File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
+            File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
+            File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
+            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFolder);
         }
         public static void LoadClanMembers(Clan clan)
         {
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetName);
-            string clanFile = Path.Combine(clanFolder, "clan.dat");
-            if (File.Exists(clanFile))
-            {
-                var _ = File.ReadAllText(clanFile);
-                clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
-                Console.WriteLine("Read {0} members from {1}",clan.details.BungieNetName ,clanFile);
-            }
-            else
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+            string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+            string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
+            if (!File.Exists(clanMembersFile) || !File.Exists(clanSpreadsheetFile) || !File.Exists(clanLeaversFile))
             {
                 SaveClanMembers(clan);
-                var _ = File.ReadAllText(clanFile);
-                clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members = JsonConvert.DeserializeObject<Clan.Members>(_);
-                Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFile);
             }
+            var a = File.ReadAllText(clanMembersFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.BungieUsers = JsonConvert.DeserializeObject<List<BungieUser>>(a);
+            var b = File.ReadAllText(clanSpreadsheetFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetUser>>(b);
+            var c = File.ReadAllText(clanLeaversFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<ClanLeaver>>(c);
+            Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClans()
         {
@@ -128,9 +134,10 @@ namespace Catamagne.Configuration
             string clanFile = Path.Combine(clanFolder, "clans.dat");
 
             Directory.CreateDirectory(clanFolder);
-            var clanDetails = clans.Select(t => t.details).ToList();
-            File.WriteAllText(clanFile, JsonConvert.SerializeObject(clanDetails, Formatting.Indented));
-            Console.WriteLine("Wrote clan details to {1}", clanFile);
+            List<Clan.Details> clanDetails = clans.Select(t => t.details).ToList();
+            var _ = JsonConvert.SerializeObject(clanDetails, Formatting.Indented);
+            File.WriteAllText(clanFile, _);
+            Console.WriteLine("Wrote clan details to {0}", clanFile);
             foreach (Clan clan in clans)
             {
                 SaveClanMembers(clan);
@@ -141,28 +148,21 @@ namespace Catamagne.Configuration
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
             string clanFile = Path.Combine(clanFolder, "clans.dat");
-            if (File.Exists(clanFile))
-            {
-                var _ = File.ReadAllText(clanFile);
-                var clanDetails = JsonConvert.DeserializeObject<List<Clan.Details>>(clanFile);
-                clans = new List<Clan>();
-
-                foreach (var details in clanDetails)
-                {
-                    clans.Append(new Clan(details, new Clan.Members()));
-                }
-            }
-            else
+            if (!File.Exists(clanFile))
             {
                 SaveClans();
-                var _ = File.ReadAllText(clanFile);
-                var clanDetails = JsonConvert.DeserializeObject<List<Clan.Details>>(clanFile);
-                clans = new List<Clan>();
+            }
+            var _ = File.ReadAllText(clanFile);
+            List<Clan.Details> clanDetails = JsonConvert.DeserializeObject<List<Clan.Details>>(_);
+            clans = new List<Clan>();
 
-                foreach (var details in clanDetails)
-                {
-                    clans.Append(new Clan(details, new Clan.Members()));
-                }
+            foreach (var details in clanDetails)
+            {
+                clans.Add(new Clan(details, new Clan.Members()));
+            }
+            foreach (Clan clan in clans)
+            {
+                LoadClanMembers(clan);
             }
         }
     }

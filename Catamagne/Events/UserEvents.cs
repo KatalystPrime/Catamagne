@@ -1,5 +1,7 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Catamagne.Configuration;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 
@@ -17,6 +19,12 @@ namespace Catamagne.Events
         {
             await Task.Run(() =>
             {
+                var startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
+                var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 4;
+                var activityTimeSpan = TimeSpan.FromMinutes(5) * (Clans.clans.Count + 1);
+                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, Clans.clans, AutoEvents.AutoReadAsync);
+                //AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
+                //AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, ConfigValues.clansList, Core.Discord.RotateActivity);
                 return Task.CompletedTask;
             });
         }

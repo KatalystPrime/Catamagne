@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Catamagne.API;
+using Serilog;
 
 namespace Catamagne.Events
 {
@@ -39,6 +41,11 @@ namespace Catamagne.Events
                     Thread.Sleep(nextTime - DateTime.UtcNow);
                 }
             }).Start();
+        }
+        public static async Task AutoReadAsync(Clan clan)
+        {
+            Log.Information("Loading members of " + clan.details.BungieNetName);
+            await SpreadsheetTools.Read(clan);
         }
     }
 }

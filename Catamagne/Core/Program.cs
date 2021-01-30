@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Catamagne.API;
+using Catamagne.Configuration;
 
 namespace Catamagne.Core
 {
@@ -13,6 +14,8 @@ namespace Catamagne.Core
         {
 
             Console.Title = "Catamagne | Watcher of Destiny";
+            ConfigValues.configValues.LoadConfig();
+            Clans.LoadClans();
             MainAsync().GetAwaiter().GetResult();
         }
         static async Task MainAsync()
@@ -20,6 +23,7 @@ namespace Catamagne.Core
             PauseEvents = false;
 
             startTime = DateTime.UtcNow;
+            await SpreadsheetTools.Configure();
             await Discord.SetupClient();
             await Task.Delay(-1);
         }

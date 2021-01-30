@@ -8,7 +8,6 @@ using Google.Apis.Util.Store;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 namespace Catamagne.API
@@ -22,7 +21,7 @@ namespace Catamagne.API
         //public static List<User> users;
         static UserCredential credential;
         static SheetsService service;
-        public static async Task SetUpSheet()
+        public static async Task Configure()
         {
             using (var stream =
                 new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
@@ -46,7 +45,7 @@ namespace Catamagne.API
                 ApplicationName = ApplicationName,
             });
         }
-        public static async Task ReadSheet(Clan clan)
+        public static async Task Read(Clan clan)
         {
             var spreadsheetID = ConfigValues.configValues.SpreadsheetID;
             string spreadsheetRange = clan.details.SpreadsheetRange;
@@ -69,12 +68,12 @@ namespace Catamagne.API
 
                 publicMembers.ForEach(async member =>
                 {
-                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default, default);
+                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default);
                     workingList.Add(_);
                 });
                 privateMembers.ForEach(async member =>
                 {
-                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default, true);
+                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default);
                 });
                 forceBulkUpdate = true;
             }
@@ -86,27 +85,27 @@ namespace Catamagne.API
                     if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0)
                     {
                         var count = spreadsheetData[i].Count;
-                        if (count == 1)
+                        if (count > 0)
                         {
                             _.BungieNetLink = spreadsheetData[i][0].ToString();
                         }
-                        if (count == 2)
+                        if (count > 1)
                         {
                             _.BungieNetName = spreadsheetData[i][1].ToString();
                         }
-                        if (count == 3)
+                        if (count > 2)
                         {
                             _.SteamLink = spreadsheetData[i][2].ToString();
                         }
-                        if (count == 4)
+                        if (count > 3)
                         {
                             _.SteamName = spreadsheetData[i][3].ToString();
                         }
-                        if (count == 5)
+                        if (count > 4)
                         {
                             _.DiscordID = Convert.ToUInt64(spreadsheetData[i][4]);
                         }
-                        if (count == 6)
+                        if (count > 5)
                         {
                             _.UserStatus = UserStatus.ToEnum(spreadsheetData[i][5].ToString());
                         }
@@ -131,8 +130,9 @@ namespace Catamagne.API
 
             if (forceBulkUpdate)
             {
-                BulkUpdate(clan);
+                //BulkUpdate(clan);
             }
+            Clans.SaveClanMembers(clan);
         }
         public static async Task Write(Clan clan)
         {
