@@ -92,3 +92,12 @@ namespace Catamagne.API.Models
         public static explicit operator ClanLeaver(BungieUser b) => new ClanLeaver(b.BungieNetLink, b.SteamLink, b.DiscordID, b.ExtraColumns);
     }
 }
+namespace Catamagne.Configuration.Models
+{
+    enum UserType : int
+    {
+        BungieUser,
+        SpreadsheetUser,
+        ClanLeaver
+    }
+}
