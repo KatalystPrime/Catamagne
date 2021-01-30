@@ -89,7 +89,7 @@ namespace Catamagne.API
                 for (int i = 0; i < spreadsheetData.Count; i++)
                 {
                     var _ = new User();
-                    if (spreadsheetData[i] != null)
+                    if (spreadsheetData[i] != null && !string.IsNullOrEmpty(spreadsheetData[i][0].ToString()))
                     {
                         switch (spreadsheetData[i].Count)
                         {
@@ -125,7 +125,10 @@ namespace Catamagne.API
                                 {
                                     extraColumns.Add(spreadsheetData[i][index].ToString());
                                 }
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.clanTag, extraColumns);
+                                var a = spreadsheetData[i];
+                                var b = a[5].ToString().ToLower();
+                                var c = Enum.Parse<UserStatus>(b);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), c, clan.clanTag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }
@@ -461,20 +464,6 @@ namespace Catamagne.API
         }
         public static User CheckUserAgainstSpreadsheet(string userID)
         {
-            //ConfigValues.clansList.ForEach(User) clan =>
-            //{
-            //    //var _ = clan.clanUsers.FindIndex(t => t.discordID == userID);
-            //    //if (_ != -1)
-            //    //{
-            //    //    User workingUser = clan.clanUsers[_];
-            //    //    workingUser.UserStatus = UserStatus.LeftDiscord;
-            //    //    clan.clanUsers[_] = workingUser;
-            //    //    WriteData(ConfigValues.clansList.FirstOrDefault());
-
-            //    //    return workingUser;
-            //    //}
-            //    //return null;
-            //});
             if (ConfigValues.clansList.Any(clan => clan.Users.Select(t => t.discordID).Contains(userID)))
             {
                 var clan = ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID)).ToList();

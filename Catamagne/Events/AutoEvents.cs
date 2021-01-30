@@ -38,8 +38,8 @@ namespace Catamagne.Events
                         await action.Invoke(clans[index]);
                         index = (index + 1) % clans.Count;
                     }
-                    
-                    Thread.Sleep(nextTime - DateTime.UtcNow);
+                    var time = TimeSpan.FromMilliseconds(Math.Max(0d, (nextTime - DateTime.UtcNow).TotalMilliseconds));
+                    Thread.Sleep(time);
                }
             }).Start();  
         }
