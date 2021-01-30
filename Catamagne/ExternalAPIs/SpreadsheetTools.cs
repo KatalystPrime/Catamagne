@@ -1,5 +1,6 @@
 ﻿using Catamagne.API.Models;
 using Catamagne.Configuration;
+using Catamagne.Configuration.Models;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
@@ -57,7 +58,7 @@ namespace Catamagne.API
             ValueRange response = requestRead.Execute();
             var spreadsheetData = response.Values;
             var workingList = new List<SpreadsheetUser>();
-            bool forceBulkUpdate = false;
+            bool grabAllMembers = false;
 
             if (spreadsheetData == null)
             {
@@ -75,7 +76,7 @@ namespace Catamagne.API
                 {
                     _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default);
                 });
-                forceBulkUpdate = true;
+                grabAllMembers = true;
             }
             else
             {
@@ -125,14 +126,14 @@ namespace Catamagne.API
             clan.members.SpreadsheetUsers = workingList;
             if (clan.members.BungieUsers == null || clan.members.BungieUsers.Count == 0)
             {
-                forceBulkUpdate = true;
+                grabAllMembers = true;
             }
 
-            if (forceBulkUpdate)
+            if (grabAllMembers)
             {
                 //BulkUpdate(clan);
             }
-            Clans.SaveClanMembers(clan);
+            Clans.SaveClanMembers(clan, UserType.SpreadsheetUser);
         }
         public static async Task Write(Clan clan)
         {
