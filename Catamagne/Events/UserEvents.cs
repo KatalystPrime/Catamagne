@@ -57,7 +57,7 @@ namespace Catamagne.Events
                 if (responses.Select(response => response.trigger).Contains(messageArgs.Message.Content))
                 {
                     Response response = responses.Find(r => r.trigger == messageArgs.Message.Content);
-                    if (response.allowedChannels.Contains(messageArgs.Channel) || response.allowedChannels == null)
+                    if (response.allowedChannels == null || response.allowedChannels.Contains(messageArgs.Channel))
                     {
                         await messageArgs.Message.RespondAsync(response.response);
                     }
