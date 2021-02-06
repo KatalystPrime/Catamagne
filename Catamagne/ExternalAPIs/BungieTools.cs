@@ -21,14 +21,14 @@ namespace Catamagne.API
             return bungieClan;
         }
 
-        public static async Task<(List<GroupMember> publicMembers, List<GroupMember> privateMembers)> GetClanMembers(Clan clan)
+        public static async Task<List<GroupMember>> GetClanMembers(Clan clan)
         {
             SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.BungieNetID));
             var groupList = group.results.ToList();
-            var publicMembers = groupList.Where(t => t.bungieNetUserInfo != null).ToList();
-            var privateMembers = groupList.Where(t => t.bungieNetUserInfo == null).ToList();
-
-            return (publicMembers, privateMembers);
+            var a = groupList.Where(t => t.bungieNetUserInfo != null).ToList();
+            var b = groupList.Where(t => t.bungieNetUserInfo == null).ToList();
+            var c = a.Concat(b).ToList();
+            return c;
         }
         public static string GetBungieProfileLink(GroupMember groupMember)
         {

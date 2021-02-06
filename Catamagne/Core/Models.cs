@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Catamagne.API.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -41,7 +42,7 @@ namespace Catamagne.API.Models
             return StatusEnum.ok; //return your default value
         }
     }
-    class SpreadsheetUser
+    public class SpreadsheetUser
     {
         public string BungieNetLink;
         public string BungieNetName;
@@ -60,7 +61,7 @@ namespace Catamagne.API.Models
         }
         public static explicit operator BungieUser(SpreadsheetUser s) => new BungieUser(s.BungieNetLink, null, s.BungieNetName, s.SteamLink, null, s.SteamName, s.DiscordID, s.UserStatus, s.ExtraColumns);
     }
-    class BungieUser
+    public class BungieUser
     {
         public string BungieNetLink;
         public ulong? BungieNetID;
@@ -78,7 +79,7 @@ namespace Catamagne.API.Models
         }
         public static explicit operator SpreadsheetUser(BungieUser b) => new SpreadsheetUser(b.BungieNetLink, b.BungieNetName, b.SteamLink, b.SteamName, b.DiscordID, b.UserStatus, b.ExtraColumns);
     }
-    class ClanLeaver
+    public class ClanLeaver
     {
         public string BungieNetLink;
         public string SteamLink;
@@ -99,5 +100,13 @@ namespace Catamagne.Configuration.Models
         BungieUser,
         SpreadsheetUser,
         ClanLeaver
+    }
+    public struct Changes
+    {
+        public Changes(List<SpreadsheetUser> addedUsers, List<SpreadsheetUser> removedUsers, List<SpreadsheetUser> updatedUsers)
+        {
+            this.addedUsers = addedUsers; this.removedUsers = removedUsers; this.updatedUsers = updatedUsers; this.TotalChanges = addedUsers.Count + removedUsers.Count + updatedUsers.Count;
+        }
+        public List<SpreadsheetUser> addedUsers; public List<SpreadsheetUser> removedUsers; public List<SpreadsheetUser> updatedUsers; public int TotalChanges;
     }
 }

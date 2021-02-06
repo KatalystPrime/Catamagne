@@ -9,6 +9,7 @@ using Google.Apis.Util.Store;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 namespace Catamagne.API
@@ -64,15 +65,7 @@ namespace Catamagne.API
             {
                 var _ = new SpreadsheetUser();
                 var members = await BungieTools.GetClanMembers(clan);
-                var publicMembers = members.publicMembers;
-                var privateMembers = members.privateMembers;
-
-                publicMembers.ForEach(async member =>
-                {
-                    _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default);
-                    workingList.Add(_);
-                });
-                privateMembers.ForEach(async member =>
+                members.ForEach(async member =>
                 {
                     _ = new SpreadsheetUser(BungieTools.GetBungieProfileLink(member), null, null, null, null, default, default);
                 });
@@ -194,6 +187,32 @@ namespace Catamagne.API
             // Prints the names and majors of students in a sample spreadsheet:
             var response = requestUpdate.Execute();
             Clans.SaveClanMembers(clan);
+        }
+        public static async Task<Changes?> CheckForChanges(Clan clan)
+        {
+            var changes = new Changes();
+            await Read(clan);
+            var spreadsheetMembers = clan.members.SpreadsheetUsers;
+            var clanMembers = await BungieTools.GetClanMembers(clan);
+            List<string> clanMemberProfiles = new List<string>();
+            foreach (var member in clanMembers)
+            {
+                clanMemberProfiles.Add(BungieTools.GetBungieProfileLink(member));
+            }
+            var addedUsers = new List<SpreadsheetUser>(); var removedUsers = new List<SpreadsheetUser>(); var changedUsers = new List<SpreadsheetUser>();
+            for (int i = 0; i < clanMemberProfiles.Count; i++)
+            {
+                if (!spreadsheetMembers.Select(t => t.BungieNetLink).Contains(clanMemberProfiles[i]))
+                {
+                    addedUsers.Add(spreadsheetMembers[i]);
+                }
+            }
+            for (int i = 0; i < spreadsheetMembers.Count; i++)
+            {
+                if (!clanMemberProfiles.Contains(spreadsheetMembers[i].BungieNetLink)) {
+                    removedUsers.Add(spreadsheetMembers[i]);
+                }
+            }
         }
     }
 }
