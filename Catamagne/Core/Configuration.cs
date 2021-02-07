@@ -109,32 +109,33 @@ namespace Catamagne.Configuration
             File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
             File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
             File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
-            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClanMembers(Clan clan, UserType userType)
         {
             Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
             string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFile;
             Directory.CreateDirectory(clanFolder);
             switch (userType)
             {
                 case UserType.BungieUser:
-                    string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
-                    File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
+                    clanFile = Path.Combine(clanFolder, "Users.dat");
+                    File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
                     break;
                 case UserType.SpreadsheetUser:
-                    string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
-                    File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
+                    clanFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+                    File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
                     break;
                 case UserType.Leaver:
-                    string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
-                    File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
+                    clanFile = Path.Combine(clanFolder, "Leavers.dat");
+                    File.WriteAllText(clanFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
                     break;
                 default:
                     throw new ArgumentException("Type provided is invalid.");
 
             }
-            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFile);
         }
         public static void LoadClanMembers(Clan clan)
         {
@@ -152,7 +153,7 @@ namespace Catamagne.Configuration
             clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
             var c = File.ReadAllText(clanLeaversFile);
             clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
-            Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void LoadClanMembers(Clan clan, UserType userType)
         {
@@ -190,7 +191,7 @@ namespace Catamagne.Configuration
                 default:
                     throw new ArgumentException("Type provided is invalid.");
             }
-            Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClans()
         {

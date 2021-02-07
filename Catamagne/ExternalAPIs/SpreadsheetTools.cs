@@ -127,8 +127,9 @@ namespace Catamagne.API
                                 }
                                 var a = spreadsheetData[i];
                                 var b = a[5].ToString().ToLower();
-                                var c = Enum.Parse<UserStatus>(b);
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), c, clan.details.Tag, extraColumns);
+                                UserStatus d = UserStatus.ok;
+                                var c = Enum.TryParse(b, false,out d);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), d, clan.details.Tag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }

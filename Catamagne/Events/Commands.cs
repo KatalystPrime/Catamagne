@@ -61,6 +61,7 @@ namespace Catamagne.Commands
 
                     //call bulkupdate method
                     ConfigValues.configValues.LoadConfig();
+                    Clans.LoadClans();
                     await Core.Discord.UpdateChannels();
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully updated configuration files");
                     await message.ModifyAsync(discordEmbed);
