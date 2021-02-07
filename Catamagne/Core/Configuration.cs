@@ -69,7 +69,7 @@ namespace Catamagne.Configuration
             {
                 var _ = File.ReadAllText(ConfigFile);
                 configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                Console.WriteLine("Read configuration values from {0}", ConfigFile);
+                Console.WriteLine(string.Format("{0,-25} {1}", "Read configuration values from", ConfigFile));
             }
             else
             {
@@ -85,7 +85,7 @@ namespace Catamagne.Configuration
                 }
                 var _ = File.ReadAllText(ConfigFile);
                 configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                Console.WriteLine("Read configuration values from {0}", ConfigFile);
+                Console.WriteLine(string.Format("{0,-25} {1}", "Read configuration values from", ConfigFile));
             }
         }
     }
@@ -109,7 +109,8 @@ namespace Catamagne.Configuration
             File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
             File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
             File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
-            Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.BungieNetName, clanFolder));
+            //Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClanMembers(Clan clan, UserType userType)
         {
@@ -135,7 +136,10 @@ namespace Catamagne.Configuration
                     throw new ArgumentException("Type provided is invalid.");
 
             }
-            Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFile);
+            //var _ = string.Format("Wrote {0} members to", clan.details.BungieNetName);
+            //Console.WriteLine(string.Format("{0,-35} {1}\\", _, clanFolder));
+            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.BungieNetName, clanFolder));
+            //Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFile);
         }
         public static void LoadClanMembers(Clan clan)
         {
@@ -153,7 +157,8 @@ namespace Catamagne.Configuration
             clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
             var c = File.ReadAllText(clanLeaversFile);
             clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
-            Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
+            //Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.BungieNetName, clanFolder));
         }
         public static void LoadClanMembers(Clan clan, UserType userType)
         {
@@ -191,7 +196,8 @@ namespace Catamagne.Configuration
                 default:
                     throw new ArgumentException("Type provided is invalid.");
             }
-            Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
+            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.BungieNetName, clanFolder));
+            //Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClans()
         {

@@ -35,8 +35,8 @@ namespace Catamagne.Events
             await Task.Run(() =>
             {
                 var startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
-                var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 4;
-                var activityTimeSpan = TimeSpan.FromMinutes(5) * (Clans.clans.Count+1);
+                var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.MediumInterval / 3 * 2;
+                var activityTimeSpan = ConfigValues.configValues.MediumInterval * (Clans.clans.Count+1);
                 //var dailyTimeSpan = TimeSpan.FromDays(1);
                 //AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
                 AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);

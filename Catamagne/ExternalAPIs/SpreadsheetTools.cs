@@ -287,6 +287,7 @@ namespace Catamagne.API
             workingList.OrderBy(t => t.steamName);
             clan.members.BungieUsers = workingList;
             Write(clan);
+            Clans.SaveClanMembers(clan);
             Core.Core.PauseEvents = false;
         }
         public static async Task SelectiveUpdate(Clan clan, Changes changes)
@@ -377,6 +378,7 @@ namespace Catamagne.API
             _.OrderBy(t => t.steamName);
             clan.members.BungieUsers = _;
             Write(clan);
+            Clans.SaveClanMembers(clan);
             Core.Core.PauseEvents = false;
         }
         public static async Task<Changes> CheckForChangesAsync(Clan clan)
