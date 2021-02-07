@@ -39,8 +39,8 @@ namespace Catamagne.API
                     Scopes,
                     "drive",
                     CancellationToken.None,
-                    new FileDataStore(Path.Combine(ConfigValues.configValues.Folderpath, "config", credPath), true));
-                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.Folderpath + credPath);
+                    new FileDataStore(Path.Combine(ConfigValues.configValues.FolderPath, "config", credPath), true));
+                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.FolderPath + credPath);
             }
 
             // Create Google Sheets API service.
@@ -54,7 +54,7 @@ namespace Catamagne.API
         {
             // Define requestRead parameters.
             String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
-            String range = clan.clanSheetRange;
+            String range = clan.details.SpreadsheetRange;
             SpreadsheetsResource.ValuesResource.GetRequest requestRead =
                     service.Spreadsheets.Values.Get(spreadsheetId, range);
 
@@ -73,15 +73,15 @@ namespace Catamagne.API
                 var invalidMembers = members.invalidMembers;
                 validMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
                     workingList.Add(_);
                 });
                 invalidMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
                     workingList.Add(_);
                 });
-                Log.Information("Spreadsheet for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+                Log.Information("Spreadsheet for " + clan.details.BungieNetName + " is empty, generating (will take 10 minutes)");
                 forceBulkUpdate = true;
             }
             else
@@ -96,27 +96,27 @@ namespace Catamagne.API
                             case 0:
                                 break;
                             case 1:
-                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.ok, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             case 2:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.ok, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.ok, clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             case 3:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.ok, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.ok, clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             case 4:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.ok, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.ok, clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             case 5:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.ok, clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.ok, clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             case 6:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.clanTag);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.details.Tag);
                                 workingList.Add(_);
                                 break;
                             default:
@@ -128,7 +128,7 @@ namespace Catamagne.API
                                 var a = spreadsheetData[i];
                                 var b = a[5].ToString().ToLower();
                                 var c = Enum.Parse<UserStatus>(b);
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), c, clan.clanTag, extraColumns);
+                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), c, clan.details.Tag, extraColumns);
                                 workingList.Add(_);
                                 break;
                         }
@@ -136,11 +136,11 @@ namespace Catamagne.API
                 }
             }
 
-            clan.spreadsheetUsers = workingList;
-            if (clan.Users == null || clan.Users.Count == 0)
+            clan.members.SpreadsheetUsers = workingList;
+            if (clan.members.BungieUsers == null || clan.members.BungieUsers.Count == 0)
             {
                 forceBulkUpdate = true;
-                Log.Information("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
+                Log.Information("User details for " + clan.details.BungieNetName + " is empty, generating (will take 10 minutes)");
                 //Console.WriteLine("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
             }
 
@@ -153,31 +153,31 @@ namespace Catamagne.API
         public static void Write(Clan clan)
         {
             String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
-            String range = clan.clanSheetRange;
+            String range = clan.details.SpreadsheetRange;
             ValueRange valueRange = new ValueRange();
             var table = new List<IList<object>>();
-            for (int c = 0; c < clan.Users.Count; c++)
+            for (int c = 0; c < clan.members.BungieUsers.Count; c++)
             {
                 List<object> _;
-                if (string.IsNullOrEmpty(clan.Users[c].bungieProfile))
+                if (string.IsNullOrEmpty(clan.members.BungieUsers[c].bungieProfile))
                 {
                     _ = new List<object>(6) { "", "", "", "", "", "", "" };
                 }
                 else
                 {
-                    _ = new List<object>(6) { clan.Users[c].bungieProfile, clan.Users[c].bungieName, clan.Users[c].steamProfile, clan.Users[c].steamName, clan.Users[c].discordID, clan.Users[c].UserStatus.ToString() };
+                    _ = new List<object>(6) { clan.members.BungieUsers[c].bungieProfile, clan.members.BungieUsers[c].bungieName, clan.members.BungieUsers[c].steamProfile, clan.members.BungieUsers[c].steamName, clan.members.BungieUsers[c].discordID, clan.members.BungieUsers[c].UserStatus.ToString() };
                 }
 
-                if (clan.Users[c].ExtraColumns != null)
+                if (clan.members.BungieUsers[c].ExtraColumns != null)
                 {
-                    foreach (string column in clan.Users[c].ExtraColumns)
+                    foreach (string column in clan.members.BungieUsers[c].ExtraColumns)
                     {
                         _.Add(column);
                     }
-                    var letterStrings = clan.clanSheetRange.Split('!')[1].Split(':');
+                    var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
                     var a = char.ToUpper(letterStrings[0][0]) - 64;
                     var b = char.ToUpper(letterStrings[1][0]) - 64;
-                    var forRange = b - a - clan.Users[c].ExtraColumns.Count() - 5;
+                    var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Count() - 5;
                     for (int i = 0; i < forRange; i++)
                     {
                         _.Add("");
@@ -185,7 +185,7 @@ namespace Catamagne.API
                 }
                 else
                 {
-                    var letterStrings = clan.clanSheetRange.Split('!')[1].Split(':');
+                    var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
                     var a = char.ToUpper(letterStrings[0][0]) - 64;
                     var b = char.ToUpper(letterStrings[1][0]) - 64;
                     var forRange = b - a - 5;
@@ -196,7 +196,7 @@ namespace Catamagne.API
                 }
                 table.Add(_);
             }
-            for (int c = clan.Users.Count; c < 100; c++)
+            for (int c = clan.members.BungieUsers.Count; c < 100; c++)
             {
                 List<object> _ = new List<object>(5) { "", "", "", "", "", "" };
                 table.Add(_);
@@ -207,14 +207,13 @@ namespace Catamagne.API
 
             // Prints the names and majors of students in a sample spreadsheet:
             var response = requestUpdate.Execute();
-            ConfigValues.configValues.SaveConfig(true);
         }
         public static async Task BulkUpdate(Clan clan, bool skipRead = false)
         {
             if (!skipRead) await Read(clan);
             //ShowLoading("processing...");
             Core.Core.PauseEvents = true;
-            var _ = clan.spreadsheetUsers;
+            var _ = clan.members.SpreadsheetUsers;
             List<User> workingList = new List<User>();
             foreach (User user in _)
             {
@@ -241,7 +240,7 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
-                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
+                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                     else
                     {
@@ -279,20 +278,20 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
-                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
+                        workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                 }
             }
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
             workingList.OrderBy(t => t.steamName);
-            clan.Users = workingList;
+            clan.members.BungieUsers = workingList;
             Write(clan);
             Core.Core.PauseEvents = false;
         }
         public static async Task SelectiveUpdate(Clan clan, Changes changes)
         {
             await Read(clan);
-            var _ = clan.Users;
+            var _ = clan.members.BungieUsers;
 
             foreach (User addedUser in changes.addedUsers)
             {
@@ -359,7 +358,7 @@ namespace Catamagne.API
                         {
                             extraColumns = addedUser.ExtraColumns;
                         }
-                        _.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.clanTag, extraColumns));
+                        _.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                 }
             }
@@ -375,7 +374,7 @@ namespace Catamagne.API
             });
             _.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
             _.OrderBy(t => t.steamName);
-            clan.Users = _;
+            clan.members.BungieUsers = _;
             Write(clan);
             Core.Core.PauseEvents = false;
         }
@@ -383,76 +382,76 @@ namespace Catamagne.API
         {
             await Read(clan);
             List<User> addedUsers = new List<User>(); List<User> removedUsers = new List<User>(); List<User> updatedUsers = new List<User>();
-            for (int i = 0; i < clan.Users.Count; i++)
+            for (int i = 0; i < clan.members.BungieUsers.Count; i++)
             {
-                if (clan.Users[i].bungieProfile != null)
+                if (clan.members.BungieUsers[i].bungieProfile != null)
                 {
-                    if (!clan.spreadsheetUsers.Select(t => t.bungieProfile).Contains(clan.Users[i].bungieProfile))
+                    if (!clan.members.SpreadsheetUsers.Select(t => t.bungieProfile).Contains(clan.members.BungieUsers[i].bungieProfile))
                     {
-                        removedUsers.Add(clan.Users[i]);
+                        removedUsers.Add(clan.members.BungieUsers[i]);
                     }
                 }
             }
-            for (int i = 0; i < clan.spreadsheetUsers.Count; i++)
+            for (int i = 0; i < clan.members.SpreadsheetUsers.Count; i++)
             {
-                if (clan.spreadsheetUsers[i].bungieProfile != null)
+                if (clan.members.SpreadsheetUsers[i].bungieProfile != null)
                 {
-                    if (!clan.Users.Select(t => t.bungieProfile).Contains(clan.spreadsheetUsers[i].bungieProfile))
+                    if (!clan.members.BungieUsers.Select(t => t.bungieProfile).Contains(clan.members.SpreadsheetUsers[i].bungieProfile))
                     {
-                        addedUsers.Add(clan.spreadsheetUsers[i]);
+                        addedUsers.Add(clan.members.SpreadsheetUsers[i]);
                     }
                 }
             }
-            for (int i = 0; i < clan.spreadsheetUsers.Count; i++)
+            for (int i = 0; i < clan.members.SpreadsheetUsers.Count; i++)
             {
-                if (clan.spreadsheetUsers[i].bungieProfile != null)
+                if (clan.members.SpreadsheetUsers[i].bungieProfile != null)
                 {
-                    if (clan.Users.Select(t => t.bungieProfile).Contains(clan.spreadsheetUsers[i].bungieProfile))
+                    if (clan.members.BungieUsers.Select(t => t.bungieProfile).Contains(clan.members.SpreadsheetUsers[i].bungieProfile))
                     {
                         bool userUpdated = false;
-                        var _ = clan.Users.Where(t => t.bungieProfile == clan.spreadsheetUsers[i].bungieProfile);
+                        var _ = clan.members.BungieUsers.Where(t => t.bungieProfile == clan.members.SpreadsheetUsers[i].bungieProfile);
                         User workingUser = _.FirstOrDefault();
-                        if (_.FirstOrDefault().UserStatus != clan.spreadsheetUsers[i].UserStatus)
+                        if (_.FirstOrDefault().UserStatus != clan.members.SpreadsheetUsers[i].UserStatus)
                         {
-                            workingUser.UserStatus = clan.spreadsheetUsers[i].UserStatus;
+                            workingUser.UserStatus = clan.members.SpreadsheetUsers[i].UserStatus;
                             userUpdated = true;
                         }
-                        if (_.FirstOrDefault().discordID != clan.spreadsheetUsers[i].discordID)
+                        if (_.FirstOrDefault().discordID != clan.members.SpreadsheetUsers[i].discordID)
                         {
-                            workingUser.discordID = clan.spreadsheetUsers[i].discordID;
+                            workingUser.discordID = clan.members.SpreadsheetUsers[i].discordID;
                             userUpdated = true;
                         }
-                        if (_.FirstOrDefault().steamName != clan.spreadsheetUsers[i].steamName)
+                        if (_.FirstOrDefault().steamName != clan.members.SpreadsheetUsers[i].steamName)
                         {
-                            workingUser.steamName = clan.spreadsheetUsers[i].steamName;
+                            workingUser.steamName = clan.members.SpreadsheetUsers[i].steamName;
                             userUpdated = true;
                         }
-                        if (_.FirstOrDefault().steamProfile != clan.spreadsheetUsers[i].steamProfile)
+                        if (_.FirstOrDefault().steamProfile != clan.members.SpreadsheetUsers[i].steamProfile)
                         {
-                            workingUser.steamProfile = clan.spreadsheetUsers[i].steamProfile;
+                            workingUser.steamProfile = clan.members.SpreadsheetUsers[i].steamProfile;
                             userUpdated = true;
                         }
-                        if (_.FirstOrDefault().bungieName != clan.spreadsheetUsers[i].bungieName)
+                        if (_.FirstOrDefault().bungieName != clan.members.SpreadsheetUsers[i].bungieName)
                         {
-                            workingUser.bungieName = clan.spreadsheetUsers[i].bungieName;
+                            workingUser.bungieName = clan.members.SpreadsheetUsers[i].bungieName;
                             userUpdated = true;
                         }
-                        if (clan.spreadsheetUsers[i].ExtraColumns != null)
+                        if (clan.members.SpreadsheetUsers[i].ExtraColumns != null)
                         {
                             if (_.FirstOrDefault().ExtraColumns != null)
                             {
                                 var a = _.FirstOrDefault().ExtraColumns;
-                                var b = clan.spreadsheetUsers[i].ExtraColumns;
+                                var b = clan.members.SpreadsheetUsers[i].ExtraColumns;
                                 var c = (!a.SequenceEqual(b));
                                 if (c)
                                 {
-                                    workingUser.ExtraColumns = clan.spreadsheetUsers[i].ExtraColumns;
+                                    workingUser.ExtraColumns = clan.members.SpreadsheetUsers[i].ExtraColumns;
                                     userUpdated = true;
                                 }
                             }
                             else
                             {
-                                workingUser.ExtraColumns = clan.spreadsheetUsers[i].ExtraColumns;
+                                workingUser.ExtraColumns = clan.members.SpreadsheetUsers[i].ExtraColumns;
                                 userUpdated = true;
                             }
                         }
@@ -464,16 +463,16 @@ namespace Catamagne.API
         }
         public static User CheckUserAgainstSpreadsheet(string userID)
         {
-            if (ConfigValues.clansList.Any(clan => clan.Users.Select(t => t.discordID).Contains(userID)))
+            if (Clans.clans.Any(clan => clan.members.BungieUsers.Select(t => t.discordID).Contains(userID)))
             {
-                var clan = ConfigValues.clansList.Where(t => t.Users.Select(t => t.discordID).Contains(userID)).ToList();
+                var clan = Clans.clans.Where(t => t.members.BungieUsers.Select(t => t.discordID).Contains(userID)).ToList();
                 //var _ = clan.clanUsers.FindIndex(t => t.discordID == userID);
-                var _ = clan.FirstOrDefault().Users.FindIndex(t => t.discordID == userID);
+                var _ = clan.FirstOrDefault().members.BungieUsers.FindIndex(t => t.discordID == userID);
                 if (_ != -1)
                 {
-                    User workingUser = clan.FirstOrDefault().Users[_];
+                    User workingUser = clan.FirstOrDefault().members.BungieUsers[_];
                     workingUser.UserStatus = UserStatus.leftdiscord;
-                    clan.FirstOrDefault().Users[_] = workingUser;
+                    clan.FirstOrDefault().members.BungieUsers[_] = workingUser;
                     Write(clan.FirstOrDefault());
 
                     return workingUser;

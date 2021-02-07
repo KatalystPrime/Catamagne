@@ -18,11 +18,11 @@ namespace Catamagne.Core
 {
     class Discord
     {
-        public static DiscordChannel alertsChannel;
-        public static DiscordChannel updatesChannel;
+        public static DiscordChannel? alertsChannel;
+        public static DiscordChannel? updatesChannel;
         static SerilogLoggerFactory logFactory;
         public static DiscordClient discord;
-        public static List<DiscordChannel> commandChannels;
+        public static List<DiscordChannel?> commandChannels;
         public static async Task SetupClient()
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Console()
@@ -65,7 +65,7 @@ namespace Catamagne.Core
         {
             try
             {
-                alertsChannel = await discord.GetChannelAsync(ConfigValues.configValues.AlertChannel);
+                alertsChannel = await discord.GetChannelAsync((ulong) ConfigValues.configValues.AlertChannel);
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ namespace Catamagne.Core
             }
             try
             {
-                updatesChannel = await discord.GetChannelAsync(ConfigValues.configValues.UpdatesChannel);
+                updatesChannel = await discord.GetChannelAsync((ulong) ConfigValues.configValues.UpdatesChannel);
             }
             catch (Exception e)
             {
@@ -233,10 +233,10 @@ namespace Catamagne.Core
         {
             var activity = new DiscordActivity()
             {
-                Name = string.Format("over {0}...", clan.clanName),
+                Name = string.Format("over {0}...", clan.details.BungieNetName),
                 ActivityType = ActivityType.Watching,
             };
-            Log.Information("Rotating status to " + clan.clanName);
+            Log.Information("Rotating status to " + clan.details.BungieNetName);
             discord.UpdateStatusAsync(activity);
             return Task.CompletedTask;
         }

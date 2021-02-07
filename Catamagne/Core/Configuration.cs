@@ -5,172 +5,230 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Catamagne.Configuration
 {
-
     [Serializable]
-    public class ConfigValues
+    class ConfigValues
     {
         [NonSerialized] public static ConfigValues configValues = new ConfigValues();
-        [NonSerialized] public static List<Clan> clansList = new List<Clan>();
-        public ulong[] RoleIDs;
-        public ulong[] AdminRoleIDs;
-        public ulong[] CommandChannels;
-        public ulong AlertChannel;
-        public ulong UpdatesChannel;
+
+        public List<ulong> RoleIDs;
+        public List<ulong> AdminRoleIDs;
+        public List<ulong> CommandChannels;
+        public ulong? AlertChannel;
+        public ulong? UpdatesChannel;
         public DiscordActivity DiscordActivity;
         public string[] Prefixes;
         public TimeSpan ShortInterval;
+        public TimeSpan MediumInterval;
         public TimeSpan LongInterval;
-        public string Folderpath;
-        public string Filepath;
+        public string FolderPath;
+        public string ConfigFolder;
+        public string ClansFolder;
         public string SpreadsheetID;
         public string BungieAPIKey;
         public string DiscordToken;
-        public Core.Response[] Responses;
-        public ulong CataID;
+        public ulong? DevID;
+        public List<Response> Responses;
         public ConfigValues()
         {
-            CataID = 194439970797256706;
-            RoleIDs = new ulong[] { 720914599536492545, 796437863667466274 };
-            CommandChannels = new ulong[] { 796409176803901441 };
-            AlertChannel = 796644582447906857;
-            UpdatesChannel = 796658619257061400;
+            DevID = 194439970797256706;
+            RoleIDs = new List<ulong>();
+            CommandChannels = new List<ulong>();
+            AdminRoleIDs = new List<ulong>();
+            AlertChannel = null;
+            UpdatesChannel = null;
             DiscordActivity = new DiscordActivity()
             {
-                Name = "over Umbral...",
+                Name = "over Destiny...",
                 ActivityType = ActivityType.Watching,
             };
-            AdminRoleIDs = new ulong[] { 743831304771993640, 743060988768550914 };
             Prefixes = new string[] { "ct!" };
-            ShortInterval = TimeSpan.FromMinutes(5);
+            ShortInterval = TimeSpan.FromMinutes(15);
             LongInterval = TimeSpan.FromHours(6);
-            Folderpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "CatamagneMULT");
-            SpreadsheetID = "ENTER SHEET ID HERE";
-            BungieAPIKey = "ENTER BUNGIE API KEY HERE";
-            DiscordToken = "ENTER DISCORD BOT TOKEN HERE";
-            Responses = new Response[] { new Response("cataisnuts", "Our <#627494111821430794> channel is used to chat and talk about the game as a whole.\nYou can pick up activity-specific roles from over at <#686486603711119360>. With these roles you can ping and be pinged for their respective activities. For example, you can ping `@Strikes D2` to find players for strikes, and be pinged for other players doing strikes.\n<#628753173959671829> is used to matchmake and talk about PVE activities, with the same applying for <#628753046712614912>.\nFor hosted activities, you can sign up to raids and other activities hosted by your fellow gladiators in <#779175016611971123>. Furthermore, you can host your own activities by typing `!event` in <#342214163323551744>. \nLastly, the standalone <#628753070846640174> channel is used for spontaneous raids, discussions about raids and communication between raiders.", "Message to welcome and introduce new members to the destiny channels!") };
-            clansList = new List<Clan>() { new Clan("3928553", "Xenolith!A2:F101", "Xenolith", "xg", new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>()), new Clan("3872177", "Zodiac!A2:F101", "Zodiac", "zog", new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>()) };
+            FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Catamagne");
+            ConfigFolder = Path.Combine(FolderPath, "Config");
+            ClansFolder = Path.Combine(FolderPath, "Clans");
+            SpreadsheetID = null;
+            BungieAPIKey = null;
+            DiscordToken = null;
+            Responses = new List<Response>();
         }
-        public void SaveConfig(bool? clanMode = false)
+        public void SaveConfig()
         {
-            string folderpath = Path.Combine(Folderpath, "Config");
-            string configpath = Path.Combine(folderpath, "config.json");
-            string clanspath = Path.Combine(folderpath, "clans.json");
-            if (clanMode.HasValue)
+            Directory.CreateDirectory(configValues.ConfigFolder);
+            var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(this, Formatting.Indented));
+        }
+        public void LoadConfig()
+        {
+            var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            if (File.Exists(ConfigFile))
             {
-                if (clanMode.Value)
-                {
-                    Directory.CreateDirectory(folderpath);
-                    File.WriteAllText(clanspath, JsonConvert.SerializeObject(clansList, Formatting.Indented));
-                }
-                else
-                {
-                    Directory.CreateDirectory(folderpath);
-                    File.WriteAllText(configpath, JsonConvert.SerializeObject(this, Formatting.Indented));
-                }
+                var _ = File.ReadAllText(ConfigFile);
+                configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
+                Console.WriteLine("Read configuration values from {0}", ConfigFile);
             }
             else
             {
-                Directory.CreateDirectory(folderpath);
-                File.WriteAllText(clanspath, JsonConvert.SerializeObject(clansList, Formatting.Indented));
-                Directory.CreateDirectory(folderpath);
-                File.WriteAllText(configpath, JsonConvert.SerializeObject(this, Formatting.Indented));
-            }
-
-        }
-        public void LoadConfig(bool? clanMode = false)
-        {
-            string folderpath = Path.Combine(Folderpath, "Config");
-            string configpath = Path.Combine(folderpath, "config.json");
-            string clanspath = Path.Combine(folderpath, "clans.json");
-            if (clanMode.HasValue)
-            {
-                if (!clanMode.Value)
+                Console.WriteLine("No configuration file found at {0}\nCreating one. please edit the file with your api keys and google secrets and press 'K'", configValues.ConfigFolder);
+                SaveConfig();
+                bool notEnter = true;
+                while (notEnter)
                 {
-                    if (File.Exists(configpath))
+                    if (Console.ReadKey(true).Key == ConsoleKey.K)
                     {
-                        var _ = File.ReadAllText(configpath);
-                        configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                        Console.WriteLine("Read configuration values from {0}", configpath);
-                    }
-                    else
-                    {
-                        Console.WriteLine("No configuration file found at {0}\nCreating one. please edit the file with your api keys and google secrets and press 'K'", configpath);
-                        SaveConfig();
-                        bool notEnter = true;
-                        while (notEnter)
-                        {
-                            if (Console.ReadKey(true).Key == ConsoleKey.K)
-                            {
-                                notEnter = false;
-                            }
-                        }
-                        var _ = File.ReadAllText(configpath);
-                        configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                        Console.WriteLine("Read configuration values from {0}", configpath);
+                        notEnter = false;
                     }
                 }
-                else
-                {
-                    if (File.Exists(clanspath))
-                    {
-                        var _ = File.ReadAllText(clanspath);
-                        clansList = JsonConvert.DeserializeObject<List<Clan>>(_);
-                        Console.WriteLine("Read clans list from {0}", clanspath);
-                    }
-                    else
-                    {
-                        Console.WriteLine("No clans list found at {0}\nCreating one.", clanspath);
-                        SaveConfig(true);
-                        var _ = File.ReadAllText(clanspath);
-                        clansList = JsonConvert.DeserializeObject<List<Clan>>(_);
-                        Console.WriteLine("Read clans list from {0}", clanspath);
-                    }
-                }
-            }
-            else
-            {
-                if (File.Exists(configpath))
-                {
-                    var _ = File.ReadAllText(configpath);
-                    configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                    Console.WriteLine("Read configuration values from {0}", configpath);
-                }
-                else
-                {
-                    Console.WriteLine("No configuration file found at {0}\nCreating one. please edit the file with your api keys and google secrets and press 'K'", configpath);
-                    SaveConfig();
-                    bool notEnter = true;
-                    while (notEnter)
-                    {
-                        if (Console.ReadKey(true).Key == ConsoleKey.K)
-                        {
-                            notEnter = false;
-                        }
-                    }
-                    var _ = File.ReadAllText(configpath);
-                    configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
-                    Console.WriteLine("Read configuration values from {0}", configpath);
-                }
-                if (File.Exists(clanspath))
-                {
-                    var _ = File.ReadAllText(clanspath);
-
-                    clansList = JsonConvert.DeserializeObject<List<Clan>>(_);
-                    Console.WriteLine("Read clans list from {0}", clanspath);
-                }
-                else
-                {
-                    Console.WriteLine("No clans list found at {0}\nCreating one.", clanspath);
-                    SaveConfig(true);
-                    var _ = File.ReadAllText(clanspath);
-                    clansList = JsonConvert.DeserializeObject<List<Clan>>(_);
-                    Console.WriteLine("Read clans list from {0}", clanspath);
-                }
+                var _ = File.ReadAllText(ConfigFile);
+                configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
+                Console.WriteLine("Read configuration values from {0}", ConfigFile);
             }
         }
     }
+    [Serializable]
+    class Clans
+    {
+        public static List<Clan> clans = new List<Clan>() {
+            new Clan(
+                new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101"),
+                new Clan.Members(new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>())
+            )};
+        public static void SaveClanMembers(Clan clan)
+        {
+            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+            string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+            string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
 
+            Directory.CreateDirectory(clanFolder);
+            File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
+            File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
+            File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
+            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFolder);
+        }
+        public static void SaveClanMembers(Clan clan, UserType userType)
+        {
+            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            Directory.CreateDirectory(clanFolder);
+            switch (userType)
+            {
+                case UserType.BungieUser:
+                    string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+                    File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
+                    break;
+                case UserType.SpreadsheetUser:
+                    string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+                    File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
+                    break;
+                case UserType.Leaver:
+                    string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
+                    File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
+                    break;
+                default:
+                    throw new ArgumentException("Type provided is invalid.");
+
+            }
+            Console.WriteLine("Wrote {0} members to {1}", clan.details.BungieNetName, clanFolder);
+        }
+        public static void LoadClanMembers(Clan clan)
+        {
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+            string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+            string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
+            if (!File.Exists(clanMembersFile) || !File.Exists(clanSpreadsheetFile) || !File.Exists(clanLeaversFile))
+            {
+                SaveClanMembers(clan);
+            }
+            var a = File.ReadAllText(clanMembersFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
+            var b = File.ReadAllText(clanSpreadsheetFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
+            var c = File.ReadAllText(clanLeaversFile);
+            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
+            Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFolder);
+        }
+        public static void LoadClanMembers(Clan clan, UserType userType)
+        {
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
+            string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
+            string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
+            switch (userType)
+            {
+                case UserType.BungieUser:
+                    if (!File.Exists(clanMembersFile))
+                    {
+                        SaveClanMembers(clan, UserType.BungieUser);
+                    }
+                    var a = File.ReadAllText(clanMembersFile);
+                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
+                    break;
+                case UserType.SpreadsheetUser:
+                    if (!File.Exists(clanSpreadsheetFile))
+                    {
+                        SaveClanMembers(clan, UserType.SpreadsheetUser);
+                    }
+
+                    var b = File.ReadAllText(clanSpreadsheetFile);
+                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
+                    break;
+                case UserType.Leaver:
+                    if (!File.Exists(clanLeaversFile))
+                    {
+                        SaveClanMembers(clan, UserType.Leaver);
+                    }
+                    var c = File.ReadAllText(clanLeaversFile);
+                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
+                    break;
+                default:
+                    throw new ArgumentException("Type provided is invalid.");
+            }
+            Console.WriteLine("Read {0} members from {1}", clan.details.BungieNetName, clanFolder);
+        }
+        public static void SaveClans()
+        {
+            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
+            string clanFile = Path.Combine(clanFolder, "clans.dat");
+
+            Directory.CreateDirectory(clanFolder);
+            List<Clan.Details> clanDetails = clans.Select(t => t.details).ToList();
+            var _ = JsonConvert.SerializeObject(clanDetails, Formatting.Indented);
+            File.WriteAllText(clanFile, _);
+            Console.WriteLine("Wrote clan details to {0}", clanFile);
+            foreach (Clan clan in clans)
+            {
+                SaveClanMembers(clan);
+            }
+        }
+        public static void LoadClans()
+        {
+            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
+            string clanFile = Path.Combine(clanFolder, "clans.dat");
+            if (!File.Exists(clanFile))
+            {
+                SaveClans();
+            }
+            var _ = File.ReadAllText(clanFile);
+            List<Clan.Details> clanDetails = JsonConvert.DeserializeObject<List<Clan.Details>>(_);
+            clans = new List<Clan>();
+
+            foreach (var details in clanDetails)
+            {
+                clans.Add(new Clan(details, new Clan.Members()));
+            }
+            foreach (Clan clan in clans)
+            {
+                LoadClanMembers(clan);
+            }
+        }
+    }
 }

@@ -23,8 +23,8 @@ namespace Catamagne.Events
                 if (member != null)
                 {
                     var clan = BungieTools.GetClanFromTag(member.clanTag);
-                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, clan.clanName + " Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
-                    Log.Information("Detected " + clan.clanName + " member leaving discord");
+                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, clan.details.BungieNetName + " Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
+                    Log.Information("Detected " + clan.details.BungieNetName + " member leaving discord");
                     DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.alertsChannel, discordEmbed);
                     //DiscordMessage message = await CatamagneCore.SendAlert(string.Format("User detected leaving discord server; was on spreadsheet, id = {0}", e.Member.Id.ToString()));
                 }
@@ -36,12 +36,12 @@ namespace Catamagne.Events
             {
                 var startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
                 var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 4;
-                var activityTimeSpan = TimeSpan.FromMinutes(5) * (ConfigValues.clansList.Count+1);
+                var activityTimeSpan = TimeSpan.FromMinutes(5) * (Clans.clans.Count+1);
                 //var dailyTimeSpan = TimeSpan.FromDays(1);
                 //AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
-                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , ConfigValues.clansList, AutoEvents.AutoScanForChangesAsync);
-                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoCheckForLeavers);
-                AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, ConfigValues.clansList, Core.Discord.RotateActivity);
+                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
+                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
+                AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, Core.Discord.RotateActivity);
                // AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, ConfigValues.clansList, AutoEvents.AutoReadAsync, false);
                 //AutoEvents.AutoScanForChanges();
                 //AutoEvents.AutoBulkUpdate();

@@ -60,7 +60,7 @@ namespace Catamagne.Commands
 
 
                     //call bulkupdate method
-                    ConfigValues.configValues.LoadConfig(false);
+                    ConfigValues.configValues.LoadConfig();
                     await Core.Discord.UpdateChannels();
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully updated configuration files");
                     await message.ModifyAsync(discordEmbed);
@@ -137,24 +137,24 @@ namespace Catamagne.Commands
             var clan = await GetClanFromTagAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
-            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
+            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 new Thread(async () =>
                 {
                     if (string.IsNullOrEmpty(mode) || mode == "spreadsheet" || mode == "sheet")
                     {
                         await SpreadsheetTools.Read(clan);
-                        var users = clan.spreadsheetUsers.ToList();
+                        var users = clan.members.SpreadsheetUsers.ToList();
                         users.OrderBy(t => t.steamName);
 
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.clanName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.BungieNetName + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
-                        List<SpreadsheetTools.User> users = clan.Users;
+                        List<SpreadsheetTools.User> users = clan.members.BungieUsers;
                         users.OrderBy(t => t.steamName);
 
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.clanName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.BungieNetName + ":");
 
                     }
                     else
@@ -175,7 +175,7 @@ namespace Catamagne.Commands
             var clan = await GetClanFromTagAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
-            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.clanTag))
+            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Turquoise, "Checking for leavers...");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
@@ -186,7 +186,7 @@ namespace Catamagne.Commands
                     {
                         await msg.DeleteAsync();
                         var fields = new List<Field>();
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, leavers, "Users found leaving " + clan.clanName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, leavers, "Users found leaving " + clan.details.BungieNetName + ":");
 
                     }
                     else
@@ -212,7 +212,7 @@ namespace Catamagne.Commands
                 await ctx.RespondAsync(discordEmbed);
                 return ErrorCode.UnqualifyChannel;
             }
-            if (ctx.Member.Id == ConfigValues.configValues.CataID)
+            if (ctx.Member.Id == ConfigValues.configValues.DevID)
             {
                 return ErrorCode.Qualify;
             }
@@ -264,7 +264,7 @@ namespace Catamagne.Commands
             {
                 new Thread(async () =>
                 {
-                    Response[] responses = ConfigValues.configValues.Responses;
+                    List<Response> responses = ConfigValues.configValues.Responses;
                     bool fail = false;
                     if (args == "list")
                     {
@@ -313,7 +313,7 @@ namespace Catamagne.Commands
                                             var response = new Response(trigger, body.Result.Content, description.Result.Content, channels);
                                             _.Add(response);
                                         }
-                                        ConfigValues.configValues.Responses = _.ToArray();
+                                        ConfigValues.configValues.Responses = _;
                                         ConfigValues.configValues.SaveConfig();
                                         Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Added", "Successfully added response to pool.");
                                         var message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
@@ -384,7 +384,7 @@ namespace Catamagne.Commands
                                                 _.Add(response);
                                             }
 
-                                            ConfigValues.configValues.Responses = _.ToArray();
+                                            ConfigValues.configValues.Responses = _;
                                             ConfigValues.configValues.SaveConfig();
                                             Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Updated", "Successfully updated response.");
                                             await message.ModifyAsync(Embed);
@@ -426,7 +426,7 @@ namespace Catamagne.Commands
                             {
                                 var _ = ConfigValues.configValues.Responses.ToList();
                                 _.Remove(ConfigValues.configValues.Responses.ToList().Find(t => t.trigger == text));
-                                ConfigValues.configValues.Responses = _.ToArray();
+                                ConfigValues.configValues.Responses = _;
                                 ConfigValues.configValues.SaveConfig();
                                 Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Removed", "Successfully removed response from pool.");
                                 message = await message.ModifyAsync(Embed);

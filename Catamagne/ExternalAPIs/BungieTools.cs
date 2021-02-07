@@ -12,20 +12,6 @@ using DSharpPlus.Entities;
 
 namespace Catamagne.API
 {
-    public class Clan
-    {
-        public string clanID;
-        public string clanName;
-        public string clanTag;
-        public string clanSheetRange;
-        public List<SpreadsheetTools.User> spreadsheetUsers;
-        public List<SpreadsheetTools.User> Users;
-        public List<SpreadsheetTools.User> Leavers;
-        public Clan(string clanID, string clanSheetRange, string clanName, string clanTag, List<SpreadsheetTools.User> spreadsheetUsers, List<SpreadsheetTools.User> clanUsers)
-        {
-            this.clanID = clanID; this.clanName = clanName; this.clanTag = clanTag ; this.clanSheetRange = clanSheetRange; this.spreadsheetUsers = spreadsheetUsers; this.Users = clanUsers;
-        }
-    }
     class BungieTools
     {
         static BungieApiClient bungieApi = new BungieApiClient(ConfigValues.configValues.BungieAPIKey);
@@ -138,7 +124,7 @@ namespace Catamagne.API
         }
         public static async Task<(List<UserInfoCard> validMembers, List<GroupUserInfoCard> invalidMembers)> GetClanMembers(Clan clan)
         {
-            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.clanID));
+            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.BungieNetID));
             var groupList = group.results.ToList();
             var validMembers = groupList.Where(t => t.bungieNetUserInfo != null).Select(t => t.bungieNetUserInfo).ToList();
             var invalidMembers = groupList.Where(t => t.bungieNetUserInfo == null).Select(t => t.destinyUserInfo).ToList();
@@ -160,18 +146,18 @@ namespace Catamagne.API
         }
         public static async Task<List<SpreadsheetTools.User>> CheckForLeaves(Clan clan, bool DontWrite = false)
         {
-            if (clan.Leavers != null)
+            if (clan.members.ClanLeavers != null)
             {
                 await CheckForRejoiners(clan);
             }
             if (!DontWrite)
             {
-                if (clan.Leavers != null)
+                if (clan.members.ClanLeavers != null)
                 {
-                    List<SpreadsheetTools.User> oldLeavers = ConfigValues.clansList.Find(t => t == clan).Leavers;
+                    List<SpreadsheetTools.User> oldLeavers = clan.members.ClanLeavers;
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                     var ClanMembers = await GetClanMembers(clan);
-                    foreach (var member in clan.Users)
+                    foreach (var member in clan.members.BungieUsers)
                     {
                         if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                         {
@@ -193,13 +179,13 @@ namespace Catamagne.API
                     foreach (var member in leavers)
                     {
                         var workingMember = member;
-                        var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
+                        var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
                         workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
-                        clan.Users[_] = workingMember;
+                        clan.members.BungieUsers[_] = workingMember;
                     }
                     oldLeavers.AddRange(leavers);
-                    clan.Leavers = oldLeavers;
-                    ConfigValues.configValues.SaveConfig(true);
+                    clan.members.ClanLeavers = oldLeavers;
+                    Clans.SaveClanMembers(clan);
                     SpreadsheetTools.Write(clan);
 
                     return leavers;
@@ -208,7 +194,7 @@ namespace Catamagne.API
                 {
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                     var ClanMembers = await GetClanMembers(clan);
-                    clan.Users.ForEach(member =>
+                    clan.members.BungieUsers.ForEach(member =>
                     {
                         if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                         {
@@ -221,12 +207,12 @@ namespace Catamagne.API
                     foreach (var member in leavers)
                     {
                         var workingMember = member;
-                        var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
+                        var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
                         workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
-                        clan.Users[_] = workingMember;
+                        clan.members.BungieUsers[_] = workingMember;
                     }
-                    clan.Leavers = leavers;
-                    ConfigValues.configValues.SaveConfig(true);
+                    clan.members.ClanLeavers = leavers;
+                    Clans.SaveClanMembers(clan);
                     SpreadsheetTools.Write(clan);
 
                     return leavers;
@@ -237,7 +223,7 @@ namespace Catamagne.API
                 await SpreadsheetTools.Read(clan);
                 List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                 var ClanMembers = await GetClanMembers(clan);
-                clan.Users.ForEach(member => {
+                clan.members.BungieUsers.ForEach(member => {
                     if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                     {
                         if (member.bungieID != null)
@@ -249,9 +235,9 @@ namespace Catamagne.API
                 foreach (var member in leavers)
                 {
                     var workingMember = member;
-                    var _ = clan.Users.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
+                    var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
                     workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
-                    clan.Users[_] = workingMember;
+                    clan.members.BungieUsers[_] = workingMember;
                 }
                 SpreadsheetTools.Write(clan);
                 return leavers;
@@ -277,22 +263,22 @@ namespace Catamagne.API
             //{
                 
             //});;
-            foreach (var member in clan.Leavers)
+            foreach (var member in clan.members.ClanLeavers)
             {
                 if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
                 {
                     rejoiners.Add(member);
                 }
             }
-            clan.Leavers = rejoiners;
-            ConfigValues.configValues.SaveConfig(true);
+            clan.members.ClanLeavers = rejoiners;
+            Clans.SaveClanMembers(clan, UserType.Leaver);
 
         }
         public static Clan GetClanFromTag(string clanTag)
         {
-            if (ConfigValues.clansList.Any(t => t.clanTag == clanTag))
+            if (Clans.clans.Any(t => t.details.Tag == clanTag))
             {
-                return (ConfigValues.clansList.Where(t => t.clanTag == clanTag).FirstOrDefault());
+                return (Clans.clans.Where(t => t.details.Tag == clanTag).FirstOrDefault());
             }
             else return null;
         }

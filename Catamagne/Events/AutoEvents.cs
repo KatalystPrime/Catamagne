@@ -49,39 +49,39 @@ namespace Catamagne.Events
         }
         public static async Task AutoBulkUpdateAsync(Clan clan)
         {
-            Log.Information("Bulk updating for " + clan.clanName);
-            //Console.WriteLine("Bulk updating for " + clan.clanName);
-            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.clanName, "Automatically updating every spreadsheet element.");
+            Log.Information("Bulk updating for " + clan.details.BungieNetName);
+            //Console.WriteLine("Bulk updating for " + clan.details.BungieNetName);
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.details.BungieNetName, "Automatically updating every spreadsheet element.");
             DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.updatesChannel, discordEmbed);
             await SpreadsheetTools.BulkUpdate(clan);
-            discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.clanName, "Updated every cell in spreadsheet.");
+            discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.BungieNetName, "Updated every cell in spreadsheet.");
             await message.ModifyAsync(discordEmbed);
         }
         public static async Task AutoScanForChangesAsync(Clan clan)
         {
-            Log.Information("Scanning for changes for " + clan.clanName);
+            Log.Information("Scanning for changes for " + clan.details.BungieNetName);
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
             if (changed.TotalChanges > 0)
             {
                 await SpreadsheetTools.SelectiveUpdate(clan, changed);
                 if (changed.TotalChanges == 1)
                 {
-                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.clanName, "Automatically processed 1 entry.");
+                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.details.BungieNetName, "Automatically processed 1 entry.");
                     DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.updatesChannel, discordEmbed);
                 }
                 else
                 {
-                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.clanName, string.Format("Automatically processed {0} entries", changed.TotalChanges));
+                    var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Processed changes for " + clan.details.BungieNetName, string.Format("Automatically processed {0} entries", changed.TotalChanges));
                     DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.updatesChannel, discordEmbed);
                 }
             }
         }
         public static async Task AutoCheckForLeavers(Clan clan)
         {
-            Log.Information("Checking for leavers for " + clan.clanName);
+            Log.Information("Checking for leavers for " + clan.details.BungieNetName);
             var Leavers = await BungieTools.CheckForLeaves(clan);
 
-            Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.clanName + ":");
+            Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.details.BungieNetName + ":");
         }
     }
 }

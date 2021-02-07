@@ -13,9 +13,9 @@ namespace Catamagne.Core
         static void Main(string[] args)
         {
 
-            ConfigValues.configValues.LoadConfig(false);
-            ConfigValues.configValues.LoadConfig(true);
+            ConfigValues.configValues.LoadConfig();
             Console.Title = "Catamagne | Watcher of Destiny";
+            Clans.LoadClans();
             MainAsync().GetAwaiter().GetResult();
         }
         static async Task MainAsync()
