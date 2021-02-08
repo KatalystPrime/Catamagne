@@ -39,8 +39,8 @@ namespace Catamagne.Events
                 var activityTimeSpan = ConfigValues.configValues.MediumInterval * (Clans.clans.Count+1);
                 //var dailyTimeSpan = TimeSpan.FromDays(1);
                 //AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
-                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
-                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
+                AutoEvents.EventScheduler(startTimeShort, ConfigValues.configValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
+                AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
                 AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, Core.Discord.RotateActivity);
                // AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, ConfigValues.clansList, AutoEvents.AutoReadAsync, false);
                 //AutoEvents.AutoScanForChanges();
