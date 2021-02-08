@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>Catamagne.Core.Core</StartupObject>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <ApplicationIcon>catamagne.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
