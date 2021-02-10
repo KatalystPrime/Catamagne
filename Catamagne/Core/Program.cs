@@ -40,15 +40,15 @@ namespace Catamagne.Core
                     {
                         timeString = string.Format("{0}s", timePassed.Seconds);
                     }
-                    else if (timePassed > TimeSpan.FromMinutes(1))
+                    if (timePassed > TimeSpan.FromMinutes(1))
                     {
                         timeString = string.Format("{0}m {1}s", timePassed.Minutes, timePassed.Seconds);
                     }
-                    else if (timePassed > TimeSpan.FromHours(1))
+                    if (timePassed > TimeSpan.FromHours(1))
                     {
                         timeString = string.Format("{0}h {1}m {2}s", timePassed.Hours, timePassed.Minutes, timePassed.Seconds);
                     }
-                    else if (timePassed > TimeSpan.FromDays(1))
+                    if (timePassed > TimeSpan.FromDays(1))
                     {
                         timeString = string.Format("{0}d {1}h {2}m {3}s", timePassed.Days, timePassed.Hours, timePassed.Minutes, timePassed.Seconds);
                     }
