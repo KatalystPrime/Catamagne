@@ -13,7 +13,7 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-                TimeSpan interval = timeSpan / (items.Count + 1);
+                TimeSpan interval = timeSpan / items.Count;
                 var done = false;
                 var index = 0;
                 var nextTime = DateTime.UtcNow;
