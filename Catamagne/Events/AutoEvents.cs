@@ -14,7 +14,7 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-               TimeSpan interval = timeSpan / (clans.Count + 1);
+               TimeSpan interval = timeSpan / clans.Count;
                var done = false;
                var index = 0;
                var nextTime = DateTime.UtcNow;
@@ -31,15 +31,9 @@ namespace Catamagne.Events
                             done = true;
                         }
                     }
-                    nextTime = DateTime.UtcNow + interval;
-                    if (DateTime.UtcNow >= (referenceTime + (interval * index)))
-                    {
-                       
-                        await action.Invoke(clans[index]);
-                        index = (index + 1) % clans.Count;
-                    }
-                    var time = TimeSpan.FromMilliseconds(Math.Max(0d, (nextTime - DateTime.UtcNow).TotalMilliseconds));
-                    Thread.Sleep(time);
+                    action.Invoke(clans[index]);
+                    index = (index + 1) % clans.Count;
+                    Thread.Sleep(interval);
                }
             }).Start();  
         }
