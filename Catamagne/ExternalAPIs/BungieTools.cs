@@ -232,14 +232,14 @@ namespace Catamagne.API
                         }
                     }
                 });
-                foreach (var member in leavers)
-                {
-                    var workingMember = member;
-                    var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                    workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
-                    clan.members.BungieUsers[_] = workingMember;
-                }
-                SpreadsheetTools.Write(clan);
+                //foreach (var member in leavers)
+                //{
+                //    var workingMember = member;
+                //    var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
+                //    workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
+                //    clan.members.BungieUsers[_] = workingMember;
+                //}
+                //SpreadsheetTools.Write(clan);
                 return leavers;
             }
            
