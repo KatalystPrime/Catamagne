@@ -47,7 +47,7 @@ namespace Catamagne.Commands
         [Command("updateconfig")]
         [Description("Update configuration for the bot. Only admins can execute this.")]
         [Aliases("updateconf", "conf", "confupdate")]
-        public async Task UpdateConf(CommandContext ctx)
+        public static async Task UpdateConf(CommandContext ctx)
         {
             var verification = await IsVerifiedAsync(ctx, true);
             if (verification == ErrorCode.Qualify)
@@ -71,7 +71,7 @@ namespace Catamagne.Commands
         [Command("updatesheet")]
         [Description("Scan for changed data.")]
         [Aliases("update")]
-        public async Task UpdateSpreadSheet(CommandContext ctx, string clanTag)
+        public static async Task UpdateSpreadSheet(CommandContext ctx, string clanTag)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -131,7 +131,7 @@ namespace Catamagne.Commands
         [Command("displayUsers")]
         [Description("Output all stored users")]
         [Aliases("users")]
-        public async Task DisplayUsers(CommandContext ctx, string clanTag, [RemainingText] string mode)
+        public static async Task DisplayUsers(CommandContext ctx, string clanTag, [RemainingText] string mode)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -146,14 +146,14 @@ namespace Catamagne.Commands
                     {
                         await SpreadsheetTools.Read(clan);
                         var users = clan.members.SpreadsheetUsers.ToList();
-                        users.OrderBy(t => t.steamName);
+                        users = users.OrderBy(t => t.steamName).ToList();
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.BungieNetName + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
                         List<SpreadsheetTools.User> users = clan.members.BungieUsers;
-                        users.OrderBy(t => t.steamName);
+                        users = users.OrderBy(t => t.steamName).ToList();
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.BungieNetName + ":");
 
@@ -169,7 +169,7 @@ namespace Catamagne.Commands
         [Command("checkleavers")]
         [Description("Check if any users have left the clan.")]
         [Aliases("leavers", "checkleaves", "leaves")]
-        public async Task CheckForLeavers(CommandContext ctx, string clanTag)
+        public static async Task CheckForLeavers(CommandContext ctx, string clanTag)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -219,7 +219,7 @@ namespace Catamagne.Commands
             }
             var roleVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.configValues.RoleIDs);
             var adminVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.configValues.AdminRoleIDs);
-            if (adminVerf.Count() > 0)
+            if (adminVerf.Any())
             {
                 return ErrorCode.Qualify;
             }
@@ -227,7 +227,7 @@ namespace Catamagne.Commands
             {
                 return ErrorCode.Qualify;
             }
-            if (roleVerf.Count() > 0 && !isAdminCommand)
+            if (roleVerf.Any() && !isAdminCommand)
             {
                 return ErrorCode.Qualify;
             }
@@ -257,7 +257,7 @@ namespace Catamagne.Commands
         [Command("responses")]
         [Description("View current responses stored and watched for")]
         [Aliases("response")]
-        public async Task Responses(CommandContext ctx, string args = null, [RemainingText] string text = null)
+        public static async Task Responses(CommandContext ctx, string args = null, [RemainingText] string text = null)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await CoreModule.IsVerifiedAsync(ctx);

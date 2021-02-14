@@ -178,7 +178,7 @@ namespace Catamagne.API
                     var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
                     var a = char.ToUpper(letterStrings[0][0]) - 64;
                     var b = char.ToUpper(letterStrings[1][0]) - 64;
-                    var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Count() - 5;
+                    var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Count - 5;
                     for (int i = 0; i < forRange; i++)
                     {
                         _.Add("");
@@ -284,7 +284,7 @@ namespace Catamagne.API
                 }
             }
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
-            workingList.OrderBy(t => t.steamName);
+            workingList =  workingList.OrderBy(t => t.steamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -375,7 +375,7 @@ namespace Catamagne.API
                 _.RemoveAt(index);
             });
             _.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
-            _.OrderBy(t => t.steamName);
+            _ = _.OrderBy(t => t.steamName).ToList();
             clan.members.BungieUsers = _;
             Write(clan);
             Clans.SaveClanMembers(clan);

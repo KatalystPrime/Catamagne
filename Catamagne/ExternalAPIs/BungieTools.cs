@@ -29,8 +29,7 @@ namespace Catamagne.API
                     var profileSplit = profileLink.Split('/');
                     foreach (var part in profileSplit)
                     {
-                        int pType;
-                        if (int.TryParse(part, out pType) && numcount == 0)
+                        if (int.TryParse(part, out int pType) && numcount == 0)
                         {
                             numcount++;
                             profileType = pType.ToString();
@@ -108,8 +107,7 @@ namespace Catamagne.API
                 int numCount = 0;
                 foreach (var part in _)
                 {
-                    long numPart;
-                    if (long.TryParse(part, out numPart))
+                    if (long.TryParse(part, out long numPart))
                     {
                         numCount++;
                     }
