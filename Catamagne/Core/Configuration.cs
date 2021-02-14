@@ -17,8 +17,8 @@ namespace Catamagne.Configuration
         public List<ulong> RoleIDs;
         public List<ulong> AdminRoleIDs;
         public List<ulong> CommandChannels;
-        public ulong? AlertChannel;
-        public ulong? UpdatesChannel;
+        public List<ulong?> AlertChannels;
+        public List<ulong?> UpdatesChannels;
         public DiscordActivity DiscordActivity;
         public string[] Prefixes;
         public TimeSpan ShortInterval;
@@ -38,8 +38,8 @@ namespace Catamagne.Configuration
             RoleIDs = new List<ulong>();
             CommandChannels = new List<ulong>();
             AdminRoleIDs = new List<ulong>();
-            AlertChannel = null;
-            UpdatesChannel = null;
+            AlertChannels = new List<ulong?>();
+            UpdatesChannels = new List<ulong?>();
             DiscordActivity = new DiscordActivity()
             {
                 Name = "over Destiny...",

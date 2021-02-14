@@ -18,8 +18,8 @@ namespace Catamagne.Core
 {
     class Discord
     {
-        public static DiscordChannel? alertsChannel;
-        public static DiscordChannel? updatesChannel;
+        public static List<DiscordChannel?> alertsChannels;
+        public static List<DiscordChannel?> updatesChannels;
         static SerilogLoggerFactory logFactory;
         public static DiscordClient discord;
         public static List<DiscordChannel?> commandChannels;
@@ -63,25 +63,33 @@ namespace Catamagne.Core
         }
         public static async Task UpdateChannels()
         {
-            try
+            foreach (var channel in ConfigValues.configValues.AlertChannels)
             {
-                alertsChannel = await discord.GetChannelAsync((ulong) ConfigValues.configValues.AlertChannel);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.GetType() + " error when getting channel id " + ConfigValues.configValues.AlertChannel);
-            }
-            try
-            {
-                updatesChannel = await discord.GetChannelAsync((ulong) ConfigValues.configValues.UpdatesChannel);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.GetType() + " error when getting channel id " + ConfigValues.configValues.UpdatesChannel);
+                try
+                {
+                    var _ = await discord.GetChannelAsync((ulong)channel);
+                    alertsChannels.Add(_);
+                }
+                catch (Exception e)
+                {
+                    Log.Information(e.GetType() + " error when getting channel id " + channel);
+                }
             }
 
+            foreach (var channel in ConfigValues.configValues.UpdatesChannels)
+            {
+                try
+                {
+                    var _ = await discord.GetChannelAsync((ulong)channel);
+                    alertsChannels.Add(_);
+                }
+                catch (Exception e)
+                {
+                    Log.Information(e.GetType() + " error when getting channel id " + channel);
+                }
+            }
             commandChannels = new List<DiscordChannel>();
-            foreach (ulong channel in ConfigValues.configValues.CommandChannels)
+            foreach (var channel in ConfigValues.configValues.CommandChannels)
             {
                 try
                 {
@@ -89,7 +97,7 @@ namespace Catamagne.Core
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.GetType() + " error when getting channel id " + channel);
+                    Log.Information(e.GetType() + " error when getting channel id " + channel);
                 }
             }
         }

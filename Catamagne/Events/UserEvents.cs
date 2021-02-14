@@ -25,7 +25,11 @@ namespace Catamagne.Events
                     var clan = BungieTools.GetClanFromTag(member.clanTag);
                     var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, clan.details.BungieNetName + " Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
                     Log.Information("Detected " + clan.details.BungieNetName + " member leaving discord");
-                    DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.alertsChannel, discordEmbed);
+                    List<DiscordMessage> messages = new List<DiscordMessage>();
+                    Core.Discord.alertsChannels.ForEach(async channel =>
+                    {
+                        messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
+                    });
                     //DiscordMessage message = await CatamagneCore.SendAlert(string.Format("User detected leaving discord server; was on spreadsheet, id = {0}", e.Member.Id.ToString()));
                 }
             }).Start();
