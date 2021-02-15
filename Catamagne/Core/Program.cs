@@ -11,16 +11,19 @@ namespace Catamagne.Core
         public static DateTime startTime;
         public static bool PauseEvents;
 
-        static void Main(string[] args)
-        {
+        //static void Main(string[] args)
+        //{
 
+        //    ConfigValues.configValues.LoadConfig();
+        //    TrackTimeLive();
+        //    Clans.LoadClans();
+        //    MainAsync().GetAwaiter().GetResult();
+        //}
+        static async Task Main(string[] args)
+        {
             ConfigValues.configValues.LoadConfig();
             TrackTimeLive();
             Clans.LoadClans();
-            MainAsync().GetAwaiter().GetResult();
-        }
-        static async Task MainAsync()
-        {
             await SpreadsheetTools.SetUpSheet();
             PauseEvents = false;
 

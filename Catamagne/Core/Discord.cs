@@ -63,6 +63,7 @@ namespace Catamagne.Core
         }
         public static async Task UpdateChannels()
         {
+            alertsChannels = new List<DiscordChannel?>(); updatesChannels = new List<DiscordChannel?>();
             foreach (var channel in ConfigValues.configValues.AlertChannels)
             {
                 try

@@ -15,39 +15,11 @@ namespace Catamagne.Commands
 {
     public class CoreModule : BaseCommandModule
     {
-        //[Command("help")]
-        //public async Task GiveHelp(CommandContext ctx)
-        //{
-        //    var _ = string.Join('\n', CatamagneCore.commandsList);
-        //    var text = string.Format("Commands List: \n{0}", _);
-        //    await ctx.RespondAsync(text);
-        //}
-        //[Command("readsheet")]
-        //[Description("Read the sheet. admin exclusive command.")]
-        //[Aliases("read")]
-        //public async Task ReadSheet(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Orange, "Reading sheet data...", "If this takes over a minute, it's generating data due to missing files.");
-        //            DiscordMessage message = await ctx.RespondAsync(discordEmbed);
-
-        //            //call bulkupdate method
-        //            await SpreadsheetTools.ReadSheet();
-        //            discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully read sheet data.");
-        //            await message.ModifyAsync(discordEmbed);
-        //        }).Start();
-        //    }
         //}
         [Command("updateconfig")]
         [Description("Update configuration for the bot. Only admins can execute this.")]
         [Aliases("updateconf", "conf", "confupdate")]
-        public static async Task UpdateConf(CommandContext ctx)
+        public async Task UpdateConf(CommandContext ctx)
         {
             var verification = await IsVerifiedAsync(ctx, true);
             if (verification == ErrorCode.Qualify)
@@ -71,7 +43,7 @@ namespace Catamagne.Commands
         [Command("updatesheet")]
         [Description("Scan for changed data.")]
         [Aliases("update")]
-        public static async Task UpdateSpreadSheet(CommandContext ctx, string clanTag)
+        public async Task UpdateSpreadSheet(CommandContext ctx, string clanTag)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -131,7 +103,7 @@ namespace Catamagne.Commands
         [Command("displayUsers")]
         [Description("Output all stored users")]
         [Aliases("users")]
-        public static async Task DisplayUsers(CommandContext ctx, string clanTag, [RemainingText] string mode)
+        public async Task DisplayUsers(CommandContext ctx, string clanTag, [RemainingText] string mode)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -169,7 +141,7 @@ namespace Catamagne.Commands
         [Command("checkleavers")]
         [Description("Check if any users have left the clan.")]
         [Aliases("leavers", "checkleaves", "leaves")]
-        public static async Task CheckForLeavers(CommandContext ctx, string clanTag)
+        public async Task CheckForLeavers(CommandContext ctx, string clanTag)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -257,7 +229,7 @@ namespace Catamagne.Commands
         [Command("responses")]
         [Description("View current responses stored and watched for")]
         [Aliases("response")]
-        public static async Task Responses(CommandContext ctx, string args = null, [RemainingText] string text = null)
+        public async Task Responses(CommandContext ctx, string args = null, [RemainingText] string text = null)
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await CoreModule.IsVerifiedAsync(ctx);
