@@ -30,7 +30,6 @@ namespace Catamagne.Configuration
         public string SpreadsheetID;
         public string BungieAPIKey;
         public string DiscordToken;
-        public string GoogleAPIKey;
         public ulong? DevID;
         public List<Response> Responses;
         public ConfigValues()

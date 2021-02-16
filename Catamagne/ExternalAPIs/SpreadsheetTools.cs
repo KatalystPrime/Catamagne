@@ -26,29 +26,28 @@ namespace Catamagne.API
         static string ApplicationName = "Umbral Management Automation Experiment";
         //public static User[] spreadsheetUsers;
         //public static List<User> users;
-        static UserCredential credential;
+        static GoogleCredential credential;
         static SheetsService service;
         public static async Task SetUpSheet()
         {
-            //using (var stream =
-            //    new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
-            //{
-            //    // The file token.json stores the user's access and refresh tokens, and is created
-            //    // automatically when the authorization flow completes for the first time.
-            //    string credPath = "token.json";
-            //    credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-            //        GoogleClientSecrets.Load(stream).Secrets,
-            //        Scopes,
-            //        "drive",
-            //        CancellationToken.None,
-            //        new FileDataStore(Path.Combine(ConfigValues.FolderPath, "config", credPath), true));
-            //    Console.WriteLine("Credential file saved to: " + ConfigValues.FolderPath + credPath);
-            //}
-
+            using (var stream =
+                new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
+            {
+                // The file token.json stores the user's access and refresh tokens, and is created
+                // automatically when the authorization flow completes for the first time.
+                credential = await GoogleCredential.FromStreamAsync(stream, CancellationToken.None);
+                //credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                //    GoogleClientSecrets.Load(stream).Secrets,
+                //    Scopes,
+                //    "drive",
+                //    CancellationToken.None,
+                //    new FileDataStore(Path.Combine(ConfigValues.FolderPath, "config", credPath), true));
+                //Console.WriteLine("Credential file saved to: " + ConfigValues.FolderPath + credPath);
+            }
             // Create Google Sheets API service.
             service = new SheetsService(new ()
             {
-                ApiKey = ConfigValues.GoogleAPIKey,
+                HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });;
         }
