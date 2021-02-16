@@ -64,7 +64,7 @@ namespace Catamagne.Core
         }
         public static async Task UpdateChannels()
         {
-            alertsChannels = new List<DiscordChannel?>(); updatesChannels = new List<DiscordChannel?>();
+            alertsChannels = new List<DiscordChannel?>(); updatesChannels = new List<DiscordChannel?>(); commandChannels = new List<DiscordChannel>();
             foreach (var channel in ConfigValues.AlertChannels)
             {
                 try
@@ -83,14 +83,13 @@ namespace Catamagne.Core
                 try
                 {
                     var _ = await discord.GetChannelAsync((ulong)channel);
-                    alertsChannels.Add(_);
+                    updatesChannels.Add(_);
                 }
                 catch (Exception e)
                 {
                     Log.Information(e.GetType() + " error when getting channel id " + channel);
                 }
             }
-            commandChannels = new List<DiscordChannel>();
             foreach (var channel in ConfigValues.CommandChannels)
             {
                 try
