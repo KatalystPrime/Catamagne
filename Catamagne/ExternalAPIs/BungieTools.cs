@@ -14,7 +14,9 @@ namespace Catamagne.API
 {
     class BungieTools
     {
-        static BungieApiClient bungieApi = new BungieApiClient(ConfigValues.configValues.BungieAPIKey);
+        static ConfigValues ConfigValues => ConfigValues.configValues;
+
+        static BungieApiClient bungieApi = new BungieApiClient(ConfigValues.BungieAPIKey);
         public static async Task<long?> GetBungieUserID(string profileLink)
         {
             UserMembershipData user = null;

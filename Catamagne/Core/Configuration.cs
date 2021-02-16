@@ -30,6 +30,7 @@ namespace Catamagne.Configuration
         public string SpreadsheetID;
         public string BungieAPIKey;
         public string DiscordToken;
+        public string GoogleAPIKey;
         public ulong? DevID;
         public List<Response> Responses;
         public ConfigValues()
@@ -92,6 +93,7 @@ namespace Catamagne.Configuration
     [Serializable]
     class Clans
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         public static List<Clan> clans = new List<Clan>() {
             new Clan(
                 new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101"),
@@ -99,8 +101,8 @@ namespace Catamagne.Configuration
             )};
         public static void SaveClanMembers(Clan clan)
         {
-            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            Directory.CreateDirectory(ConfigValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -114,8 +116,8 @@ namespace Catamagne.Configuration
         }
         public static void SaveClanMembers(Clan clan, UserType userType)
         {
-            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            Directory.CreateDirectory(ConfigValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
             string clanFile;
             Directory.CreateDirectory(clanFolder);
             switch (userType)
@@ -143,7 +145,7 @@ namespace Catamagne.Configuration
         }
         public static void LoadClanMembers(Clan clan)
         {
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -162,7 +164,7 @@ namespace Catamagne.Configuration
         }
         public static void LoadClanMembers(Clan clan, UserType userType)
         {
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -201,8 +203,8 @@ namespace Catamagne.Configuration
         }
         public static void SaveClans()
         {
-            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
+            Directory.CreateDirectory(ConfigValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder);
             string clanFile = Path.Combine(clanFolder, "clans.dat");
 
             Directory.CreateDirectory(clanFolder);
@@ -217,8 +219,8 @@ namespace Catamagne.Configuration
         }
         public static void LoadClans()
         {
-            Directory.CreateDirectory(ConfigValues.configValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.configValues.ClansFolder);
+            Directory.CreateDirectory(ConfigValues.ClansFolder);
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder);
             string clanFile = Path.Combine(clanFolder, "clans.dat");
             if (!File.Exists(clanFile))
             {

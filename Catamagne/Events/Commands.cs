@@ -15,6 +15,7 @@ namespace Catamagne.Commands
 {
     public class CoreModule : BaseCommandModule
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         //}
         [Command("updateconfig")]
         [Description("Update configuration for the bot. Only admins can execute this.")]
@@ -32,7 +33,7 @@ namespace Catamagne.Commands
 
 
                     //call bulkupdate method
-                    ConfigValues.configValues.LoadConfig();
+                    ConfigValues.LoadConfig();
                     Clans.LoadClans();
                     await Core.Discord.UpdateChannels();
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully updated configuration files");
@@ -185,12 +186,12 @@ namespace Catamagne.Commands
                 await ctx.RespondAsync(discordEmbed);
                 return ErrorCode.UnqualifyChannel;
             }
-            if (ctx.Member.Id == ConfigValues.configValues.DevID)
+            if (ctx.Member.Id == ConfigValues.DevID)
             {
                 return ErrorCode.Qualify;
             }
-            var roleVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.configValues.RoleIDs);
-            var adminVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.configValues.AdminRoleIDs);
+            var roleVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.RoleIDs);
+            var adminVerf = ctx.Member.Roles.Select(t => t.Id).Intersect(ConfigValues.AdminRoleIDs);
             if (adminVerf.Any())
             {
                 return ErrorCode.Qualify;
@@ -225,7 +226,7 @@ namespace Catamagne.Commands
 
     public class UserInteractionsModule : BaseCommandModule
     {
-
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         [Command("responses")]
         [Description("View current responses stored and watched for")]
         [Aliases("response")]
@@ -237,7 +238,7 @@ namespace Catamagne.Commands
             {
                 new Thread(async () =>
                 {
-                    List<Response> responses = ConfigValues.configValues.Responses;
+                    List<Response> responses = ConfigValues.Responses;
                     bool fail = false;
                     if (args == "list")
                     {
@@ -269,11 +270,11 @@ namespace Catamagne.Commands
                                     var channelString = await ctx.Message.GetNextMessageAsync();
                                     if (!channelString.TimedOut)
                                     {
-                                        var _ = ConfigValues.configValues.Responses.ToList();
+                                        var workingList = ConfigValues.Responses.ToList();
                                         if (channelString.Result.Content == "all" || string.IsNullOrWhiteSpace(channelString.Result.Content))
                                         {
                                             var response = new Response(trigger, body.Result.Content, description.Result.Content);
-                                            _.Add(response);
+                                            workingList.Add(response);
                                         }
                                         else
                                         {
@@ -284,10 +285,10 @@ namespace Catamagne.Commands
                                                 channels.Add(await Core.Discord.discord.GetChannelAsync(Convert.ToUInt64(channel)));
                                             });
                                             var response = new Response(trigger, body.Result.Content, description.Result.Content, channels);
-                                            _.Add(response);
+                                            workingList.Add(response);
                                         }
-                                        ConfigValues.configValues.Responses = _;
-                                        ConfigValues.configValues.SaveConfig();
+                                        ConfigValues.Responses = workingList;
+                                        ConfigValues.SaveConfig();
                                         Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Added", "Successfully added response to pool.");
                                         var message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
 
@@ -317,7 +318,7 @@ namespace Catamagne.Commands
                         {
                             var Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Working", "Finding response from pool");
                             var message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
-                            var match = ConfigValues.configValues.Responses.Select(t => t.trigger);
+                            var match = ConfigValues.Responses.Select(t => t.trigger);
                             if (match.Contains(text))
                             {
                                 var trigger = text;
@@ -338,8 +339,8 @@ namespace Catamagne.Commands
                                         {
                                             Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Working", "Updating response.");
                                             message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
-                                            var _ = ConfigValues.configValues.Responses.ToList();
-                                            _.Remove(ConfigValues.configValues.Responses.ToList().Find(t => t.trigger == text));
+                                            var _ = ConfigValues.Responses.ToList();
+                                            _.Remove(ConfigValues.Responses.ToList().Find(t => t.trigger == text));
                                             if (channelString.Result.Content == "all" || string.IsNullOrWhiteSpace(channelString.Result.Content))
                                             {
                                                 var response = new Response(trigger, body.Result.Content, description.Result.Content);
@@ -357,8 +358,8 @@ namespace Catamagne.Commands
                                                 _.Add(response);
                                             }
 
-                                            ConfigValues.configValues.Responses = _;
-                                            ConfigValues.configValues.SaveConfig();
+                                            ConfigValues.Responses = _;
+                                            ConfigValues.SaveConfig();
                                             Embed = Core.Discord.CreateFancyMessage(DiscordColor.CornflowerBlue, "Updated", "Successfully updated response.");
                                             await message.ModifyAsync(Embed);
 
@@ -394,13 +395,13 @@ namespace Catamagne.Commands
                         {
                             var Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Working", "Removing response from pool.");
                             var message = await Core.Discord.SendFancyMessage(ctx.Channel, Embed);
-                            var match = ConfigValues.configValues.Responses.Select(t => t.trigger);
+                            var match = ConfigValues.Responses.Select(t => t.trigger);
                             if (match.Contains(text))
                             {
-                                var _ = ConfigValues.configValues.Responses.ToList();
-                                _.Remove(ConfigValues.configValues.Responses.ToList().Find(t => t.trigger == text));
-                                ConfigValues.configValues.Responses = _;
-                                ConfigValues.configValues.SaveConfig();
+                                var _ = ConfigValues.Responses.ToList();
+                                _.Remove(ConfigValues.Responses.ToList().Find(t => t.trigger == text));
+                                ConfigValues.Responses = _;
+                                ConfigValues.SaveConfig();
                                 Embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Removed", "Successfully removed response from pool.");
                                 message = await message.ModifyAsync(Embed);
                             }

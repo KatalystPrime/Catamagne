@@ -15,6 +15,7 @@ namespace Catamagne.Events
 {
     class UserEvents
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         public static async Task Discord_GuildMemberRemoved(DiscordClient client, GuildMemberRemoveEventArgs e)
         {
             new Thread(async () =>
@@ -34,6 +35,10 @@ namespace Catamagne.Events
                     //{
                     //    messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
                     //});
+                    //Core.Discord.alertsChannels.ForEach(async channel =>
+                    //{
+                    //    messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
+                    //});
                     //DiscordMessage message = await CatamagneCore.SendAlert(string.Format("User detected leaving discord server; was on spreadsheet, id = {0}", e.Member.Id.ToString()));
                 }
             }).Start();
@@ -42,15 +47,13 @@ namespace Catamagne.Events
         {
             await Task.Run(() =>
             {
-                var startTimeLong = DateTime.UtcNow + ConfigValues.configValues.LongInterval / 2;
-                var startTimeShort = DateTime.UtcNow + ConfigValues.configValues.MediumInterval / 3 * 2;
-                var activityTimeSpan = ConfigValues.configValues.MediumInterval * (Clans.clans.Count+1);
+                var startTimeLong = DateTime.UtcNow + ConfigValues.LongInterval / 2;
+                var startTimeShort = DateTime.UtcNow + ConfigValues.MediumInterval / 5 * 7;
+                var activityTimeSpan = ConfigValues.MediumInterval * (Clans.clans.Count+1);
                 //var dailyTimeSpan = TimeSpan.FromDays(1);
-                //AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, ConfigValues.clansList, AutoEvents.AutoBulkUpdateAsync);
-                AutoEvents.EventScheduler(startTimeShort, ConfigValues.configValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
-                AutoEvents.EventScheduler(startTimeLong, ConfigValues.configValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
+                AutoEvents.EventScheduler(startTimeShort, ConfigValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
+                AutoEvents.EventScheduler(startTimeLong, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
                 AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, Core.Discord.RotateActivity);
-               // AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.configValues.ShortInterval, ConfigValues.clansList, AutoEvents.AutoReadAsync, false);
                 //AutoEvents.AutoScanForChanges();
                 //AutoEvents.AutoBulkUpdate();
                 //AutoEvents.AutoCheckForLeavers();
@@ -61,7 +64,7 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-                var responses = ConfigValues.configValues.Responses.ToList();
+                var responses = ConfigValues.Responses.ToList();
                 if (responses.Select(response => response.trigger).Contains(messageArgs.Message.Content))
                 {
                     Response response = responses.Find(r => r.trigger == messageArgs.Message.Content);

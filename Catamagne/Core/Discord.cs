@@ -18,6 +18,7 @@ namespace Catamagne.Core
 {
     class Discord
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         public static List<DiscordChannel?> alertsChannels = new List<DiscordChannel?>();
         public static List<DiscordChannel?> updatesChannels = new List<DiscordChannel?>();
         static SerilogLoggerFactory logFactory;
@@ -34,14 +35,14 @@ namespace Catamagne.Core
             {
                 MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug,
                 Intents = DiscordIntents.GuildMembers | DiscordIntents.GuildIntegrations | DiscordIntents.GuildMessages | DiscordIntents.Guilds | DiscordIntents.GuildPresences,
-                Token = ConfigValues.configValues.DiscordToken,
+                Token = ConfigValues.DiscordToken,
                 TokenType = TokenType.Bot,
                 AlwaysCacheMembers = true,
                 LoggerFactory = logFactory
             }); ;
             var commands = discord.UseCommandsNext(new CommandsNextConfiguration()
             {
-                StringPrefixes = ConfigValues.configValues.Prefixes,
+                StringPrefixes = ConfigValues.Prefixes,
                 CaseSensitive = false,
             });
 
@@ -58,13 +59,13 @@ namespace Catamagne.Core
             discord.MessageCreated += UserEvents.Discord_MessageCreated;
             discord.Ready += UserEvents.Discord_Ready;
 
-            await discord.ConnectAsync(ConfigValues.configValues.DiscordActivity);
+            await discord.ConnectAsync(ConfigValues.DiscordActivity);
             await UpdateChannels();
         }
         public static async Task UpdateChannels()
         {
             alertsChannels = new List<DiscordChannel?>(); updatesChannels = new List<DiscordChannel?>();
-            foreach (var channel in ConfigValues.configValues.AlertChannels)
+            foreach (var channel in ConfigValues.AlertChannels)
             {
                 try
                 {
@@ -77,7 +78,7 @@ namespace Catamagne.Core
                 }
             }
 
-            foreach (var channel in ConfigValues.configValues.UpdatesChannels)
+            foreach (var channel in ConfigValues.UpdatesChannels)
             {
                 try
                 {
@@ -90,7 +91,7 @@ namespace Catamagne.Core
                 }
             }
             commandChannels = new List<DiscordChannel>();
-            foreach (var channel in ConfigValues.configValues.CommandChannels)
+            foreach (var channel in ConfigValues.CommandChannels)
             {
                 try
                 {

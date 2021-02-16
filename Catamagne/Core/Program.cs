@@ -8,20 +8,21 @@ namespace Catamagne.Core
 {
     class Core
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         public static DateTime startTime;
         public static bool PauseEvents;
 
         //static void Main(string[] args)
         //{
 
-        //    ConfigValues.configValues.LoadConfig();
+        //    ConfigValues.LoadConfig();
         //    TrackTimeLive();
         //    Clans.LoadClans();
         //    MainAsync().GetAwaiter().GetResult();
         //}
         static async Task Main(string[] args)
         {
-            ConfigValues.configValues.LoadConfig();
+            ConfigValues.LoadConfig();
             TrackTimeLive();
             Clans.LoadClans();
             await SpreadsheetTools.SetUpSheet();

@@ -13,11 +13,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace Catamagne.API
 {
-
+    
     public class SpreadsheetTools
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
         // If modifying these scopes, delete your previously saved credentials
         // at ~/.credentials/sheets.googleapis.com-dotnet-quickstart.json
         static string[] Scopes = { SheetsService.Scope.Spreadsheets };
@@ -28,32 +30,32 @@ namespace Catamagne.API
         static SheetsService service;
         public static async Task SetUpSheet()
         {
-            using (var stream =
-                new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
-            {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    Scopes,
-                    "drive",
-                    CancellationToken.None,
-                    new FileDataStore(Path.Combine(ConfigValues.configValues.FolderPath, "config", credPath), true));
-                Console.WriteLine("Credential file saved to: " + ConfigValues.configValues.FolderPath + credPath);
-            }
+            //using (var stream =
+            //    new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
+            //{
+            //    // The file token.json stores the user's access and refresh tokens, and is created
+            //    // automatically when the authorization flow completes for the first time.
+            //    string credPath = "token.json";
+            //    credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+            //        GoogleClientSecrets.Load(stream).Secrets,
+            //        Scopes,
+            //        "drive",
+            //        CancellationToken.None,
+            //        new FileDataStore(Path.Combine(ConfigValues.FolderPath, "config", credPath), true));
+            //    Console.WriteLine("Credential file saved to: " + ConfigValues.FolderPath + credPath);
+            //}
 
             // Create Google Sheets API service.
-            service = new SheetsService(new BaseClientService.Initializer()
+            service = new SheetsService(new ()
             {
-                HttpClientInitializer = credential,
+                ApiKey = ConfigValues.GoogleAPIKey,
                 ApplicationName = ApplicationName,
-            });
+            });;
         }
         public static async Task Read(Clan clan)
         {
             // Define requestRead parameters.
-            String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
+            String spreadsheetId = ConfigValues.SpreadsheetID;
             String range = clan.details.SpreadsheetRange;
             SpreadsheetsResource.ValuesResource.GetRequest requestRead =
                     service.Spreadsheets.Values.Get(spreadsheetId, range);
@@ -153,7 +155,7 @@ namespace Catamagne.API
         }
         public static void Write(Clan clan)
         {
-            String spreadsheetId = ConfigValues.configValues.SpreadsheetID;
+            String spreadsheetId = ConfigValues.SpreadsheetID;
             String range = clan.details.SpreadsheetRange;
             ValueRange valueRange = new ValueRange();
             var table = new List<IList<object>>();
