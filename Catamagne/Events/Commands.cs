@@ -16,7 +16,6 @@ namespace Catamagne.Commands
     public class CoreModule : BaseCommandModule
     {
         static ConfigValues ConfigValues => ConfigValues.configValues;
-        //}
         [Command("updateconfig")]
         [Description("Update configuration for the bot. Only admins can execute this.")]
         [Aliases("updateconf", "conf", "confupdate")]

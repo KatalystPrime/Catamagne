@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Discord;
+using DSharpPlus.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,10 +15,12 @@ namespace Catamagne.API
             public string BungieNetName;
             public string Tag;
             public string SpreadsheetRange;
+            public string ClanColour;
+            [NonSerialized] public DiscordColor DiscordColor;
 
-            public Details(long BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange)
+            public Details(long BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange, string ClanColour)
             {
-                this.BungieNetID = BungieNetClanID; this.BungieNetName = BungieNetClanName; this.Tag = ClanTag; this.SpreadsheetRange = SpreadsheetClanRange;
+                this.BungieNetID = BungieNetClanID; this.BungieNetName = BungieNetClanName; this.Tag = ClanTag; this.SpreadsheetRange = SpreadsheetClanRange; this.ClanColour = ClanColour; this.DiscordColor = new DiscordColor(ClanColour);
             }
         }
         public class Members

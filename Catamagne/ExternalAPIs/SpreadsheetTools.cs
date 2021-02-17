@@ -33,16 +33,8 @@ namespace Catamagne.API
             using (var stream =
                 new FileStream("credentials.dat", FileMode.Open, FileAccess.ReadWrite))
             {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
+                //fuck OATH 2.0 for console apps, that shit does not belong in a console app.
                 credential = await GoogleCredential.FromStreamAsync(stream, CancellationToken.None);
-                //credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                //    GoogleClientSecrets.Load(stream).Secrets,
-                //    Scopes,
-                //    "drive",
-                //    CancellationToken.None,
-                //    new FileDataStore(Path.Combine(ConfigValues.FolderPath, "config", credPath), true));
-                //Console.WriteLine("Credential file saved to: " + ConfigValues.FolderPath + credPath);
             }
             // Create Google Sheets API service.
             service = new SheetsService(new ()
