@@ -95,7 +95,7 @@ namespace Catamagne.Configuration
         static ConfigValues ConfigValues => ConfigValues.configValues;
         public static List<Clan> clans = new List<Clan>() {
             new Clan(
-                new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101"),
+                new Clan.Details(4170189, "Umbral", "ug", "Umbral!A2:F101", "#6E63BD"),
                 new Clan.Members(new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>(), new List<SpreadsheetTools.User>())
             )};
         public static void SaveClanMembers(Clan clan)
