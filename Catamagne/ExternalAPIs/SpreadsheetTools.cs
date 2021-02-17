@@ -75,33 +75,33 @@ namespace Catamagne.API
             {
                 for (int i = 0; i < spreadsheetData.Count; i++)
                 {
-                    var _ = new SpreadsheetUser();
+                    var user = new SpreadsheetUser();
                     if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0)
                     {
                         var count = spreadsheetData[i].Count;
                         if (count > 0)
                         {
-                            _.BungieNetLink = spreadsheetData[i][0].ToString();
+                            user.BungieNetLink = spreadsheetData[i][0].ToString();
                         }
                         if (count > 1)
                         {
-                            _.BungieNetName = spreadsheetData[i][1].ToString();
+                            user.BungieNetName = spreadsheetData[i][1].ToString();
                         }
                         if (count > 2)
                         {
-                            _.SteamLink = spreadsheetData[i][2].ToString();
+                            user.SteamLink = spreadsheetData[i][2].ToString();
                         }
                         if (count > 3)
                         {
-                            _.SteamName = spreadsheetData[i][3].ToString();
+                            user.SteamName = spreadsheetData[i][3].ToString();
                         }
                         if (count > 4)
                         {
-                            _.DiscordID = Convert.ToUInt64(spreadsheetData[i][4]);
+                            user.DiscordID = Convert.ToUInt64(spreadsheetData[i][4]);
                         }
                         if (count > 5)
                         {
-                            _.UserStatus = UserStatus.ToEnum(spreadsheetData[i][5].ToString());
+                            user.UserStatus = UserStatus.ToEnum(spreadsheetData[i][5].ToString());
                         }
                         if (count > 6)
                         {
@@ -110,9 +110,9 @@ namespace Catamagne.API
                             {
                                 extraColumns.Add(spreadsheetData[i][index].ToString());
                             }
-                            _.ExtraColumns = extraColumns.ToArray();
+                            user.ExtraColumns = extraColumns.ToArray();
                         }
-                        workingList.Add(_);
+                        workingList.Add(user);
                     }
                 }
             }
@@ -137,8 +137,8 @@ namespace Catamagne.API
 
             for (int c = 0; c < clan.members.BungieUsers.Count; c++)
             {
-                List<object> _;
-                _ = new List<object>(6)
+                List<object> user;
+                user = new List<object>(6)
                 {
                     clan.members.BungieUsers[c].BungieNetLink,
                     clan.members.BungieUsers[c].BungieNetName,
@@ -151,7 +151,7 @@ namespace Catamagne.API
                 {
                     foreach (string column in clan.members.BungieUsers[c].ExtraColumns)
                     {
-                        _.Add(column);
+                        user.Add(column);
                     }
                     var letterStrings = clan.details.SpreadsheetRange.Split('!')[1].Split(':');
                     var a = char.ToUpper(letterStrings[0][0]) - 64;
@@ -159,7 +159,7 @@ namespace Catamagne.API
                     var forRange = b - a - clan.members.BungieUsers[c].ExtraColumns.Length - 5;
                     for (int i = 0; i < forRange; i++)
                     {
-                        _.Add("");
+                        user.Add("");
                     }
                 }
                 else
@@ -170,10 +170,10 @@ namespace Catamagne.API
                     var forRange = b - a - 5;
                     for (int i = 0; i < forRange; i++)
                     {
-                        _.Add("");
+                        user.Add("");
                     }
                 }
-                table.Add(_);
+                table.Add(user);
             }
             for (int c = clan.members.BungieUsers.Count; c < 100; c++)
             {

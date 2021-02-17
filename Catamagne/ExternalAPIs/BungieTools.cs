@@ -39,8 +39,8 @@ namespace Catamagne.API
         }
         public static async Task<Clan> GetClanContainingUser(BungieUser user)
         {
-            var _ = Clans.clans.Where(t => t.members.BungieUsers.Contains(user)).FirstOrDefault();
-            return _;
+            var clan = Clans.clans.Where(t => t.members.BungieUsers.Contains(user)).FirstOrDefault();
+            return clan;
         }
         public static async Task<long?> GetDestinyUserID(string profileLink)
         {
@@ -80,9 +80,9 @@ namespace Catamagne.API
         {
             if (profileLink.Length > 0)
             {
-                var _ = profileLink.Split('/');
+                var profileParts = profileLink.Split('/');
                 int numCount = 0;
-                foreach (var part in _)
+                foreach (var part in profileParts)
                 {
                     long numPart;
                     if (long.TryParse(part, out numPart))
