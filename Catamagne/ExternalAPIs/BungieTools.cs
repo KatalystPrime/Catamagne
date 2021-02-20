@@ -7,8 +7,6 @@ using BungieSharper.Schema.User;
 using BungieSharper.Schema;
 using BungieSharper.Schema.GroupsV2;
 using Catamagne.Configuration;
-using Discord.Commands;
-using DSharpPlus.Entities;
 
 namespace Catamagne.API
 {
