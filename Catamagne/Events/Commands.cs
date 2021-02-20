@@ -64,7 +64,7 @@ namespace Catamagne.Commands
                         discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                         await msg.ModifyAsync(discordEmbed);
                         await SpreadsheetTools.SelectiveUpdate(clan, _);
-                        discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColor, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
+                        discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
                         await msg.ModifyAsync(discordEmbed);
                     }
                     else
@@ -120,14 +120,14 @@ namespace Catamagne.Commands
                         var users = clan.members.SpreadsheetUsers.ToList();
                         users = users.OrderBy(t => t.steamName).ToList();
 
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.BungieNetName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.Name + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
                         List<SpreadsheetTools.User> users = clan.members.BungieUsers;
                         users = users.OrderBy(t => t.steamName).ToList();
 
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.BungieNetName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.Name + ":");
 
                     }
                     else
@@ -159,7 +159,7 @@ namespace Catamagne.Commands
                     {
                         await msg.DeleteAsync();
                         var fields = new List<Field>();
-                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, leavers, "Users found leaving " + clan.details.BungieNetName + ":");
+                        Core.Discord.SendFancyListMessage(ctx.Channel, clan, leavers, "Users found leaving " + clan.details.Name + ":");
 
                     }
                     else
