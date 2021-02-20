@@ -101,7 +101,7 @@ namespace Catamagne.Configuration
         public static void SaveClanMembers(Clan clan)
         {
             Directory.CreateDirectory(ConfigValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.ID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -110,13 +110,13 @@ namespace Catamagne.Configuration
             File.WriteAllText(clanMembersFile, JsonConvert.SerializeObject(clan.members.BungieUsers, Formatting.Indented));
             File.WriteAllText(clanSpreadsheetFile, JsonConvert.SerializeObject(clan.members.SpreadsheetUsers, Formatting.Indented));
             File.WriteAllText(clanLeaversFile, JsonConvert.SerializeObject(clan.members.ClanLeavers, Formatting.Indented));
-            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.BungieNetName, clanFolder));
+            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.Name, clanFolder));
             //Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClanMembers(Clan clan, UserType userType)
         {
             Directory.CreateDirectory(ConfigValues.ClansFolder);
-            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.ID.ToString());
             string clanFile;
             Directory.CreateDirectory(clanFolder);
             switch (userType)
@@ -139,12 +139,12 @@ namespace Catamagne.Configuration
             }
             //var _ = string.Format("Wrote {0} members to", clan.details.BungieNetName);
             //Console.WriteLine(string.Format("{0,-35} {1}\\", _, clanFolder));
-            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.BungieNetName, clanFolder));
+            Console.WriteLine(string.Format("Wrote {0,-9} members to {1}\\", clan.details.Name, clanFolder));
             //Console.WriteLine("Wrote {0} members to {1}\\", clan.details.BungieNetName, clanFile);
         }
         public static void LoadClanMembers(Clan clan)
         {
-            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.ID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -153,17 +153,17 @@ namespace Catamagne.Configuration
                 SaveClanMembers(clan);
             }
             var a = File.ReadAllText(clanMembersFile);
-            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
+            clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
             var b = File.ReadAllText(clanSpreadsheetFile);
-            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
+            clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
             var c = File.ReadAllText(clanLeaversFile);
-            clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
+            clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
             //Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
-            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.BungieNetName, clanFolder));
+            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.Name, clanFolder));
         }
         public static void LoadClanMembers(Clan clan, UserType userType)
         {
-            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.BungieNetID.ToString());
+            string clanFolder = Path.Combine(ConfigValues.ClansFolder, clan.details.ID.ToString());
             string clanMembersFile = Path.Combine(clanFolder, "Users.dat");
             string clanSpreadsheetFile = Path.Combine(clanFolder, "SpreadsheetUsers.dat");
             string clanLeaversFile = Path.Combine(clanFolder, "Leavers.dat");
@@ -175,7 +175,7 @@ namespace Catamagne.Configuration
                         SaveClanMembers(clan, UserType.BungieUser);
                     }
                     var a = File.ReadAllText(clanMembersFile);
-                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
+                    clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.BungieUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(a);
                     break;
                 case UserType.SpreadsheetUser:
                     if (!File.Exists(clanSpreadsheetFile))
@@ -184,7 +184,7 @@ namespace Catamagne.Configuration
                     }
 
                     var b = File.ReadAllText(clanSpreadsheetFile);
-                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
+                    clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.SpreadsheetUsers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(b);
                     break;
                 case UserType.Leaver:
                     if (!File.Exists(clanLeaversFile))
@@ -192,12 +192,12 @@ namespace Catamagne.Configuration
                         SaveClanMembers(clan, UserType.Leaver);
                     }
                     var c = File.ReadAllText(clanLeaversFile);
-                    clans[clans.FindIndex(t => t.details.BungieNetID == clan.details.BungieNetID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
+                    clans[clans.FindIndex(t => t.details.ID == clan.details.ID)].members.ClanLeavers = JsonConvert.DeserializeObject<List<SpreadsheetTools.User>>(c);
                     break;
                 default:
                     throw new ArgumentException("Type provided is invalid.");
             }
-            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.BungieNetName, clanFolder));
+            Console.WriteLine(string.Format("Read {0,-9} members from {1}\\", clan.details.Name, clanFolder));
             //Console.WriteLine("Read {0} members from {1}\\", clan.details.BungieNetName, clanFolder);
         }
         public static void SaveClans()

@@ -122,7 +122,7 @@ namespace Catamagne.API
         }
         public static async Task<(List<UserInfoCard> validMembers, List<GroupUserInfoCard> invalidMembers)> GetClanMembers(Clan clan)
         {
-            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.BungieNetID));
+            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.ID));
             var groupList = group.results.ToList();
             var validMembers = groupList.Where(t => t.bungieNetUserInfo != null).Select(t => t.bungieNetUserInfo).ToList();
             var invalidMembers = groupList.Where(t => t.bungieNetUserInfo == null).Select(t => t.destinyUserInfo).ToList();
@@ -282,9 +282,9 @@ namespace Catamagne.API
         }
         public static Clan GetClanFromName(string clanName)
         {
-            if (Clans.clans.Any(t => t.details.BungieNetName.ToLower() == clanName.ToLower()))
+            if (Clans.clans.Any(t => t.details.Name.ToLower() == clanName.ToLower()))
             {
-                return (Clans.clans.Where(t => t.details.BungieNetName.ToLower() == clanName.ToLower()).FirstOrDefault());
+                return (Clans.clans.Where(t => t.details.Name.ToLower() == clanName.ToLower()).FirstOrDefault());
             }
             else return null;
         }

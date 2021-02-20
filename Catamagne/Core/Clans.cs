@@ -11,16 +11,16 @@ namespace Catamagne.API
     {
         public class Details
         {
-            public long BungieNetID;
-            public string BungieNetName;
+            public long ID;
+            public string Name;
             public string Tag;
             public string SpreadsheetRange;
-            public string ClanColour;
-            [NonSerialized] public DiscordColor DiscordColor;
+            public string Colour;
+            [NonSerialized] public DiscordColor DiscordColour;
 
-            public Details(long BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange, string ClanColour)
+            public Details(long BungieNetClanID, string BungieNetClanName, string ClanTag, string SpreadsheetClanRange, string Colour)
             {
-                this.BungieNetID = BungieNetClanID; this.BungieNetName = BungieNetClanName; this.Tag = ClanTag; this.SpreadsheetRange = SpreadsheetClanRange; this.ClanColour = ClanColour; this.DiscordColor = new DiscordColor(ClanColour);
+                this.ID = BungieNetClanID; this.Name = BungieNetClanName; this.Tag = ClanTag; this.SpreadsheetRange = SpreadsheetClanRange; this.Colour = Colour; this.DiscordColour = new DiscordColor(Colour);
             }
         }
         public class Members

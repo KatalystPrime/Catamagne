@@ -74,7 +74,7 @@ namespace Catamagne.API
                     _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
                     workingList.Add(_);
                 });
-                Log.Information("Spreadsheet for " + clan.details.BungieNetName + " is empty, generating (will take 10 minutes)");
+                Log.Information("Spreadsheet for " + clan.details.Name + " is empty, generating (will take 10 minutes)");
                 forceBulkUpdate = true;
             }
             else
@@ -134,7 +134,7 @@ namespace Catamagne.API
             if (clan.members.BungieUsers == null || clan.members.BungieUsers.Count == 0)
             {
                 forceBulkUpdate = true;
-                Log.Information("User details for " + clan.details.BungieNetName + " is empty, generating (will take 10 minutes)");
+                Log.Information("User details for " + clan.details.Name + " is empty, generating (will take 10 minutes)");
                 //Console.WriteLine("User details for " + clan.clanName + " is empty, generating (will take 10 minutes)");
             }
 

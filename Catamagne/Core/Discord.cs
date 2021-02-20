@@ -210,7 +210,7 @@ namespace Catamagne.Core
                     }
                 }
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-                var colour = clan.details.DiscordColor;
+                var colour = clan.details.DiscordColour;
                 if (fields.Count > 0 )
                 {
                     embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(0, Math.Min(25, fields.Count)), title));
@@ -235,10 +235,10 @@ namespace Catamagne.Core
         {
             var activity = new DiscordActivity()
             {
-                Name = string.Format("over {0}...", clan.details.BungieNetName),
+                Name = string.Format("over {0}...", clan.details.Name),
                 ActivityType = ActivityType.Watching,
             };
-            Log.Information("Rotating status to " + clan.details.BungieNetName);
+            Log.Information("Rotating status to " + clan.details.Name);
             discord.UpdateStatusAsync(activity);
             return Task.CompletedTask;
         }
