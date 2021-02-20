@@ -210,29 +210,22 @@ namespace Catamagne.Core
                     }
                 }
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
-                
-                if (fields.Count < 25)
+                var colour = clan.details.DiscordColor;
+                if (fields.Count > 0 )
                 {
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title));
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(0, Math.Min(25, fields.Count)), title));
                 }
-                else if (fields.Count < 50)
+                if (fields.Count > 25)
                 {
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, fields.Count)));
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(25, Math.Min(50, fields.Count))));
                 }
-                else if (fields.Count < 75)
+                if (fields.Count > 50)
                 {
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, 50)));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(50, fields.Count)));
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(50, Math.Min(75, fields.Count))));
                 }
-                else
+                if (fields.Count > 75)
                 {
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(0, Math.Min(25, fields.Count)), title));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(25, 50)));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(50, 75)));
-                    embeds.Add(GetUsersToDisplayInRange(DiscordColor.IndianRed, fields, new Range(75, fields.Count)));
-
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(75, Math.Min(100, fields.Count))));
                 }
                 List<DiscordMessage> messages = new List<DiscordMessage>();
                 embeds.ForEach(async embed => messages.Add(await SendFancyMessage(channel, embed)));

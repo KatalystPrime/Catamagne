@@ -274,9 +274,17 @@ namespace Catamagne.API
         }
         public static Clan GetClanFromTag(string clanTag)
         {
-            if (Clans.clans.Any(t => t.details.Tag == clanTag))
+            if (Clans.clans.Any(t => t.details.Tag.ToLower() == clanTag.ToLower()))
             {
-                return (Clans.clans.Where(t => t.details.Tag == clanTag).FirstOrDefault());
+                return (Clans.clans.Where(t => t.details.Tag.ToLower() == clanTag.ToLower()).FirstOrDefault());
+            }
+            else return null;
+        }
+        public static Clan GetClanFromName(string clanName)
+        {
+            if (Clans.clans.Any(t => t.details.BungieNetName.ToLower() == clanName.ToLower()))
+            {
+                return (Clans.clans.Where(t => t.details.BungieNetName.ToLower() == clanName.ToLower()).FirstOrDefault());
             }
             else return null;
         }

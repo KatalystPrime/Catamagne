@@ -47,12 +47,12 @@ namespace Catamagne.Commands
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
-            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
             if (verification == ErrorCode.Qualify)
             {
-                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Turquoise, "Scanning for Changes...");
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Scanning for Changes...");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 new Thread(async () =>
                 {
@@ -64,7 +64,7 @@ namespace Catamagne.Commands
                         discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                         await msg.ModifyAsync(discordEmbed);
                         await SpreadsheetTools.SelectiveUpdate(clan, _);
-                        discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
+                        discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColor, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
                         await msg.ModifyAsync(discordEmbed);
                     }
                     else
@@ -107,7 +107,7 @@ namespace Catamagne.Commands
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
-            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
             if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
@@ -145,7 +145,7 @@ namespace Catamagne.Commands
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
-            var clan = await GetClanFromTagAsync(ctx, clanTag);
+            var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
             if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
@@ -207,12 +207,17 @@ namespace Catamagne.Commands
             await ctx.RespondAsync(discordEmbed);
             return ErrorCode.UnqualifyRole;
         }
-        static async Task<Clan> GetClanFromTagAsync(CommandContext ctx, string clanTag)
+        static async Task<Clan> GetClanFromTagOrNameAsync(CommandContext ctx, string clanNameOrTag)
         {
-            var clan = BungieTools.GetClanFromTag(clanTag);
-            if (clan != null)
+            var clanByTag = BungieTools.GetClanFromTag(clanNameOrTag);
+            var clanByName = BungieTools.GetClanFromName(clanNameOrTag);
+            if (clanByTag != null)
             {
-                return clan;
+                return clanByTag;
+            }
+            else if (clanByName != null)
+            {
+                return clanByName;
             }
             else
             {
