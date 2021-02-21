@@ -82,7 +82,7 @@ namespace Catamagne.API
                 for (int i = 0; i < spreadsheetData.Count; i++)
                 {
                     var _ = new User();
-                    if (spreadsheetData[i] != null && !string.IsNullOrEmpty(spreadsheetData[i][0].ToString()))
+                    if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0 && !string.IsNullOrEmpty(spreadsheetData[i][0].ToString()))
                     {
                         switch (spreadsheetData[i].Count)
                         {
