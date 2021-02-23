@@ -5,15 +5,32 @@ using DSharpPlus.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
+using Catamagne.Configuration;
 
 namespace Catamagne.Events
 {
     class AutoEvents
     {
+        static ConfigValues ConfigValues => ConfigValues.configValues;
+        public static void SetUp()
+        {
+            var startTimeLong = DateTime.UtcNow + ConfigValues.LongInterval / 2;
+            var startTimeShort = DateTime.UtcNow + ConfigValues.MediumInterval / 5 * 7;
+            var activityTimeSpan = ConfigValues.MediumInterval * (Clans.clans.Count + 1);
+            //var dailyTimeSpan = TimeSpan.FromDays(1);
+            AutoEvents.EventScheduler(startTimeShort, ConfigValues.ShortInterval, Clans.clans, AutoEvents.AutoScanForChangesAsync);
+            AutoEvents.EventScheduler(startTimeLong, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
+            AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, AutoEvents.AutoRotateActivity);
+            AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoBulkUpdateAsync);
+            //AutoEvents.AutoScanForChanges();
+            //AutoEvents.AutoBulkUpdate();
+            //AutoEvents.AutoCheckForLeavers();
+        }
         public static void EventScheduler(DateTime referenceTime, TimeSpan timeSpan, List<Clan> clans, Func<Clan, Task> action, bool repeat = true)
         {
             new Thread(async () =>
             {
+               Thread.Sleep(DateTime.UtcNow - referenceTime);
                TimeSpan interval = timeSpan / clans.Count;
                var done = false;
                var index = 0;

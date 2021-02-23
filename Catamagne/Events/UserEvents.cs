@@ -45,21 +45,7 @@ namespace Catamagne.Events
         }
         public static async Task Discord_Ready(DiscordClient client, ReadyEventArgs r)
         {
-            await Task.Run(() =>
-            {
-                var startTimeLong = DateTime.UtcNow + ConfigValues.LongInterval / 2;
-                var startTimeShort = DateTime.UtcNow + ConfigValues.MediumInterval / 5 * 7;
-                var activityTimeSpan = ConfigValues.MediumInterval * (Clans.clans.Count+1);
-                //var dailyTimeSpan = TimeSpan.FromDays(1);
-                AutoEvents.EventScheduler(startTimeShort, ConfigValues.ShortInterval , Clans.clans, AutoEvents.AutoScanForChangesAsync);
-                AutoEvents.EventScheduler(startTimeLong, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
-                AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, AutoEvents.AutoRotateActivity);
-                AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoBulkUpdateAsync);
-                //AutoEvents.AutoScanForChanges();
-                //AutoEvents.AutoBulkUpdate();
-                //AutoEvents.AutoCheckForLeavers();
-                return Task.CompletedTask;
-            });
+            AutoEvents.SetUp();
         }
         public static async Task Discord_MessageCreated(DiscordClient sender, DSharpPlus.EventArgs.MessageCreateEventArgs messageArgs)
         {
