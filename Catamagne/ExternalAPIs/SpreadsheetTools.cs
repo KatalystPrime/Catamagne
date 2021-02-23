@@ -206,7 +206,6 @@ namespace Catamagne.API
         {
             if (!skipRead) await Read(clan);
             //ShowLoading("processing...");
-            Core.Core.PauseEvents = true;
             var _ = clan.members.SpreadsheetUsers;
             List<User> workingList = new List<User>();
             foreach (User user in _)
@@ -222,11 +221,10 @@ namespace Catamagne.API
                         string bungieProfile = user.bungieProfile;
                         string bungieID = workingUser.bungieID;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
-                        SteamTools.SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
                         string steamID = SteamTools.GetSteamID(bungieProfile);
+                        string steamName = SteamTools.GetSteamUserName(steamID);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
-                        string steamName = steamUser.displayname;
                         string discordID = user.discordID;
                         UserStatus userStatus = user.UserStatus;
 
@@ -282,7 +280,6 @@ namespace Catamagne.API
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
-            Core.Core.PauseEvents = false;
         }
         public static async Task SelectiveUpdate(Clan clan, Changes changes)
         {
@@ -302,11 +299,10 @@ namespace Catamagne.API
                         string bungieID = workingUser.bungieID;
                         UserStatus userStatus = addedUser.UserStatus;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
-                        SteamTools.SteamUser steamUser = await BungieTools.GetSteamUser(bungieProfile);
                         string steamID = SteamTools.GetSteamID(bungieProfile);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
-                        string steamName = steamUser.displayname;
+                        string steamName = SteamTools.GetSteamUserName(steamID);
                         string discordID = addedUser.discordID;
                         string userClanTag = addedUser.clanTag;
                         workingUser = new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, userClanTag);
@@ -374,7 +370,6 @@ namespace Catamagne.API
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
-            Core.Core.PauseEvents = false;
         }
         public static async Task SelectiveUpdate(Clan clan)
         {
@@ -386,7 +381,6 @@ namespace Catamagne.API
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
-            Core.Core.PauseEvents = false;
         }
         public static async Task<Changes> CheckForChangesAsync(Clan clan)
         {
