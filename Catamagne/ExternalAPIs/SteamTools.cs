@@ -1,11 +1,30 @@
-﻿using HtmlAgilityPack;
+﻿using Catamagne.Configuration;
+using HtmlAgilityPack;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace Catamagne.API
 {
     public class SteamTools
     {
+        //public static 
+        static ConfigValues ConfigValues => ConfigValues.configValues;
+        public static string GetSteamUserName(string steamID)
+        {
+            var xmlData = WebRequest.Create($"https://steamcommunity.com/profiles/{steamID}?xml=1").GetResponse().GetResponseStream();
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlData);
+            var steamIDs = doc.GetElementsByTagName("steamid");
+            if (steamIDs != null && steamIDs.Count > 0)
+            {
+                return steamIDs[0].InnerText;
+            }
+            return null;
+        }
         public static string GetSteamID(string url)
         {
             var pattern = new Regex(@"(\(ID: (.*[0-9])\))");
@@ -36,14 +55,14 @@ namespace Catamagne.API
 
             //Console.WriteLine(filteredArray[160]);
         }
-        public class SteamUser
-        {
-            public string displayname;
-            public ulong steamID64;
-            public SteamUser(string username, ulong steamID)
-            {
-                displayname = username; steamID64 = steamID;
-            }
-        }
+        //public class SteamUser
+        //{
+        //    public string displayname;
+        //    public ulong steamID64;
+        //    public SteamUser(string username, ulong steamID)
+        //    {
+        //        displayname = username; steamID64 = steamID;
+        //    }
+        //}
     }
 }
