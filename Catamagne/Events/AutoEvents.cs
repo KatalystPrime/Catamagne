@@ -30,7 +30,7 @@ namespace Catamagne.Events
         {
             new Thread(async () =>
             {
-               Thread.Sleep(DateTime.UtcNow - referenceTime);
+               Thread.Sleep(TimeSpan.FromMilliseconds(Math.Max( (referenceTime -  DateTime.UtcNow).TotalMilliseconds ,0d)));
                TimeSpan interval = timeSpan / clans.Count;
                var done = false;
                var index = 0;
