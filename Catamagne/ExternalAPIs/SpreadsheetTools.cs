@@ -232,6 +232,7 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
+                        Console.WriteLine("bulk updated member.");
                         workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                     else

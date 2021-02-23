@@ -60,7 +60,7 @@ namespace Catamagne.Commands
                     var _ = await SpreadsheetTools.CheckForChangesAsync(clan);
                     if (_.TotalChanges > 0)
                     {
-                        TimeSpan t = TimeSpan.FromSeconds((_.addedUsers.Count * 5) + (_.updatedUsers.Count * 0.1) + (_.removedUsers.Count * 0.1));
+                        TimeSpan t = TimeSpan.FromSeconds((_.addedUsers.Count * 3) + (_.updatedUsers.Count * 0.1) + (_.removedUsers.Count * 0.1));
                         discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                         await msg.ModifyAsync(discordEmbed);
                         await SpreadsheetTools.SelectiveUpdate(clan, _);
@@ -89,7 +89,7 @@ namespace Catamagne.Commands
 
             if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
-                TimeSpan t = TimeSpan.FromSeconds(5 * clan.members.SpreadsheetUsers.Count);
+                TimeSpan t = TimeSpan.FromSeconds(3 * clan.members.SpreadsheetUsers.Count);
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "ETA:" + t.ToString(@"mm\:ss"));
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 new Thread(async () =>
