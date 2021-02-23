@@ -43,19 +43,14 @@ namespace Catamagne.Events
         }
         public static async Task AutoBulkUpdateAsync(Clan clan)
         {
-            Log.Information("Bulk updating for " + clan.details.Name);
+            Log.Information("Bulk updating " + clan.details.Name);
             //Console.WriteLine("Bulk updating for " + clan.details.BungieNetName);
-            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.details.Name, "Automatically updating every spreadsheet element.");
             List<DiscordMessage> messages = new List<DiscordMessage>();
+            await SpreadsheetTools.BulkUpdate(clan);
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.Name, "Updated every cell in spreadsheet.");
             foreach (var channel in Core.Discord.updatesChannels)
             {
                 messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
-            }
-            await SpreadsheetTools.BulkUpdate(clan);
-            discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.Name, "Updated every cell in spreadsheet.");
-            foreach (var message in messages)
-            {
-                await message.ModifyAsync(discordEmbed);
             }
         }
         public static async Task AutoScanForChangesAsync(Clan clan)
