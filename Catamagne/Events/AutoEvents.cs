@@ -51,21 +51,12 @@ namespace Catamagne.Events
             {
                 messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
             }
-            //Core.Discord.updatesChannels.ForEach(async channel =>
-            //{
-            //    messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
-            //});
-            //DiscordMessage message = await Core.Discord.SendFancyMessage(Core.Discord.updatesChannel, discordEmbed);
             await SpreadsheetTools.BulkUpdate(clan);
             discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.Name, "Updated every cell in spreadsheet.");
             foreach (var message in messages)
             {
                 await message.ModifyAsync(discordEmbed);
             }
-            //messages.ForEach(async message =>
-            //{
-            //    await message.ModifyAsync(discordEmbed);
-            //});
         }
         public static async Task AutoScanForChangesAsync(Clan clan)
         {
@@ -104,6 +95,17 @@ namespace Catamagne.Events
             //    Core.Discord.SendFancyListMessage(channel, clan, Leavers, "Users found leaving " + clan.details.BungieNetName + ":");
             //});
             //Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.details.BungieNetName + ":");
+        }
+        public static Task AutoRotateActivity(Clan clan)
+        {
+            var activity = new DiscordActivity()
+            {
+                Name = string.Format("over {0}...", clan.details.Name),
+                ActivityType = ActivityType.Watching,
+            };
+            Log.Information("Rotating status to " + clan.details.Name);
+            Core.Discord.discord.UpdateStatusAsync(activity);
+            return Task.CompletedTask;
         }
     }
 }
