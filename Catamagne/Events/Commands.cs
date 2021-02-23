@@ -50,7 +50,7 @@ namespace Catamagne.Commands
             var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
-            if (verification == ErrorCode.Qualify)
+            if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Scanning for Changes...");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
@@ -60,7 +60,7 @@ namespace Catamagne.Commands
                     var _ = await SpreadsheetTools.CheckForChangesAsync(clan);
                     if (_.TotalChanges > 0)
                     {
-                        TimeSpan t = TimeSpan.FromSeconds(_.TotalChanges * 5);
+                        TimeSpan t = TimeSpan.FromSeconds((_.addedUsers.Count * 5) + (_.updatedUsers.Count * 0.1) + (_.removedUsers.Count * 0.1));
                         discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                         await msg.ModifyAsync(discordEmbed);
                         await SpreadsheetTools.SelectiveUpdate(clan, _);
@@ -69,6 +69,7 @@ namespace Catamagne.Commands
                     }
                     else
                     {
+                        await SpreadsheetTools.SelectiveUpdate(clan);
                         var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "No changes found", "To update steam names, please run a bulk update.");
                         await msg.ModifyAsync(discordEmbed);
                     }
@@ -76,30 +77,29 @@ namespace Catamagne.Commands
                 }).Start();
             }
         }
-        //[Command("bulkupdate")]
-        //[Description("Update all the data in the sheets. This takes upwards of 10 minutes")]
-        //[Aliases("bulk")]
-        //public async Task BulkUpdateSheet(CommandContext ctx)
-        //{
-        //    var roles = ctx.Member.Roles.ToList();
-        //    var verification = await IsVerifiedAsync(ctx, true);
-        //    if (verification == ErrorCode.Qualify)
-        //    {
-        //        new Thread(async () =>
-        //        {
-        //            Thread.CurrentThread.IsBackground = true;
-        //            //call bulkupdate method
-        //            await SpreadsheetTools.ReadSheet();
-        //            TimeSpan t = TimeSpan.FromSeconds(100 * 5);
-        //            var discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.Yellow, "Bulk updating sheets", "This will update every single element in the spreadsheet", new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
-        //            DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-        //            await SpreadsheetTools.BulkUpdateSheet();
+        [Command("bulkupdate")]
+        [Description("Update all the data in the sheets. This takes upwards of 10 minutes")]
+        [Aliases("bulk")]
+        public async Task BulkUpdateSheet(CommandContext ctx, string clanTag)
+        {
+            var roles = ctx.Member.Roles.ToList();
+            var verification = await IsVerifiedAsync(ctx, true);
+            var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
+            clanTag = clanTag.ToLower();
 
-        //            discordEmbed = Core.Core.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Successfully bulk updated data!");
-        //            await msg.ModifyAsync(discordEmbed);
-        //        }).Start();
-        //    }
-        //}
+            if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
+            {
+                TimeSpan t = TimeSpan.FromSeconds(5 * clan.members.SpreadsheetUsers.Count);
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "ETA:" + t.ToString(@"mm\:ss"));
+                DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
+                new Thread(async () =>
+                {
+                    await SpreadsheetTools.BulkUpdate(clan);
+                    discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully bulk updated {0} members", clan.members.BungieUsers.Count));
+                    await msg.ModifyAsync(discordEmbed);
+                }).Start();
+            }
+        }
         [Command("displayUsers")]
         [Description("Output all stored users")]
         [Aliases("users")]
@@ -110,7 +110,7 @@ namespace Catamagne.Commands
             var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
-            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
+            if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 new Thread(async () =>
                 {
@@ -148,7 +148,7 @@ namespace Catamagne.Commands
             var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
             clanTag = clanTag.ToLower();
 
-            if (verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
+            if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Turquoise, "Checking for leavers...");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
@@ -432,6 +432,23 @@ namespace Catamagne.Commands
                         await ctx.RespondAsync(discordEmbed);
                     }
                 }).Start();
+            }
+        }
+
+        [Command("exit")]
+        [Description("Shut Rosalina down. this cannot be reverted without manually restarting her. only possible by Squid and Cata.")]
+        [Aliases("stop")]
+        public async Task Stop(CommandContext ctx)
+        {
+            var member = ctx.Member;
+            bool isVerified = false;
+            if (member.Id == ConfigValues.DevID || member.IsOwner) isVerified = true;
+
+            if (isVerified)
+            {
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Red, "Shutting down.", "Goodbye World! <:winsad:712225483445633024>");
+                DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
+                Environment.Exit(-1);
             }
         }
     }
