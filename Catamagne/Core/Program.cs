@@ -10,7 +10,6 @@ namespace Catamagne.Core
     {
         static ConfigValues ConfigValues => ConfigValues.configValues;
         public static DateTime startTime;
-        public static bool PauseEvents;
 
         //static void Main(string[] args)
         //{
@@ -26,7 +25,6 @@ namespace Catamagne.Core
             TrackTimeLive();
             Clans.LoadClans();
             await SpreadsheetTools.SetUpSheet();
-            PauseEvents = false;
 
             startTime = DateTime.UtcNow;
             await Discord.SetupClient();
