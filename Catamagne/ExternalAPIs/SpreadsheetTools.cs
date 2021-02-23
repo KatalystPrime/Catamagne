@@ -587,13 +587,13 @@ namespace Catamagne.API
         {
             var lowered = status.ToLowerInvariant();
 
-            if (lowered == "okay")
+            if (lowered == "okay" || lowered == "ok")
                 return StatusEnum.ok;
-            if (lowered == "left clan")
+            if (lowered == "left clan" || lowered == "leftclan")
                 return StatusEnum.leftClan;
-            if (lowered == "left discord")
+            if (lowered == "left discord" || lowered == "leftdiscord")
                 return StatusEnum.leftDiscord;
-            if (lowered == "left discord & clan")
+            if (lowered == "left discord & clan" || lowered == "left")
                 return StatusEnum.leftDiscordClan;
             if (lowered == "lobby")
                 return StatusEnum.lobby;
