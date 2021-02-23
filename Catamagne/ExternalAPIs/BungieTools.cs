@@ -143,11 +143,11 @@ namespace Catamagne.API
                     var ClanMembers = await GetClanMembers(clan);
                     foreach (var member in clan.members.BungieUsers)
                     {
-                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
+                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
                         {
-                            if (!oldLeavers.Select(t => t.bungieID).Contains(member.bungieID))
+                            if (!oldLeavers.Select(t => t.BungieID).Contains(member.BungieID))
                             {
-                                if (member.bungieID != null)
+                                if (member.BungieID != null)
                                 {
 
                                     leavers.Add(member);
@@ -163,8 +163,8 @@ namespace Catamagne.API
                     foreach (var member in leavers)
                     {
                         var workingMember = member;
-                        var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
+                        var _ = clan.members.BungieUsers.FindIndex(t => t.BungieProfile == workingMember.BungieProfile);
+                        workingMember.UserStatus = UserStatus.StatusEnum.leftClan;
                         clan.members.BungieUsers[_] = workingMember;
                     }
                     oldLeavers.AddRange(leavers);
@@ -180,9 +180,9 @@ namespace Catamagne.API
                     var ClanMembers = await GetClanMembers(clan);
                     clan.members.BungieUsers.ForEach(member =>
                     {
-                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
+                        if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
                         {
-                            if (member.bungieID != null)
+                            if (member.BungieID != null)
                             {
                                 leavers.Add(member);
                             }
@@ -191,8 +191,8 @@ namespace Catamagne.API
                     foreach (var member in leavers)
                     {
                         var workingMember = member;
-                        var _ = clan.members.BungieUsers.FindIndex(t => t.bungieProfile == workingMember.bungieProfile);
-                        workingMember.UserStatus = SpreadsheetTools.UserStatus.leftclan;
+                        var _ = clan.members.BungieUsers.FindIndex(t => t.BungieProfile == workingMember.BungieProfile);
+                        workingMember.UserStatus = UserStatus.StatusEnum.leftClan;
                         clan.members.BungieUsers[_] = workingMember;
                     }
                     clan.members.ClanLeavers = leavers;
@@ -208,9 +208,9 @@ namespace Catamagne.API
                 List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
                 var ClanMembers = await GetClanMembers(clan);
                 clan.members.BungieUsers.ForEach(member => {
-                    if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
+                    if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
                     {
-                        if (member.bungieID != null)
+                        if (member.BungieID != null)
                         {
                             leavers.Add(member);
                         }
@@ -249,7 +249,7 @@ namespace Catamagne.API
             //});;
             foreach (var member in clan.members.ClanLeavers)
             {
-                if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
+                if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
                 {
                     rejoiners.Add(member);
                 }

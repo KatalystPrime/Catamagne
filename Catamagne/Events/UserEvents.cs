@@ -23,7 +23,7 @@ namespace Catamagne.Events
                 var member = SpreadsheetTools.CheckUserAgainstSpreadsheet(e.Member.Id.ToString());
                 if (member != null)
                 {
-                    var clan = BungieTools.GetClanFromTag(member.clanTag);
+                    var clan = BungieTools.GetClanFromTag(member.ClanTag);
                     var discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, clan.details.Name + " Member left Discord server!", "User was found on spreadsheet.", new List<Field>(2) { new Field("Username", e.Member.Username + '#' + e.Member.Discriminator), new Field("ID", e.Member.Id.ToString()) });
                     Log.Information("Detected " + clan.details.Name + " member leaving discord");
                     List<DiscordMessage> messages = new List<DiscordMessage>();

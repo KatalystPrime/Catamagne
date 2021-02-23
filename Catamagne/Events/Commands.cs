@@ -118,14 +118,14 @@ namespace Catamagne.Commands
                     {
                         await SpreadsheetTools.Read(clan);
                         var users = clan.members.SpreadsheetUsers.ToList();
-                        users = users.OrderBy(t => t.steamName).ToList();
+                        users = users.OrderBy(t => t.SteamName).ToList();
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.Name + ":");
                     }
                     else if (mode == "saved data" || mode == "saved" || mode == "file")
                     {
                         List<SpreadsheetTools.User> users = clan.members.BungieUsers;
-                        users = users.OrderBy(t => t.steamName).ToList();
+                        users = users.OrderBy(t => t.SteamName).ToList();
 
                         Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.Name + ":");
 

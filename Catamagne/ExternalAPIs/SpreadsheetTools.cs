@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Catamagne.API
 {
-    
+
     public class SpreadsheetTools
     {
         static ConfigValues ConfigValues => ConfigValues.configValues;
@@ -37,11 +37,11 @@ namespace Catamagne.API
                 credential = await GoogleCredential.FromStreamAsync(stream, CancellationToken.None);
             }
             // Create Google Sheets API service.
-            service = new SheetsService(new ()
+            service = new SheetsService(new()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
-            });;
+            }); ;
         }
         public static async Task Read(Clan clan)
         {
@@ -66,12 +66,12 @@ namespace Catamagne.API
                 var invalidMembers = members.invalidMembers;
                 validMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.StatusEnum.ok, clan.details.Tag);
                     workingList.Add(_);
                 });
                 invalidMembers.ForEach(async member =>
                 {
-                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
+                    _ = new User(BungieTools.GetBungieProfileLink(member), null, null, null, null, null, null, UserStatus.StatusEnum.ok, clan.details.Tag);
                     workingList.Add(_);
                 });
                 Log.Information("Spreadsheet for " + clan.details.Name + " is empty, generating (will take 10 minutes)");
@@ -81,51 +81,89 @@ namespace Catamagne.API
             {
                 for (int i = 0; i < spreadsheetData.Count; i++)
                 {
-                    var _ = new User();
+                    var user = new User();
+                    //if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0 && !string.IsNullOrEmpty(spreadsheetData[i][0].ToString()))
+                    //{
+                    //    switch (spreadsheetData[i].Count)
+                    //    {
+                    //        case 0:
+                    //            break;
+                    //        case 1:
+                    //            user = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        case 2:
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.ok, clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        case 3:
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.ok, clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        case 4:
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.ok, clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        case 5:
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.ok, clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        case 6:
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.details.Tag);
+                    //            workingList.Add(user);
+                    //            break;
+                    //        default:
+                    //            List<string> extraColumns = new List<string>();
+                    //            for (int index = 6; index < spreadsheetData[i].Count; index++)
+                    //            {
+                    //                extraColumns.Add(spreadsheetData[i][index].ToString());
+                    //            }
+                    //            var a = spreadsheetData[i];
+                    //            var b = a[5].ToString().ToLower();
+                    //            UserStatus d = UserStatus.ok;
+                    //            var c = Enum.TryParse(b, false, out d);
+                    //            user = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), d, clan.details.Tag, extraColumns);
+                    //            workingList.Add(user);
+                    //            break;
+                    //    }
+                    //}
                     if (spreadsheetData[i] != null && spreadsheetData[i].Count > 0 && !string.IsNullOrEmpty(spreadsheetData[i][0].ToString()))
                     {
-                        switch (spreadsheetData[i].Count)
+                        var count = spreadsheetData[i].Count;
+                        if (count > 0)
                         {
-                            case 0:
-                                break;
-                            case 1:
-                                _ = new User(spreadsheetData[i][0].ToString(), null, null, null, null, null, null, UserStatus.ok, clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            case 2:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, null, null, null, null, UserStatus.ok, clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            case 3:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, null, null, UserStatus.ok, clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            case 4:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), null, UserStatus.ok, clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            case 5:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), UserStatus.ok, clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            case 6:
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), Enum.Parse<UserStatus>(spreadsheetData[i][5].ToString().ToLower()), clan.details.Tag);
-                                workingList.Add(_);
-                                break;
-                            default:
-                                List<string> extraColumns = new List<string>();
-                                for (int index = 6; index < spreadsheetData[i].Count; index++)
-                                {
-                                    extraColumns.Add(spreadsheetData[i][index].ToString());
-                                }
-                                var a = spreadsheetData[i];
-                                var b = a[5].ToString().ToLower();
-                                UserStatus d = UserStatus.ok;
-                                var c = Enum.TryParse(b, false,out d);
-                                _ = new User(spreadsheetData[i][0].ToString(), spreadsheetData[i][1].ToString(), null, spreadsheetData[i][2].ToString(), null, spreadsheetData[i][3].ToString(), spreadsheetData[i][4].ToString(), d, clan.details.Tag, extraColumns);
-                                workingList.Add(_);
-                                break;
+                            user.BungieProfile = spreadsheetData[i][0].ToString();
                         }
+                        if (count > 1)
+                        {
+                            user.BungieName = spreadsheetData[i][1].ToString();
+                        }
+                        if (count > 2)
+                        {
+                            user.BteamProfile = spreadsheetData[i][2].ToString();
+                        }
+                        if (count > 3)
+                        {
+                            user.SteamName = spreadsheetData[i][3].ToString();
+                        }
+                        if (count > 4)
+                        {
+                            user.DiscordID = spreadsheetData[i][4].ToString();
+                        }
+                        if (count > 5)
+                        {
+                            user.UserStatus = UserStatus.ToEnum(spreadsheetData[i][5].ToString());
+                        }
+                        if (count > 6)
+                        {
+                            List<string> extraColumns = new List<string>();
+                            for (int index = 6; index < spreadsheetData[i].Count; index++)
+                            {
+                                extraColumns.Add(spreadsheetData[i][index].ToString());
+                            }
+                            user.ExtraColumns = extraColumns;
+                        }
+                        workingList.Add(user);
                     }
                 }
             }
@@ -153,13 +191,13 @@ namespace Catamagne.API
             for (int c = 0; c < clan.members.BungieUsers.Count; c++)
             {
                 List<object> _;
-                if (string.IsNullOrEmpty(clan.members.BungieUsers[c].bungieProfile))
+                if (string.IsNullOrEmpty(clan.members.BungieUsers[c].BungieProfile))
                 {
                     _ = new List<object>(6) { "", "", "", "", "", "", "" };
                 }
                 else
                 {
-                    _ = new List<object>(6) { clan.members.BungieUsers[c].bungieProfile, clan.members.BungieUsers[c].bungieName, clan.members.BungieUsers[c].steamProfile, clan.members.BungieUsers[c].steamName, clan.members.BungieUsers[c].discordID, clan.members.BungieUsers[c].UserStatus.ToString() };
+                    _ = new List<object>(6) { clan.members.BungieUsers[c].BungieProfile, clan.members.BungieUsers[c].BungieName, clan.members.BungieUsers[c].BteamProfile, clan.members.BungieUsers[c].SteamName, clan.members.BungieUsers[c].DiscordID, UserStatus.ToString(clan.members.BungieUsers[c].UserStatus) };
                 }
 
                 if (clan.members.BungieUsers[c].ExtraColumns != null)
@@ -211,22 +249,22 @@ namespace Catamagne.API
             foreach (User user in _)
             {
                 var workingUser = new User();
-                if (!string.IsNullOrEmpty(user.bungieProfile))
+                if (!string.IsNullOrEmpty(user.BungieProfile))
                 {
-                    long? a = await BungieTools.GetBungieUserID(user.bungieProfile);
-                    workingUser.bungieID = a.ToString();
-                    if (!string.IsNullOrEmpty(workingUser.bungieID))
+                    long? a = await BungieTools.GetBungieUserID(user.BungieProfile);
+                    workingUser.BungieID = a.ToString();
+                    if (!string.IsNullOrEmpty(workingUser.BungieID))
                     {
                         List<string> extraColumns = new List<string>();
-                        string bungieProfile = user.bungieProfile;
-                        string bungieID = workingUser.bungieID;
+                        string bungieProfile = user.BungieProfile;
+                        string bungieID = workingUser.BungieID;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
                         string steamID = SteamTools.GetSteamID(bungieProfile);
                         string steamName = SteamTools.GetSteamUserName(steamID);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
-                        string discordID = user.discordID;
-                        UserStatus userStatus = user.UserStatus;
+                        string discordID = user.DiscordID;
+                        UserStatus.StatusEnum userStatus = user.UserStatus;
 
                         if (user.ExtraColumns != null)
                         {
@@ -238,33 +276,33 @@ namespace Catamagne.API
                     else
                     {
                         List<string> extraColumns = new List<string>();
-                        string bungieProfile = user.bungieProfile;
+                        string bungieProfile = user.BungieProfile;
                         string bungieID = "N/A";
                         string steamID = "N/A";
                         string steamProfile = "N/A";
                         string bungieName = "N/A";
                         string steamName = "N/A";
-                        string discordID = user.discordID;
-                        UserStatus userStatus = user.UserStatus;
-                        if (user.bungieID != "N/A" || user.bungieID != null)
+                        string discordID = user.DiscordID;
+                        UserStatus.StatusEnum userStatus = user.UserStatus;
+                        if (user.BungieID != "N/A" || user.BungieID != null)
                         {
-                            bungieID = user.bungieID;
+                            bungieID = user.BungieID;
                         }
-                        if (user.steamID != "N/A" || user.steamID != null)
+                        if (user.SteamID != "N/A" || user.SteamID != null)
                         {
-                            steamID = user.steamID;
+                            steamID = user.SteamID;
                         }
-                        if (user.steamProfile != "N/A" || user.steamProfile != null)
+                        if (user.BteamProfile != "N/A" || user.BteamProfile != null)
                         {
-                            steamProfile = user.steamProfile;
+                            steamProfile = user.BteamProfile;
                         }
-                        if (user.bungieName != "N/A" || user.bungieName != null)
+                        if (user.BungieName != "N/A" || user.BungieName != null)
                         {
-                            bungieName = user.bungieName;
+                            bungieName = user.BungieName;
                         }
-                        if (user.steamName != "N/A" || user.steamName != null)
+                        if (user.SteamName != "N/A" || user.SteamName != null)
                         {
-                            steamName = user.steamName;
+                            steamName = user.SteamName;
                         }
 
                         if (user.ExtraColumns != null)
@@ -275,9 +313,9 @@ namespace Catamagne.API
                     }
                 }
             }
-            workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
-            workingList = workingList.GroupBy(t => t.bungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList =  workingList.OrderBy(t => t.steamName).ToList();
+            workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
+            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -290,22 +328,22 @@ namespace Catamagne.API
             foreach (User addedUser in changes.addedUsers)
             {
                 var workingUser = new User();
-                if (!string.IsNullOrEmpty(addedUser.bungieProfile))
+                if (!string.IsNullOrEmpty(addedUser.BungieProfile))
                 {
-                    var a = await BungieTools.GetBungieUserID(addedUser.bungieProfile);
-                    workingUser.bungieID = a.ToString();
-                    if (!string.IsNullOrEmpty(workingUser.bungieID))
+                    var a = await BungieTools.GetBungieUserID(addedUser.BungieProfile);
+                    workingUser.BungieID = a.ToString();
+                    if (!string.IsNullOrEmpty(workingUser.BungieID))
                     {
-                        string bungieProfile = addedUser.bungieProfile;
-                        string bungieID = workingUser.bungieID;
-                        UserStatus userStatus = addedUser.UserStatus;
+                        string bungieProfile = addedUser.BungieProfile;
+                        string bungieID = workingUser.BungieID;
+                        UserStatus.StatusEnum userStatus = addedUser.UserStatus;
                         GeneralUser bungieUser = await BungieTools.GetBungieUser(Convert.ToInt64(bungieID));
                         string steamID = SteamTools.GetSteamID(bungieProfile);
                         string steamProfile = "https://steamcommunity.com/profiles/" + steamID;
                         string bungieName = bungieUser.displayName;
                         string steamName = SteamTools.GetSteamUserName(steamID);
-                        string discordID = addedUser.discordID;
-                        string userClanTag = addedUser.clanTag;
+                        string discordID = addedUser.DiscordID;
+                        string userClanTag = addedUser.ClanTag;
                         workingUser = new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, userClanTag);
                         workingList.Add(workingUser);
 
@@ -313,39 +351,39 @@ namespace Catamagne.API
                     else
                     {
                         List<string> extraColumns = new List<string>();
-                        string bungieProfile = addedUser.bungieProfile;
+                        string bungieProfile = addedUser.BungieProfile;
                         string bungieID = "N/A";
                         string steamID = "N/A";
                         string steamProfile = "N/A";
                         string bungieName = "N/A";
                         string steamName = "N/A";
-                        string discordID = addedUser.discordID;
-                        if (addedUser.bungieID != "N/A" || addedUser.bungieID != "")
+                        string discordID = addedUser.DiscordID;
+                        if (addedUser.BungieID != "N/A" || addedUser.BungieID != "")
                         {
-                            bungieID = addedUser.bungieID;
+                            bungieID = addedUser.BungieID;
                         }
-                        if (addedUser.steamID != "N/A" || addedUser.steamID != "")
+                        if (addedUser.SteamID != "N/A" || addedUser.SteamID != "")
                         {
-                            steamID = addedUser.steamID;
+                            steamID = addedUser.SteamID;
                         }
-                        if (addedUser.steamProfile != "N/A" || addedUser.steamProfile != "")
+                        if (addedUser.BteamProfile != "N/A" || addedUser.BteamProfile != "")
                         {
-                            steamProfile = addedUser.steamProfile;
+                            steamProfile = addedUser.BteamProfile;
                         }
-                        if (addedUser.bungieName != "N/A" || addedUser.bungieName != "")
+                        if (addedUser.BungieName != "N/A" || addedUser.BungieName != "")
                         {
-                            bungieName = addedUser.bungieName;
+                            bungieName = addedUser.BungieName;
                         }
-                        if (addedUser.steamName != "N/A" || addedUser.steamName != "")
+                        if (addedUser.SteamName != "N/A" || addedUser.SteamName != "")
                         {
-                            steamName = addedUser.steamName;
+                            steamName = addedUser.SteamName;
                         }
 
                         if (addedUser.ExtraColumns != null)
                         {
                             extraColumns = addedUser.ExtraColumns;
                         }
-                        UserStatus userStatus = addedUser.UserStatus;
+                        UserStatus.StatusEnum userStatus = addedUser.UserStatus;
 
                         if (addedUser.ExtraColumns != null)
                         {
@@ -357,17 +395,17 @@ namespace Catamagne.API
             }
             for (int i = 0; i < changes.updatedUsers.Count; i++)
             {
-                var index = workingList.FindIndex(t => t.bungieProfile == changes.updatedUsers[i].bungieProfile);
+                var index = workingList.FindIndex(t => t.BungieProfile == changes.updatedUsers[i].BungieProfile);
                 workingList[index] = changes.updatedUsers[i];
             }
             changes.removedUsers.ForEach(removedUser =>
             {
-                var index = workingList.FindIndex(t => t.bungieProfile == removedUser.bungieProfile);
+                var index = workingList.FindIndex(t => t.BungieProfile == removedUser.BungieProfile);
                 workingList.RemoveAt(index);
             });
-            workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
-            workingList = workingList.GroupBy(t => t.bungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList = workingList.OrderBy(t => t.steamName).ToList();
+            workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
+            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -376,9 +414,9 @@ namespace Catamagne.API
         {
             await Read(clan);
             var workingList = clan.members.BungieUsers;
-            workingList.RemoveAll(t => string.IsNullOrEmpty(t.bungieProfile));
-            workingList = workingList.GroupBy(t => t.bungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList = workingList.OrderBy(t => t.steamName).ToList();
+            workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
+            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -389,9 +427,9 @@ namespace Catamagne.API
             List<User> addedUsers = new List<User>(); List<User> removedUsers = new List<User>(); List<User> updatedUsers = new List<User>();
             for (int i = 0; i < clan.members.BungieUsers.Count; i++)
             {
-                if (clan.members.BungieUsers[i].bungieProfile != null)
+                if (clan.members.BungieUsers[i].BungieProfile != null)
                 {
-                    if (!clan.members.SpreadsheetUsers.Select(t => t.bungieProfile).Contains(clan.members.BungieUsers[i].bungieProfile))
+                    if (!clan.members.SpreadsheetUsers.Select(t => t.BungieProfile).Contains(clan.members.BungieUsers[i].BungieProfile))
                     {
                         removedUsers.Add(clan.members.BungieUsers[i]);
                     }
@@ -399,9 +437,9 @@ namespace Catamagne.API
             }
             for (int i = 0; i < clan.members.SpreadsheetUsers.Count; i++)
             {
-                if (clan.members.SpreadsheetUsers[i].bungieProfile != null)
+                if (clan.members.SpreadsheetUsers[i].BungieProfile != null)
                 {
-                    if (!clan.members.BungieUsers.Select(t => t.bungieProfile).Contains(clan.members.SpreadsheetUsers[i].bungieProfile))
+                    if (!clan.members.BungieUsers.Select(t => t.BungieProfile).Contains(clan.members.SpreadsheetUsers[i].BungieProfile))
                     {
                         addedUsers.Add(clan.members.SpreadsheetUsers[i]);
                     }
@@ -409,36 +447,36 @@ namespace Catamagne.API
             }
             for (int i = 0; i < clan.members.SpreadsheetUsers.Count; i++)
             {
-                if (clan.members.SpreadsheetUsers[i].bungieProfile != null)
+                if (clan.members.SpreadsheetUsers[i].BungieProfile != null)
                 {
-                    if (clan.members.BungieUsers.Select(t => t.bungieProfile).Contains(clan.members.SpreadsheetUsers[i].bungieProfile))
+                    if (clan.members.BungieUsers.Select(t => t.BungieProfile).Contains(clan.members.SpreadsheetUsers[i].BungieProfile))
                     {
                         bool userUpdated = false;
-                        var workingList = clan.members.BungieUsers.Where(t => t.bungieProfile == clan.members.SpreadsheetUsers[i].bungieProfile);
+                        var workingList = clan.members.BungieUsers.Where(t => t.BungieProfile == clan.members.SpreadsheetUsers[i].BungieProfile);
                         User workingUser = workingList.FirstOrDefault();
                         if (workingList.FirstOrDefault().UserStatus != clan.members.SpreadsheetUsers[i].UserStatus)
                         {
                             workingUser.UserStatus = clan.members.SpreadsheetUsers[i].UserStatus;
                             userUpdated = true;
                         }
-                        if (workingList.FirstOrDefault().discordID != clan.members.SpreadsheetUsers[i].discordID)
+                        if (workingList.FirstOrDefault().DiscordID != clan.members.SpreadsheetUsers[i].DiscordID)
                         {
-                            workingUser.discordID = clan.members.SpreadsheetUsers[i].discordID;
+                            workingUser.DiscordID = clan.members.SpreadsheetUsers[i].DiscordID;
                             userUpdated = true;
                         }
-                        if (workingList.FirstOrDefault().steamName != clan.members.SpreadsheetUsers[i].steamName)
+                        if (workingList.FirstOrDefault().SteamName != clan.members.SpreadsheetUsers[i].SteamName)
                         {
-                            workingUser.steamName = clan.members.SpreadsheetUsers[i].steamName;
+                            workingUser.SteamName = clan.members.SpreadsheetUsers[i].SteamName;
                             userUpdated = true;
                         }
-                        if (workingList.FirstOrDefault().steamProfile != clan.members.SpreadsheetUsers[i].steamProfile)
+                        if (workingList.FirstOrDefault().BteamProfile != clan.members.SpreadsheetUsers[i].BteamProfile)
                         {
-                            workingUser.steamProfile = clan.members.SpreadsheetUsers[i].steamProfile;
+                            workingUser.BteamProfile = clan.members.SpreadsheetUsers[i].BteamProfile;
                             userUpdated = true;
                         }
-                        if (workingList.FirstOrDefault().bungieName != clan.members.SpreadsheetUsers[i].bungieName)
+                        if (workingList.FirstOrDefault().BungieName != clan.members.SpreadsheetUsers[i].BungieName)
                         {
-                            workingUser.bungieName = clan.members.SpreadsheetUsers[i].bungieName;
+                            workingUser.BungieName = clan.members.SpreadsheetUsers[i].BungieName;
                             userUpdated = true;
                         }
                         if (clan.members.SpreadsheetUsers[i].ExtraColumns != null)
@@ -468,15 +506,15 @@ namespace Catamagne.API
         }
         public static User CheckUserAgainstSpreadsheet(string userID)
         {
-            if (Clans.clans.Any(clan => clan.members.BungieUsers.Select(t => t.discordID).Contains(userID)))
+            if (Clans.clans.Any(clan => clan.members.BungieUsers.Select(t => t.DiscordID).Contains(userID)))
             {
-                var clan = Clans.clans.Where(t => t.members.BungieUsers.Select(t => t.discordID).Contains(userID)).ToList();
+                var clan = Clans.clans.Where(t => t.members.BungieUsers.Select(t => t.DiscordID).Contains(userID)).ToList();
                 //var _ = clan.clanUsers.FindIndex(t => t.discordID == userID);
-                var _ = clan.FirstOrDefault().members.BungieUsers.FindIndex(t => t.discordID == userID);
+                var _ = clan.FirstOrDefault().members.BungieUsers.FindIndex(t => t.DiscordID == userID);
                 if (_ != -1)
                 {
                     User workingUser = clan.FirstOrDefault().members.BungieUsers[_];
-                    workingUser.UserStatus = UserStatus.leftdiscord;
+                    workingUser.UserStatus = UserStatus.StatusEnum.leftDiscord;
                     clan.FirstOrDefault().members.BungieUsers[_] = workingUser;
                     Write(clan.FirstOrDefault());
 
@@ -488,39 +526,34 @@ namespace Catamagne.API
         }
         public class User
         {
-            public string bungieProfile;
-            public string bungieName;
-            public string bungieID; public string steamProfile;
-            public string steamID; public string steamName;
-            public string discordID; public UserStatus UserStatus;
+            public string BungieProfile;
+            public string BungieName;
+            public string BungieID;
+            public string BteamProfile;
+            public string SteamID;
+            public string SteamName;
+            public string DiscordID;
+            public UserStatus.StatusEnum UserStatus;
             public List<string> ExtraColumns;
-            public string clanTag;
+            public string ClanTag;
 
             public User()
             {
             }
 
-            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus userStatus, string userClanTag, List<string> ExtraColumns = null)
+            public User(string bungieLink, string bungieName, string bungieID, string steamProfile, string steamID, string steamName, string discordID, UserStatus.StatusEnum userStatus, string userClanTag, List<string> ExtraColumns = null)
             {
-                this.bungieProfile = bungieLink;
-                this.bungieName = bungieName;
-                this.bungieID = bungieID;
-                this.steamProfile = steamProfile;
-                this.steamID = steamID;
-                this.steamName = steamName;
-                this.discordID = discordID;
+                this.BungieProfile = bungieLink;
+                this.BungieName = bungieName;
+                this.BungieID = bungieID;
+                this.BteamProfile = steamProfile;
+                this.SteamID = steamID;
+                this.SteamName = steamName;
+                this.DiscordID = discordID;
                 this.UserStatus = userStatus;
-                this.clanTag = userClanTag;
+                this.ClanTag = userClanTag;
                 this.ExtraColumns = ExtraColumns;
             }
-
-        }
-        public enum UserStatus : ushort
-        {
-            ok,
-            leftclan,
-            leftdiscord,
-            lobby
         }
         public struct Changes
         {
@@ -529,6 +562,43 @@ namespace Catamagne.API
                 this.addedUsers = addedUsers; this.removedUsers = removedUsers; this.updatedUsers = updatedUsers; this.TotalChanges = addedUsers.Count + removedUsers.Count + updatedUsers.Count;
             }
             public List<User> addedUsers; public List<User> removedUsers; public List<User> updatedUsers; public int TotalChanges;
+        }
+    }
+    public static class UserStatus
+    {
+        public enum StatusEnum
+        {
+            ok,
+            leftClan,
+            leftDiscord,
+            leftDiscordClan,
+            lobby
+        }
+        public static string ToString(this StatusEnum status)
+        => status switch
+        {
+            StatusEnum.ok => "Okay",
+            StatusEnum.leftClan => "Left Clan",
+            StatusEnum.leftDiscord => "Left Discord",
+            StatusEnum.leftDiscordClan => "Left Discord & Clan",
+            StatusEnum.lobby => "Lobby"
+        };
+        public static StatusEnum ToEnum(this string status)
+        {
+            var lowered = status.ToLowerInvariant();
+
+            if (lowered == "okay")
+                return StatusEnum.ok;
+            if (lowered == "left clan")
+                return StatusEnum.leftClan;
+            if (lowered == "left discord")
+                return StatusEnum.leftDiscord;
+            if (lowered == "left discord & clan")
+                return StatusEnum.leftDiscordClan;
+            if (lowered == "lobby")
+                return StatusEnum.lobby;
+
+            return StatusEnum.ok; //return your default value
         }
     }
 }

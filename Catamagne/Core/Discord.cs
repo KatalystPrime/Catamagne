@@ -198,14 +198,14 @@ namespace Catamagne.Core
                 List<Field> fields = new List<Field>();
                 foreach (SpreadsheetTools.User user in Users)
                 {
-                    if (!string.IsNullOrEmpty(user.discordID))
+                    if (!string.IsNullOrEmpty(user.DiscordID))
                     {
-                        var _ = new Field("Steam name: " + user.steamName, "Discord ID: " + user.discordID);
+                        var _ = new Field("Steam name: " + user.SteamName, "Discord ID: " + user.DiscordID);
                         fields.Add(_);
                     }
                     else
                     {
-                        var _ = new Field("Steam name: " + user.steamName, "Discord ID: N/A");
+                        var _ = new Field("Steam name: " + user.SteamName, "Discord ID: N/A");
                         fields.Add(_);
                     }
                 }
