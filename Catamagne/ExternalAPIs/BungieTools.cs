@@ -79,20 +79,6 @@ namespace Catamagne.API
         {
             return await GetBungieUser((long)await GetBungieUserID(profileLink));
         }
-        public static async Task<SteamTools.SteamUser> GetSteamUser(string profileLink)
-        {
-            long? _ = GetMemberIDFromLink(profileLink);
-            if (_.HasValue)
-            {
-                long profileID = (long)_;
-                //var _ = await bungieApi.ApiEndpoints.User_GetMembershipDataById(profileID, BungieSharper.Schema.BungieMembershipType.BungieNext);
-                var profile = await bungieApi.ApiEndpoints.Destiny2_GetLinkedProfiles(profileID, BungieSharper.Schema.BungieMembershipType.TigerSteam, true);
-                ulong steamID = (ulong)profile.profiles.FirstOrDefault().membershipId;
-                string steamName = profile.profiles.FirstOrDefault().displayName;
-                return new SteamTools.SteamUser(steamName, steamID);
-            }
-            else return null;
-        }
         public static long? GetMemberIDFromLink(string profileLink)
         {
             //Regex TypeandID = new Regex(@"\d.+(/)");
