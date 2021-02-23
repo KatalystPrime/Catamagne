@@ -90,7 +90,7 @@ namespace Catamagne.Commands
             if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 TimeSpan t = TimeSpan.FromSeconds(3 * clan.members.SpreadsheetUsers.Count);
-                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "ETA:" + t.ToString(@"mm\:ss"));
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 new Thread(async () =>
                 {
