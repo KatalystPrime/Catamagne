@@ -25,13 +25,13 @@ namespace Catamagne.Configuration
         public TimeSpan MediumInterval;
         public TimeSpan LongInterval;
         public string FolderPath;
-        public string ConfigFolder;
-        public string ClansFolder;
+        [NonSerialized] public string ConfigFolder;
+        [NonSerialized] public string ClansFolder;
         public string SpreadsheetID;
         public string BungieAPIKey;
         public string DiscordToken;
         public ulong? DevID;
-        public List<Response> Responses;
+        [NonSerialized] public List<Response> Responses;
         public ConfigValues()
         {
             DevID = 194439970797256706;
@@ -60,15 +60,20 @@ namespace Catamagne.Configuration
         {
             Directory.CreateDirectory(configValues.ConfigFolder);
             var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            var ResponsesFile = Path.Combine(ConfigFolder, "responses.json");
             File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(this, Formatting.Indented));
+            File.WriteAllText(ResponsesFile, JsonConvert.SerializeObject(this.Responses, Formatting.Indented));
         }
         public void LoadConfig()
         {
             var ConfigFile = Path.Combine(ConfigFolder, "config.json");
+            var ResponsesFile = Path.Combine(ConfigFolder, "responses.json");
             if (File.Exists(ConfigFile))
             {
-                var _ = File.ReadAllText(ConfigFile);
-                configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
+                var json = File.ReadAllText(ConfigFile);
+                configValues = JsonConvert.DeserializeObject<ConfigValues>(json);
+                configValues.ConfigFolder = Path.Combine(configValues.FolderPath, "Config");
+                configValues.ClansFolder = Path.Combine(configValues.FolderPath, "Clans");
                 Console.WriteLine(string.Format("{0,-25} {1}", "Read configuration values from", ConfigFile));
             }
             else
@@ -85,7 +90,23 @@ namespace Catamagne.Configuration
                 }
                 var _ = File.ReadAllText(ConfigFile);
                 configValues = JsonConvert.DeserializeObject<ConfigValues>(_);
+                configValues.ConfigFolder = Path.Combine(configValues.FolderPath, "Config");
+                configValues.ClansFolder = Path.Combine(configValues.FolderPath, "Clans");
                 Console.WriteLine(string.Format("{0,-25} {1}", "Read configuration values from", ConfigFile));
+            }
+            if (File.Exists(ResponsesFile))
+            {
+                var json = File.ReadAllText(ResponsesFile);
+                configValues.Responses = JsonConvert.DeserializeObject<List<Response>>(json);
+                Console.WriteLine(string.Format("{0,-25} {1}", "Read responses from", ResponsesFile));
+            }
+            else
+            {
+                Console.WriteLine("No responses file found at {0}, creating one.", configValues.ConfigFolder);
+                SaveConfig();
+                var json = File.ReadAllText(ResponsesFile);
+                configValues.Responses = JsonConvert.DeserializeObject<List<Response>>(json);
+                Console.WriteLine(string.Format("{0,-25} {1}", "Read responses from", ResponsesFile));
             }
         }
     }
