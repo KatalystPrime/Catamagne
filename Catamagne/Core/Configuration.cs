@@ -21,9 +21,6 @@ namespace Catamagne.Configuration
         public List<ulong?> UpdatesChannels;
         public DiscordActivity DiscordActivity;
         public string[] Prefixes;
-        public TimeSpan ShortInterval;
-        public TimeSpan MediumInterval;
-        public TimeSpan LongInterval;
         public string FolderPath;
         [NonSerialized] public string ConfigFolder;
         [NonSerialized] public string ClansFolder;
@@ -32,6 +29,7 @@ namespace Catamagne.Configuration
         public string DiscordToken;
         public ulong? DevID;
         [NonSerialized] public List<Response> Responses;
+        [NonSerialized] public Dictionary<string, string> Events;
         public ConfigValues()
         {
             DevID = 194439970797256706;
@@ -46,8 +44,6 @@ namespace Catamagne.Configuration
                 ActivityType = ActivityType.Watching,
             };
             Prefixes = new string[] { "ct!" };
-            ShortInterval = TimeSpan.FromMinutes(15);
-            LongInterval = TimeSpan.FromHours(6);
             FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Catamagne");
             ConfigFolder = Path.Combine(FolderPath, "Config");
             ClansFolder = Path.Combine(FolderPath, "Clans");
@@ -55,6 +51,7 @@ namespace Catamagne.Configuration
             BungieAPIKey = null;
             DiscordToken = null;
             Responses = new List<Response>();
+            Events = JsonConvert.DeserializeObject<Dictionary<string, string>>("{ \"AutoBulk\": \"06:00:00\", \"Read\": \"00:15:00\" }");
         }
         public void SaveConfig()
         {
@@ -68,6 +65,7 @@ namespace Catamagne.Configuration
         {
             var ConfigFile = Path.Combine(ConfigFolder, "config.json");
             var ResponsesFile = Path.Combine(ConfigFolder, "responses.json");
+            var EventsFile = Path.Combine(ConfigFolder, "events.json");
             if (File.Exists(ConfigFile))
             {
                 var json = File.ReadAllText(ConfigFile);
@@ -107,6 +105,18 @@ namespace Catamagne.Configuration
                 var json = File.ReadAllText(ResponsesFile);
                 configValues.Responses = JsonConvert.DeserializeObject<List<Response>>(json);
                 Console.WriteLine(string.Format("{0,-25} {1}", "Read responses from", ResponsesFile));
+            }
+            if (File.Exists(EventsFile))
+            {
+                var json = File.ReadAllText(EventsFile);
+                configValues.Events = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                Console.WriteLine(string.Format("{0,-25} {1}", "Read events from", EventsFile));
+            }
+            else
+            {
+                Console.WriteLine("No events file found at {0}, creating one.", configValues.ConfigFolder);
+                configValues.Events = configValues.Events = JsonConvert.DeserializeObject<Dictionary<string, string>>("{ \"AutoBulk\": \"06:00:00\", \"Read\": \"00:15:00\" }");
+                File.WriteAllText(EventsFile, JsonConvert.SerializeObject(this.Events, Formatting.Indented));
             }
         }
     }

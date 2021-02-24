@@ -1,10 +1,8 @@
 ﻿using BungieSharper.Schema.User;
 using Catamagne.Configuration;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
-using Google.Apis.Util.Store;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MoreLinq.Extensions;
 
 
 namespace Catamagne.API
@@ -140,7 +139,7 @@ namespace Catamagne.API
                         }
                         if (count > 2)
                         {
-                            user.BteamProfile = spreadsheetData[i][2].ToString();
+                            user.SteamProfile = spreadsheetData[i][2].ToString();
                         }
                         if (count > 3)
                         {
@@ -197,7 +196,7 @@ namespace Catamagne.API
                 }
                 else
                 {
-                    _ = new List<object>(6) { clan.members.BungieUsers[c].BungieProfile, clan.members.BungieUsers[c].BungieName, clan.members.BungieUsers[c].BteamProfile, clan.members.BungieUsers[c].SteamName, clan.members.BungieUsers[c].DiscordID, UserStatus.ToString(clan.members.BungieUsers[c].UserStatus) };
+                    _ = new List<object>(6) { clan.members.BungieUsers[c].BungieProfile, clan.members.BungieUsers[c].BungieName, clan.members.BungieUsers[c].SteamProfile, clan.members.BungieUsers[c].SteamName, clan.members.BungieUsers[c].DiscordID, UserStatus.ToString(clan.members.BungieUsers[c].UserStatus) };
                 }
 
                 if (clan.members.BungieUsers[c].ExtraColumns != null)
@@ -291,9 +290,9 @@ namespace Catamagne.API
                         {
                             steamID = user.SteamID;
                         }
-                        if (user.BteamProfile != "N/A" || user.BteamProfile != null)
+                        if (user.SteamProfile != "N/A" || user.SteamProfile != null)
                         {
-                            steamProfile = user.BteamProfile;
+                            steamProfile = user.SteamProfile;
                         }
                         if (user.BungieName != "N/A" || user.BungieName != null)
                         {
@@ -313,8 +312,7 @@ namespace Catamagne.API
                 }
             }
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
-            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList = workingList.OrderBy(t => t.SteamName).ToList();
+            workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -365,9 +363,9 @@ namespace Catamagne.API
                         {
                             steamID = addedUser.SteamID;
                         }
-                        if (addedUser.BteamProfile != "N/A" || addedUser.BteamProfile != "")
+                        if (addedUser.SteamProfile != "N/A" || addedUser.SteamProfile != "")
                         {
-                            steamProfile = addedUser.BteamProfile;
+                            steamProfile = addedUser.SteamProfile;
                         }
                         if (addedUser.BungieName != "N/A" || addedUser.BungieName != "")
                         {
@@ -403,8 +401,7 @@ namespace Catamagne.API
                 workingList.RemoveAt(index);
             });
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
-            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList = workingList.OrderBy(t => t.SteamName).ToList();
+            workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -414,8 +411,7 @@ namespace Catamagne.API
             await Read(clan);
             var workingList = clan.members.BungieUsers;
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
-            workingList = workingList.GroupBy(t => t.BungieProfile).Select(g => g.First()).ToList(); //remove duplicates
-            workingList = workingList.OrderBy(t => t.SteamName).ToList();
+            workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -468,9 +464,9 @@ namespace Catamagne.API
                             workingUser.SteamName = clan.members.SpreadsheetUsers[i].SteamName;
                             userUpdated = true;
                         }
-                        if (workingList.FirstOrDefault().BteamProfile != clan.members.SpreadsheetUsers[i].BteamProfile)
+                        if (workingList.FirstOrDefault().SteamProfile != clan.members.SpreadsheetUsers[i].SteamProfile)
                         {
-                            workingUser.BteamProfile = clan.members.SpreadsheetUsers[i].BteamProfile;
+                            workingUser.SteamProfile = clan.members.SpreadsheetUsers[i].SteamProfile;
                             userUpdated = true;
                         }
                         if (workingList.FirstOrDefault().BungieName != clan.members.SpreadsheetUsers[i].BungieName)
@@ -528,7 +524,7 @@ namespace Catamagne.API
             public string BungieProfile;
             public string BungieName;
             public string BungieID;
-            public string BteamProfile;
+            public string SteamProfile;
             public string SteamID;
             public string SteamName;
             public string DiscordID;
@@ -545,7 +541,7 @@ namespace Catamagne.API
                 this.BungieProfile = bungieLink;
                 this.BungieName = bungieName;
                 this.BungieID = bungieID;
-                this.BteamProfile = steamProfile;
+                this.SteamProfile = steamProfile;
                 this.SteamID = steamID;
                 this.SteamName = steamName;
                 this.DiscordID = discordID;

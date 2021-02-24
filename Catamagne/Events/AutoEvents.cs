@@ -1,64 +1,83 @@
 ﻿using System;
 using Catamagne.API;
+using Catamagne.Attributes;
 using System.Threading;
 using DSharpPlus.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Serilog;
 using Catamagne.Configuration;
+using System.Reflection;
+using System.Linq;
 
 namespace Catamagne.Events
 {
     class AutoEvents
     {
         static ConfigValues ConfigValues => ConfigValues.configValues;
+        
+        [ExcludeFromFind]
         public static void SetUp()
         {
-            var startTimeLong = DateTime.UtcNow + ConfigValues.LongInterval / 2;
-            var startTimeShort = DateTime.UtcNow + ConfigValues.MediumInterval / 5 * 7;
-            var activityTimeSpan = ConfigValues.MediumInterval * (Clans.clans.Count + 1);
-            //var dailyTimeSpan = TimeSpan.FromDays(1);
-            AutoEvents.EventScheduler(startTimeShort, ConfigValues.ShortInterval, Clans.clans, AutoEvents.AutoScanForChangesAsync);
-            AutoEvents.EventScheduler(startTimeLong, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoCheckForLeavers);
-            AutoEvents.EventScheduler(DateTime.UtcNow, activityTimeSpan, Clans.clans, AutoEvents.AutoRotateActivity);
-            AutoEvents.EventScheduler(DateTime.UtcNow, ConfigValues.LongInterval, Clans.clans, AutoEvents.AutoBulkUpdateAsync);
-            //AutoEvents.AutoScanForChanges();
-            //AutoEvents.AutoBulkUpdate();
-            //AutoEvents.AutoCheckForLeavers();
-        }
-        public static void EventScheduler(DateTime referenceTime, TimeSpan timeSpan, List<Clan> clans, Func<Clan, Task> action, bool repeat = true)
-        {
-            new Thread(async () =>
+            Dictionary<string, MethodInfo> methods = new();
+            var random = new Random();
+
+            var type = typeof(AutoEvents);
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
             {
-               Thread.Sleep(TimeSpan.FromMilliseconds(Math.Max( (referenceTime -  DateTime.UtcNow).TotalMilliseconds ,0d)));
-               TimeSpan interval = timeSpan / clans.Count;
-               var done = false;
-               var index = 0;
-               var nextTime = DateTime.UtcNow;
-               while (!done)
-               {
-                    if (DateTime.UtcNow >= (referenceTime + timeSpan))
-                    {
-                        if (repeat) 
-                        { 
-                            referenceTime = DateTime.UtcNow; 
-                        }
-                        else
-                        {
-                            done = true;
-                        }
+                var a = method.GetCustomAttribute<ExcludeFromFind>();
+                if (a == null && !methods.ContainsKey(method.Name))
+                {
+                    methods.Add(method.Name, method);
+                }
+            }
+
+            foreach (var method in methods)
+            {
+                var timeSpan = TimeSpan.FromHours(6);
+                bool enabled = true;
+                if (ConfigValues.Events.ContainsKey(method.Key))
+                {
+                    var matches = ConfigValues.Events.Where(t => t.Key == method.Key).ToList();
+                    foreach (var match in matches) {
+                        bool.TryParse(match.Value, out enabled);
+                        TimeSpan.TryParse(match.Value, out timeSpan);
                     }
-                    action.Invoke(clans[index]);
-                    index = (index + 1) % clans.Count;
-                    Thread.Sleep(interval);
-               }
-            }).Start();  
+                }
+                var startTime = DateTime.UtcNow + TimeSpan.FromMinutes(random.Next(0, 60));
+                EventScheduler(startTime, timeSpan, Clans.clans, method.Value, enabled);
+            }
         }
-        public static async Task AutoReadAsync(Clan clan)
+        [ExcludeFromFind]
+        public static void EventScheduler(DateTime referenceTime, TimeSpan timeSpan, List<Clan> clans, MethodInfo action, bool enabled)
+        {
+            if (enabled)
+            {
+                new Thread(async () =>
+                {
+                    Thread.Sleep(TimeSpan.FromMilliseconds(Math.Max((referenceTime - DateTime.UtcNow).TotalMilliseconds, 0d)));
+                    TimeSpan interval = timeSpan / clans.Count;
+                    var done = false;
+                    var index = 0;
+                    var nextTime = DateTime.UtcNow;
+                    while (!done)
+                    {
+                        if (DateTime.UtcNow >= (referenceTime + timeSpan))
+                        {
+                            referenceTime = DateTime.UtcNow;
+                        }
+                        action.Invoke(action, new[] { clans[index] });
+                        index = (index + 1) % clans.Count;
+                        Thread.Sleep(interval);
+                    }
+                }).Start();
+            }
+        }
+        public static async Task Read(Clan clan)
         {
             await SpreadsheetTools.Read(clan);
         }
-        public static async Task AutoBulkUpdateAsync(Clan clan)
+        public static async Task BulkUpdate(Clan clan)
         {
             List<DiscordMessage> messages = new List<DiscordMessage>();
             var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.details.Name + ".");
@@ -69,7 +88,7 @@ namespace Catamagne.Events
             discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.Name, "Updated every cell in spreadsheet.");
             messages.ForEach(async message => { message.ModifyAsync(discordEmbed); });
         }
-        public static async Task AutoScanForChangesAsync(Clan clan)
+        public static async Task SelectiveUpdate(Clan clan)
         {
             Log.Information("Scanning for changes for " + clan.details.Name);
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
@@ -92,7 +111,7 @@ namespace Catamagne.Events
                 }
             }
         }
-        public static async Task AutoCheckForLeavers(Clan clan)
+        public static async Task CheckForLeavers(Clan clan)
         {
             Log.Information("Checking for leavers for " + clan.details.Name);
             var Leavers = await BungieTools.CheckForLeaves(clan);
@@ -107,7 +126,7 @@ namespace Catamagne.Events
             //});
             //Core.Discord.SendFancyListMessage(Core.Discord.alertsChannel ,clan, Leavers, "Users found leaving " + clan.details.BungieNetName + ":");
         }
-        public static Task AutoRotateActivity(Clan clan)
+        public static Task RotateActivity(Clan clan)
         {
             var activity = new DiscordActivity()
             {
