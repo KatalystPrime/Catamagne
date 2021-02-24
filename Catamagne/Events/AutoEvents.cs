@@ -61,7 +61,7 @@ namespace Catamagne.Events
         public static async Task AutoBulkUpdateAsync(Clan clan)
         {
             List<DiscordMessage> messages = new List<DiscordMessage>();
-            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updating " + clan.details.Name + ".");
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.details.Name + ".");
             Core.Discord.updatesChannels.ForEach(async channel => { messages.Add(Core.Discord.SendFancyMessage(channel, discordEmbed).Result); });
             //Console.WriteLine("Bulk updating for " + clan.details.BungieNetName);
             

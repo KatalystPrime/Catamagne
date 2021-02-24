@@ -446,7 +446,7 @@ namespace Catamagne.Commands
 
             if (isVerified)
             {
-                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Red, "Shutting down.", "Goodbye World! <:winsad:712225483445633024>");
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "<:winsad:712225483445633024>", "Goodbye World! <:winsad:712225483445633024>");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 Environment.Exit(-1);
             }

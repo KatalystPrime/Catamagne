@@ -1,5 +1,6 @@
 ﻿using Catamagne.Configuration;
 using HtmlAgilityPack;
+using Serilog;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -33,12 +34,16 @@ namespace Catamagne.API
             var removedspace = doc.DocumentNode.InnerText.Split('\n').Select(s => s.Trim());
             string filteredString = string.Concat(removedspace.Where(t => !string.IsNullOrEmpty(t)).ToArray());
             string result = pattern.Match(filteredString).Value;
-            result = result[5..^1];
-            if (!string.IsNullOrEmpty(result))
+            try
             {
-                return result;
+                result = result[5..^1];
             }
-            return null;
+            catch
+            {
+                Log.Debug("error grabbing steam ID from " + result + " at " + url);
+                return null;
+            }
+            return result;
             //foreach (var line in filteredArray)
             //{
             //    lineNumber++;
