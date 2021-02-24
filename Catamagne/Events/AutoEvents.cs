@@ -40,8 +40,14 @@ namespace Catamagne.Events
                 {
                     var matches = ConfigValues.Events.Where(t => t.Key == method.Key).ToList();
                     foreach (var match in matches) {
-                        bool.TryParse(match.Value, out enabled);
-                        TimeSpan.TryParse(match.Value, out timeSpan);
+                        if (matches.Any(t => t.Value == "false")) 
+                        {
+                            enabled = false;
+                        }
+                        else
+                        {
+                            TimeSpan.TryParse(match.Value, out timeSpan);
+                        }
                     }
                 }
                 var startTime = DateTime.UtcNow + TimeSpan.FromMinutes(random.Next(0, 10));
@@ -55,7 +61,8 @@ namespace Catamagne.Events
             {
                 new Thread(async () =>
                 {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(Math.Max((referenceTime - DateTime.UtcNow).TotalMilliseconds, 0d)));
+                    var time = TimeSpan.FromMilliseconds(Math.Max((referenceTime - DateTime.UtcNow).TotalMilliseconds, 0d));
+                    Thread.Sleep(time);
                     TimeSpan interval = timeSpan / clans.Count;
                     var done = false;
                     var index = 0;

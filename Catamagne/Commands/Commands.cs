@@ -432,9 +432,9 @@ namespace Catamagne.Commands
             }
         }
 
-        [Command("exit")]
+        [Command("stop")]
         [Description("Shut Rosalina down. this cannot be reverted without manually restarting her. only possible by Squid and Cata.")]
-        [Aliases("stop")]
+        [Aliases("kill")]
         public async Task Stop(CommandContext ctx)
         {
             var member = ctx.Member;
@@ -443,7 +443,7 @@ namespace Catamagne.Commands
 
             if (isVerified)
             {
-                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Goodbye World!", "<:winsad:712225483445633024>");
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Shutting Down.", "<:winsad:712225483445633024> Goodbye World!");
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
                 Environment.Exit(-1);
             }
