@@ -269,6 +269,10 @@ namespace Catamagne.API
                         {
                             extraColumns = user.ExtraColumns;
                         }
+                        if (steamName == null || steamID == null)
+                        {
+                            steamName = "N/A"; steamProfile = "N/A";
+                        }
                         workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                     else

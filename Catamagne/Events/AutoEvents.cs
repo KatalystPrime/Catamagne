@@ -44,7 +44,7 @@ namespace Catamagne.Events
                         TimeSpan.TryParse(match.Value, out timeSpan);
                     }
                 }
-                var startTime = DateTime.UtcNow + TimeSpan.FromMinutes(random.Next(0, 60));
+                var startTime = DateTime.UtcNow + TimeSpan.FromMinutes(random.Next(0, 10));
                 EventScheduler(startTime, timeSpan, Clans.clans, method.Value, enabled);
             }
         }

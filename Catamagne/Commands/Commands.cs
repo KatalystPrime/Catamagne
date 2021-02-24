@@ -92,12 +92,9 @@ namespace Catamagne.Commands
                 TimeSpan t = TimeSpan.FromSeconds(5 * clan.members.SpreadsheetUsers.Count);
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-                new Thread(async () =>
-                {
-                    await SpreadsheetTools.BulkUpdate(clan);
-                    discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully bulk updated {0} members", clan.members.BungieUsers.Count));
-                    await msg.ModifyAsync(discordEmbed);
-                }).Start();
+                await SpreadsheetTools.BulkUpdate(clan);
+                discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully bulk updated {0} members", clan.members.BungieUsers.Count));
+                await msg.ModifyAsync(discordEmbed);
             }
         }
         [Command("displayUsers")]

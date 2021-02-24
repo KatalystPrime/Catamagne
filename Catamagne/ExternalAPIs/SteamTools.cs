@@ -1,6 +1,7 @@
 ﻿using Catamagne.Configuration;
 using HtmlAgilityPack;
 using Serilog;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
@@ -14,11 +15,20 @@ namespace Catamagne.API
         static ConfigValues ConfigValues => ConfigValues.configValues;
         public static string GetSteamUserName(string steamID)
         {
-            var xmlData = WebRequest.Create($"https://steamcommunity.com/profiles/{steamID}?xml=1").GetResponse().GetResponseStream();
+            //string responseData = "";
+            //var request = WebRequest.Create($"https://steamcommunity.com/profiles/{steamID}?xml=1").GetResponse();
+            //HttpWebResponse response = (HttpWebResponse)request;
+            //if (response.StatusCode == HttpStatusCode.OK)
+            //{
+            //    Stream responseStream = response.GetResponseStream();
+            //    XmlReader myStreamReader = XmlReader.Create(responseStream);
+            //    responseData = myStreamReader.ReadContentAsString();
+            //}
+            //response.Close();
 
             XmlDocument doc = new XmlDocument();
-            doc.Load(xmlData);
-            var steamIDs = doc.GetElementsByTagName("steamid");
+            doc.Load($"https://steamcommunity.com/profiles/{steamID}?xml=1");
+            var steamIDs = doc.GetElementsByTagName("steamID");
             if (steamIDs != null && steamIDs.Count > 0)
             {
                 return steamIDs[0].InnerText;

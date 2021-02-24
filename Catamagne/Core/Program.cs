@@ -55,7 +55,6 @@ namespace Catamagne.Core
                         timeString = string.Format("{0}d {1}h {2}m {3}s", timePassed.Days, timePassed.Hours, timePassed.Minutes, timePassed.Seconds);
                     }
                     Console.Title = string.Format("Catamagne | Watcher of Destiny | Live for {0}", timeString);
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
             }).Start();
         }
