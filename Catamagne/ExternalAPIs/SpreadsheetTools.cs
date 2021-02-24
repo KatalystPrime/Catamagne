@@ -317,6 +317,7 @@ namespace Catamagne.API
             }
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -406,6 +407,7 @@ namespace Catamagne.API
             });
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -416,6 +418,7 @@ namespace Catamagne.API
             var workingList = clan.members.BungieUsers;
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
