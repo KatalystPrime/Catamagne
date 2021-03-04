@@ -10,6 +10,7 @@ namespace Catamagne.Core
     {
         static ConfigValues ConfigValues => ConfigValues.configValues;
         public static DateTime startTime;
+        public static Random Random;
 
         //static void Main(string[] args)
         //{
@@ -21,6 +22,7 @@ namespace Catamagne.Core
         //}
         static async Task Main(string[] args)
         {
+            Random = new Random();
             ConfigValues.LoadConfig();
             //TrackTimeLive();
             Clans.LoadClans();
