@@ -317,9 +317,9 @@ namespace Catamagne.API
                         workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                 }
-                durations[index % 5] = DateTime.UtcNow - startTime;
+                durations[index % durations.Length] = DateTime.UtcNow - startTime;
 
-                if (index > 4)
+                if (index > durations.Length - 1)
                 {
                     var averageTime = TimeSpan.FromMilliseconds(durations.Average(t => t.TotalMilliseconds));
                     var usersLeft = _.Count - (index + 1);
@@ -337,13 +337,15 @@ namespace Catamagne.API
             Write(clan);
             Clans.SaveClanMembers(clan);
         }
-        public static async Task SelectiveUpdate(Clan clan, Changes changes)
+        public static async Task SelectiveUpdate(Clan clan, Changes changes, List<DiscordMessage> modifyMessages, Action<List<DiscordMessage>, TimeSpan, Changes> modifyMethod)
         {
             await Read(clan);
+            TimeSpan[] durations = new TimeSpan[(changes.addedUsers.Count / 5)];
             var workingList = clan.members.BungieUsers;
-
+            int index = 0;
             foreach (User addedUser in changes.addedUsers)
             {
+                var startTime = DateTime.UtcNow;
                 var workingUser = new User();
                 if (!string.IsNullOrEmpty(addedUser.BungieProfile))
                 {
@@ -408,16 +410,29 @@ namespace Catamagne.API
                         }
                         workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
+                    
                 }
+                durations[index % durations.Length] = DateTime.UtcNow - startTime;
+
+                if (index > durations.Length -1)
+                {
+                    var averageTime = TimeSpan.FromMilliseconds(durations.Average(t => t.TotalMilliseconds));
+                    var usersLeft = changes.addedUsers.Count - (index + 1);
+                    if (modifyMessages != null && modifyMethod != null)
+                    {
+                        modifyMethod.Invoke(modifyMessages, averageTime * usersLeft, changes);
+                    }
+                }
+                index++;
             }
             for (int i = 0; i < changes.updatedUsers.Count; i++)
             {
-                var index = workingList.FindIndex(t => t.BungieProfile == changes.updatedUsers[i].BungieProfile);
+                index = workingList.FindIndex(t => t.BungieProfile == changes.updatedUsers[i].BungieProfile);
                 workingList[index] = changes.updatedUsers[i];
             }
             changes.removedUsers.ForEach(removedUser =>
             {
-                var index = workingList.FindIndex(t => t.BungieProfile == removedUser.BungieProfile);
+                index = workingList.FindIndex(t => t.BungieProfile == removedUser.BungieProfile);
                 workingList.RemoveAt(index);
             });
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));

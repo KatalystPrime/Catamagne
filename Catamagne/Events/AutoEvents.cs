@@ -110,7 +110,7 @@ namespace Catamagne.Events
             var changed = await SpreadsheetTools.CheckForChangesAsync(clan);
             if (changed.TotalChanges > 0)
             {
-                await SpreadsheetTools.SelectiveUpdate(clan, changed);
+                await SpreadsheetTools.SelectiveUpdate(clan, changed, null, null);
                 DiscordEmbed discordEmbed;
                 if (changed.TotalChanges == 1)
                 {

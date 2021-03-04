@@ -35,11 +35,7 @@ namespace Catamagne.Commands
                 await Core.Discord.UpdateChannels();
                 discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Done", "Sucessfully updated configuration files");
                 await message.ModifyAsync(discordEmbed);
-                if (new Random().Next(0, 100) == 0)
-                {
-                    var embed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Glad to be of service <:blobblush:396521772691881987>");
-                    await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                }
+                await ThankUsage(ctx, DiscordColor.SpringGreen, 1);
             }
         }
         [Command("updatesheet")]
@@ -63,7 +59,7 @@ namespace Catamagne.Commands
                     TimeSpan t = TimeSpan.FromSeconds((_.addedUsers.Count * 5) + (_.updatedUsers.Count * 0.1) + (_.removedUsers.Count * 0.1));
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("Time Left", t.ToString(@"mm\:ss")) });
                     await msg.ModifyAsync(discordEmbed);
-                    await SpreadsheetTools.SelectiveUpdate(clan, _);
+                    await SpreadsheetTools.SelectiveUpdate(clan, _, new() { msg }, UpdateSpreadsheetProgress);
                     discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
                     await msg.ModifyAsync(discordEmbed);
                 }
@@ -73,11 +69,18 @@ namespace Catamagne.Commands
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "No changes found", "To update steam names, please run a bulk update.");
                     await msg.ModifyAsync(discordEmbed);
                 }
-                if (new Random().Next(0, 100) == 0)
-                {
-                    var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                    await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                }
+                await ThankUsage(ctx, clan, 100);
+            }
+        }
+        public async void UpdateSpreadsheetProgress(List<DiscordMessage> messages, TimeSpan timeLeft, SpreadsheetTools.Changes changes)
+        {
+            //discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("Time Left", timeLeft.ToString(@"mm\:ss")) });
+            //await msg.ModifyAsync(discordEmbed);
+
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", changes.TotalChanges), new List<Field>() { new Field("Time Left", timeLeft.ToString(@"mm\:ss")) });
+            foreach (var message in messages)
+            {
+                await message.ModifyAsync(discordEmbed);
             }
         }
         [Command("bulkupdate")]
@@ -98,11 +101,7 @@ namespace Catamagne.Commands
                 await SpreadsheetTools.BulkUpdate(clan, new () { msg }, BulkUpdateSheetProgress );
                 discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully bulk updated {0} members", clan.members.BungieUsers.Count));
                 await msg.ModifyAsync(discordEmbed);
-                if (new Random().Next(0, 100) == 0)
-                {
-                    var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                    await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                }
+                await ThankUsage(ctx, clan, 100);
             }
         }
         public async void BulkUpdateSheetProgress(List<DiscordMessage> messages, TimeSpan timeLeft)
@@ -133,11 +132,7 @@ namespace Catamagne.Commands
 
                     Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users on spreadsheet for " + clan.details.Name + ":");
 
-                    if (new Random().Next(0, 100) == 0)
-                    {
-                        var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                        await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                    }
+                    await ThankUsage(ctx, clan, 100);
                 }
                 else if (mode == "saved data" || mode == "saved" || mode == "file")
                 {
@@ -146,19 +141,13 @@ namespace Catamagne.Commands
 
                     Core.Discord.SendFancyListMessage(ctx.Channel, clan, users, "Users for " + clan.details.Name + ":");
 
-                    if (new Random().Next(0, 100) == 0)
-                    {
-                        var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                        await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                    }
-
+                    await ThankUsage(ctx, clan, 100);
                 }
                 else
                 {
                     var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "Additional arguments required. eithe use:\ndisplayusers sheet or displayusers saved");
                     await ctx.RespondAsync(discordEmbed);
                 }
-
             }
         }
         [Command("checkleavers")]
@@ -188,11 +177,7 @@ namespace Catamagne.Commands
                     discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "No leavers found", "No one to remove from sheet <:unipeepo:601277029459034112>");
                     await msg.ModifyAsync(discordEmbed);
                 }
-                if (new Random().Next(0, 100) == 0)
-                {
-                    var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                    await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                }
+                await ThankUsage(ctx, clan, 100);
             }
         }
 
@@ -226,11 +211,7 @@ namespace Catamagne.Commands
                 
 
                 Core.Discord.SendInactivityListMessage(ctx.Channel, clan, inactives, inactiveTimes, "Here's all the " + clan.details.Name + " users above " + threshold + " days of inactivity:");
-                if (new Random().Next(0,100) == 0)
-                {
-                    var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <:blobblush:396521772691881987>");
-                    await Core.Discord.SendFancyMessage(ctx.Channel, embed);
-                }
+                await ThankUsage(ctx, clan, 100);
 
             }
         }
@@ -287,6 +268,23 @@ namespace Catamagne.Commands
                 var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.IndianRed, "Sorry!", "The clan you provided is invalid!");
                 await ctx.RespondAsync(discordEmbed);
                 return null;
+            }
+        }
+
+        async Task ThankUsage(CommandContext ctx, Clan clan, int chance)
+        {
+            if (new Random().Next(0, chance) == 0)
+            {
+                var embed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Glad to be of service <a:rosalinablush:817036345276891163>");
+                await Core.Discord.SendFancyMessage(ctx.Channel, embed);
+            }
+        }
+        async Task ThankUsage(CommandContext ctx, DiscordColor discordColor, int chance)
+        {
+            if (new Random().Next(0, chance) == 0)
+            {
+                var embed = Core.Discord.CreateFancyMessage(discordColor, "<a:rosalinablush:817036345276891163> Glad to be of service!!");
+                await Core.Discord.SendFancyMessage(ctx.Channel, embed);
             }
         }
     }
