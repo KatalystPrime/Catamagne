@@ -1,4 +1,5 @@
-﻿using Catamagne.API;
+﻿using BungieSharper.Schema.GroupsV2;
+using Catamagne.API;
 using Catamagne.Commands;
 using Catamagne.Configuration;
 using Catamagne.Events;
@@ -212,6 +213,45 @@ namespace Catamagne.Core
                 List<DiscordEmbed> embeds = new List<DiscordEmbed>();
                 var colour = clan.details.DiscordColour;
                 if (fields.Count > 0 )
+                {
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(0, Math.Min(25, fields.Count)), title));
+                }
+                if (fields.Count > 25)
+                {
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(25, Math.Min(50, fields.Count))));
+                }
+                if (fields.Count > 50)
+                {
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(50, Math.Min(75, fields.Count))));
+                }
+                if (fields.Count > 75)
+                {
+                    embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(75, Math.Min(100, fields.Count))));
+                }
+                List<DiscordMessage> messages = new List<DiscordMessage>();
+                embeds.ForEach(async embed => messages.Add(await SendFancyMessage(channel, embed)));
+            }
+        }
+        public static void SendInactivityListMessage(DiscordChannel channel, Clan clan, List<GroupMember> Users, List<TimeSpan> InactivityNumbers, string title)
+        {
+            if (Users.Count > 0)
+            {
+                List<Field> fields = new List<Field>();
+                for (int i = 0; i < Users.Count; i++)
+                {
+                    var a = Users[i].destinyUserInfo.membershipId;
+                    if (a != 4611686018501264896 && a != 4611686018506629705 && a != 4611686018501304351 && a != 4611686018496543963 && a != 4611686018496921425 && a != 4611686018491494724)
+                    {
+                        var b = Users[i];
+                        var time = InactivityNumbers[i].ToString("%d'd 'hh'h'");
+                        var _ = new Field(Users[i].destinyUserInfo.displayName, time, true);
+                        fields.Add(_);
+                    }
+                    
+                }
+                List<DiscordEmbed> embeds = new List<DiscordEmbed>();
+                var colour = clan.details.DiscordColour;
+                if (fields.Count > 0)
                 {
                     embeds.Add(GetUsersToDisplayInRange(colour, fields, new Range(0, Math.Min(25, fields.Count)), title));
                 }

@@ -106,13 +106,23 @@ namespace Catamagne.API
             }
             return null;
         }
-        public static async Task<(List<UserInfoCard> validMembers, List<GroupUserInfoCard> invalidMembers)> GetClanMembers(Clan clan)
+        public static async Task<(List<UserInfoCard> validMembers, List<GroupUserInfoCard> invalidMembers)> GetClanInfoCards(Clan clan)
         {
             SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.ID));
+
             var groupList = group.results.ToList();
+
             var validMembers = groupList.Where(t => t.bungieNetUserInfo != null).Select(t => t.bungieNetUserInfo).ToList();
             var invalidMembers = groupList.Where(t => t.bungieNetUserInfo == null).Select(t => t.destinyUserInfo).ToList();
             return (validMembers, invalidMembers);
+        }
+        public static async Task<List<GroupMember>> GetClanMembers(Clan clan)
+        {
+            SearchResultOfGroupMember group = await bungieApi.ApiEndpoints.GroupV2_GetMembersOfGroup(1, Convert.ToInt64(clan.details.ID));
+
+            var groupList = group.results.ToList();
+
+            return groupList;
         }
         public static string GetBungieProfileLink(UserInfoCard bungieUser)
         {
@@ -140,7 +150,7 @@ namespace Catamagne.API
                 {
                     List<SpreadsheetTools.User> oldLeavers = clan.members.ClanLeavers;
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                    var ClanMembers = await GetClanMembers(clan);
+                    var ClanMembers = await GetClanInfoCards(clan);
                     foreach (var member in clan.members.BungieUsers)
                     {
                         if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
@@ -177,7 +187,7 @@ namespace Catamagne.API
                 else
                 {
                     List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                    var ClanMembers = await GetClanMembers(clan);
+                    var ClanMembers = await GetClanInfoCards(clan);
                     clan.members.BungieUsers.ForEach(member =>
                     {
                         if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
@@ -206,7 +216,7 @@ namespace Catamagne.API
             {
                 await SpreadsheetTools.Read(clan);
                 List<SpreadsheetTools.User> leavers = new List<SpreadsheetTools.User>();
-                var ClanMembers = await GetClanMembers(clan);
+                var ClanMembers = await GetClanInfoCards(clan);
                 clan.members.BungieUsers.ForEach(member => {
                     if (!ClanMembers.validMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.BungieID)))
                     {
@@ -233,7 +243,7 @@ namespace Catamagne.API
         {
             await SpreadsheetTools.Read(clan);
             List<SpreadsheetTools.User> rejoiners = new List<SpreadsheetTools.User>();
-            var ClanMembers = await GetClanMembers(clan);
+            var ClanMembers = await GetClanInfoCards(clan);
             //SpreadsheetTools.savedUsers.ToList().ForEach(member => {
             //    if (!ClanMembers.Select(t => t.membershipId).Contains(Convert.ToInt64(member.bungieID)))
             //    {
@@ -276,7 +286,7 @@ namespace Catamagne.API
         }
         public static async Task<List<SpreadsheetTools.User>> GetInactiveUsersAsync(Clan clan, int threshold = 14)
         {
-            var clanMembers = await GetClanMembers(clan);
+            var clanMembers = await GetClanInfoCards(clan);
             foreach (var member in clanMembers.validMembers)
             {
                 //Console.WriteLine(string.Format("Destiny2/{0}/Profile/{1}/", member.membershipType, member.membershipId));

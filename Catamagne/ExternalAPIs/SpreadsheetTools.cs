@@ -59,7 +59,7 @@ namespace Catamagne.API
             if (spreadsheetData == null)
             {
                 var _ = new User();
-                var members = await BungieTools.GetClanMembers(clan);
+                var members = await BungieTools.GetClanInfoCards(clan);
 
                 var validMembers = members.validMembers;
                 var invalidMembers = members.invalidMembers;

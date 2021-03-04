@@ -177,6 +177,39 @@ namespace Catamagne.Commands
             }
         }
 
+        [Command("inactives")]
+        [Description("Checks for inactives.")]
+        [Aliases("i", "inactive")]
+        public async Task CheckForInactives(CommandContext ctx, string clanTag, string threshold = "14")
+        {
+            var roles = ctx.Member.Roles.ToList();
+            var verification = await IsVerifiedAsync(ctx, true);
+            var clan = await GetClanFromTagOrNameAsync(ctx, clanTag);
+            clanTag = clanTag.ToLower();
+            List<BungieSharper.Schema.GroupsV2.GroupMember> inactives = new ();
+            List<TimeSpan> inactiveTimes = new ();
+
+            if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
+            {
+                var clanMembers = await BungieTools.GetClanMembers(clan);
+                foreach (var member in clanMembers)
+                {
+                    int inactivityLimit = 14;
+                    var lastLogon = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Convert.ToDouble(member.lastOnlineStatusChange));
+                    var inactivityDuration = DateTime.UtcNow - lastLogon;
+                    int.TryParse(threshold, out inactivityLimit);
+                    if (inactivityDuration.TotalDays > inactivityLimit)
+                    {
+                        inactives.Add(member);
+                        inactiveTimes.Add(inactivityDuration);
+                    }
+                }
+
+
+                Core.Discord.SendInactivityListMessage(ctx.Channel, clan, inactives, inactiveTimes, "inactive " + clan.details.Name + " users above " + threshold + " days.");
+            }
+        }
+
         public static async Task<ErrorCode> IsVerifiedAsync(CommandContext ctx, bool isAdminCommand = false, bool isAvailableEverywhere = false)
         {
             DiscordEmbed discordEmbed;

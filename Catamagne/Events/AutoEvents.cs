@@ -65,10 +65,9 @@ namespace Catamagne.Events
                     var time = TimeSpan.FromMilliseconds(Math.Max((referenceTime - DateTime.UtcNow).TotalMilliseconds, 0d));
                     Thread.Sleep(time);
                     TimeSpan interval = timeSpan / clans.Count;
-                    var done = false;
                     var index = 0;
                     var nextTime = DateTime.UtcNow;
-                    while (!done)
+                    while (true)
                     {
                         if (DateTime.UtcNow >= (referenceTime + timeSpan))
                         {
