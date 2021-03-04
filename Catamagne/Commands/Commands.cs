@@ -198,7 +198,7 @@ namespace Catamagne.Commands
                     var lastLogon = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Convert.ToDouble(member.lastOnlineStatusChange));
                     var inactivityDuration = DateTime.UtcNow - lastLogon;
                     int.TryParse(threshold, out inactivityLimit);
-                    if (inactivityDuration.TotalDays > inactivityLimit)
+                    if (inactivityDuration.TotalDays > inactivityLimit && member.lastOnlineStatusChange != 0)
                     {
                         inactives.Add(member);
                         inactiveTimes.Add(inactivityDuration);
