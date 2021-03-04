@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MoreLinq.Extensions;
-
+using DSharpPlus.Entities;
 
 namespace Catamagne.API
 {
@@ -177,7 +177,7 @@ namespace Catamagne.API
 
             if (forceBulkUpdate)
             {
-                await BulkUpdate(clan, true);
+                await BulkUpdate(clan, null, null, true);
 
             }
         }
@@ -239,14 +239,17 @@ namespace Catamagne.API
             // Prints the names and majors of students in a sample spreadsheet:
             var response = requestUpdate.Execute();
         }
-        public static async Task BulkUpdate(Clan clan, bool skipRead = false)
+        public static async Task BulkUpdate(Clan clan, List<DiscordMessage> modifyMessages, Action<List<DiscordMessage>, TimeSpan> modifyMethod, bool skipRead = false)
         {
+            TimeSpan[] durations = new TimeSpan[5];
             if (!skipRead) await Read(clan);
             //ShowLoading("processing...");
             var _ = clan.members.SpreadsheetUsers;
             List<User> workingList = new List<User>();
+            int index = 0;
             foreach (User user in _)
             {
+                var startTime = DateTime.UtcNow;
                 var workingUser = new User();
                 if (!string.IsNullOrEmpty(user.BungieProfile))
                 {
@@ -314,10 +317,22 @@ namespace Catamagne.API
                         workingList.Add(new User(bungieProfile, bungieName, bungieID, steamProfile, steamID, steamName, discordID, userStatus, clan.details.Tag, extraColumns));
                     }
                 }
+                durations[index % 5] = DateTime.UtcNow - startTime;
+
+                if (index > 4)
+                {
+                    var averageTime = TimeSpan.FromMilliseconds(durations.Average(t => t.TotalMilliseconds));
+                    var usersLeft = _.Count - (index + 1);
+                    if (modifyMessages != null && modifyMethod != null)
+                    {
+                        modifyMethod.Invoke(modifyMessages, averageTime * usersLeft);
+                    }
+                }
+                index++;
             }
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
-            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -407,7 +422,7 @@ namespace Catamagne.API
             });
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
-            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);
@@ -418,7 +433,7 @@ namespace Catamagne.API
             var workingList = clan.members.BungieUsers;
             workingList.RemoveAll(t => string.IsNullOrEmpty(t.BungieProfile));
             workingList = workingList.DistinctBy(t => t.BungieProfile).ToList();
-            workingList = workingList.OrderBy(t => t.SteamProfile).ToList();
+            workingList = workingList.OrderBy(t => t.SteamName).ToList();
             clan.members.BungieUsers = workingList;
             Write(clan);
             Clans.SaveClanMembers(clan);

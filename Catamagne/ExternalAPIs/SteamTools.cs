@@ -9,32 +9,21 @@ using System.Xml;
 
 namespace Catamagne.API
 {
-    public class SteamTools
-    {
-        //public static 
-        static ConfigValues ConfigValues => ConfigValues.configValues;
-        public static string GetSteamUserName(string steamID)
+        public class SteamTools
         {
-            //string responseData = "";
-            //var request = WebRequest.Create($"https://steamcommunity.com/profiles/{steamID}?xml=1").GetResponse();
-            //HttpWebResponse response = (HttpWebResponse)request;
-            //if (response.StatusCode == HttpStatusCode.OK)
-            //{
-            //    Stream responseStream = response.GetResponseStream();
-            //    XmlReader myStreamReader = XmlReader.Create(responseStream);
-            //    responseData = myStreamReader.ReadContentAsString();
-            //}
-            //response.Close();
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load($"https://steamcommunity.com/profiles/{steamID}?xml=1");
-            var steamIDs = doc.GetElementsByTagName("steamID");
-            if (steamIDs != null && steamIDs.Count > 0)
+            //public static 
+            static ConfigValues ConfigValues => ConfigValues.configValues;
+            public static string GetSteamUserName(string steamID)
             {
-                return steamIDs[0].InnerText;
+                XmlDocument doc = new XmlDocument();
+                doc.Load($"https://steamcommunity.com/profiles/{steamID}?xml=1");
+                var steamIDs = doc.GetElementsByTagName("steamID");
+                if (steamIDs != null && steamIDs.Count > 0)
+                {
+                    return steamIDs[0].InnerText;
+                }
+                return null;
             }
-            return null;
-        }
         public static string GetSteamID(string url)
         {
             var pattern = new Regex(@"(\(ID: (.*[0-9])\))");
@@ -53,30 +42,6 @@ namespace Catamagne.API
                 return null;
             }
             return result;
-            //foreach (var line in filteredArray)
-            //{
-            //    lineNumber++;
-            //    if (line.Length > 4)
-            //    {
-            //        //Console.WriteLine(line.Substring(0, 5));
-            //        if (line.Substring(0, 5) == "(ID: ")
-            //        {
-            //            Console.WriteLine(line.Substring(5, line.Length-6));
-            //            return line;
-            //        }
-            //    }
-            //}
-
-            //Console.WriteLine(filteredArray[160]);
         }
-        //public class SteamUser
-        //{
-        //    public string displayname;
-        //    public ulong steamID64;
-        //    public SteamUser(string username, ulong steamID)
-        //    {
-        //        displayname = username; steamID64 = steamID;
-        //    }
-        //}
     }
 }

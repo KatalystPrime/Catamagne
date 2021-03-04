@@ -31,15 +31,6 @@ namespace Catamagne.Events
                     {
                         messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
                     }
-                    //Core.Discord.alertsChannels.ForEach(async channel =>
-                    //{
-                    //    messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
-                    //});
-                    //Core.Discord.alertsChannels.ForEach(async channel =>
-                    //{
-                    //    messages.Add(await Core.Discord.SendFancyMessage(channel, discordEmbed));
-                    //});
-                    //DiscordMessage message = await CatamagneCore.SendAlert(string.Format("User detected leaving discord server; was on spreadsheet, id = {0}", e.Member.Id.ToString()));
                 }
             }).Start();
         }

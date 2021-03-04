@@ -9,6 +9,7 @@ using Serilog;
 using Catamagne.Configuration;
 using System.Reflection;
 using System.Linq;
+using Catamagne.Core;
 
 namespace Catamagne.Events
 {
@@ -80,6 +81,15 @@ namespace Catamagne.Events
                 }).Start();
             }
         }
+        [ExcludeFromFind]
+        public static async void BulkUpdateSheetProgress(List<DiscordMessage> messages, TimeSpan timeLeft)
+        {
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("Time Left", timeLeft.ToString(@"mm\:ss")) });
+            foreach (var message in messages)
+            {
+                await message.ModifyAsync(discordEmbed);
+            }
+        }
         public static async Task Read(Clan clan)
         {
             await SpreadsheetTools.Read(clan);
@@ -88,12 +98,12 @@ namespace Catamagne.Events
         {
             List<DiscordMessage> messages = new List<DiscordMessage>();
             var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk updating " + clan.details.Name + ".");
-            Core.Discord.updatesChannels.ForEach(async channel => { messages.Add(Core.Discord.SendFancyMessage(channel, discordEmbed).Result); });
+            Core.Discord.updatesChannels.ForEach(channel => { messages.Add(Core.Discord.SendFancyMessage(channel, discordEmbed).Result); });
             //Console.WriteLine("Bulk updating for " + clan.details.BungieNetName);
             
-            await SpreadsheetTools.BulkUpdate(clan);
+            await SpreadsheetTools.BulkUpdate(clan, messages, BulkUpdateSheetProgress);
             discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.SpringGreen, "Bulk updated " + clan.details.Name, "Updated every cell in spreadsheet.");
-            messages.ForEach(async message => { message.ModifyAsync(discordEmbed); });
+            messages.ForEach(async message => { await message.ModifyAsync(discordEmbed); });
         }
         public static async Task SelectiveUpdate(Clan clan)
         {

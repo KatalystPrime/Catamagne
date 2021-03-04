@@ -61,7 +61,7 @@ namespace Catamagne.Commands
                     if (_.TotalChanges > 0)
                     {
                         TimeSpan t = TimeSpan.FromSeconds((_.addedUsers.Count * 5) + (_.updatedUsers.Count * 0.1) + (_.removedUsers.Count * 0.1));
-                        discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
+                        discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Yellow, "Found changes", string.Format("{0} change(s) found...", _.TotalChanges), new List<Field>() { new Field("Time Left", t.ToString(@"mm\:ss")) });
                         await msg.ModifyAsync(discordEmbed);
                         await SpreadsheetTools.SelectiveUpdate(clan, _);
                         discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully processed {0} changes.", _.TotalChanges));
@@ -90,11 +90,19 @@ namespace Catamagne.Commands
             if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
                 TimeSpan t = TimeSpan.FromSeconds(5 * clan.members.SpreadsheetUsers.Count);
-                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("ETA", t.ToString(@"mm\:ss")) });
+                var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("Time Left", t.ToString(@"mm\:ss")) });
                 DiscordMessage msg = await ctx.RespondAsync(discordEmbed);
-                await SpreadsheetTools.BulkUpdate(clan);
+                await SpreadsheetTools.BulkUpdate(clan, new () { msg }, BulkUpdateSheetProgress );
                 discordEmbed = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "Done", string.Format("Successfully bulk updated {0} members", clan.members.BungieUsers.Count));
                 await msg.ModifyAsync(discordEmbed);
+            }
+        }
+        public async void BulkUpdateSheetProgress(List<DiscordMessage> messages, TimeSpan timeLeft)
+        {
+            var discordEmbed = Core.Discord.CreateFancyMessage(DiscordColor.Orange, "Bulk Updating", "Updating every element in spreadsheet...", new List<Field>() { new Field("Time Left", timeLeft.ToString(@"mm\:ss")) });
+            foreach (var message in messages)
+            {
+                await message.ModifyAsync(discordEmbed);
             }
         }
         [Command("displayUsers")]
