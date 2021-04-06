@@ -10,6 +10,7 @@ using System.Threading;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity.Extensions;
 using Catamagne.Configuration;
+using BungieSharper.Schema.GroupsV2;
 
 namespace Catamagne.Commands
 {
@@ -183,8 +184,8 @@ namespace Catamagne.Commands
 
         [Command("inactives")]
         [Description("Checks for inactives.")]
-        [Aliases("i", "inactive")]
-        public async Task CheckForInactives(CommandContext ctx, string clanTag, string threshold = "14")
+        [Aliases("i", "inactive","inactivity")]
+        public async Task CheckForInactives(CommandContext ctx, string clanTag, string threshold = "-1")
         {
             var roles = ctx.Member.Roles.ToList();
             var verification = await IsVerifiedAsync(ctx, true);
@@ -192,27 +193,47 @@ namespace Catamagne.Commands
             clanTag = clanTag.ToLower();
             List<BungieSharper.Schema.GroupsV2.GroupMember> inactives = new ();
             List<TimeSpan> inactiveTimes = new ();
+            int inactivityLimit = ConfigValues.InactivityThreshold;
 
             if (clan != null && verification == ErrorCode.Qualify && !string.IsNullOrEmpty(clan.details.Tag))
             {
+                if (threshold == "-1") threshold = ConfigValues.InactivityThreshold.ToString();
                 var clanMembers = await BungieTools.GetClanMembers(clan);
                 foreach (var member in clanMembers)
                 {
-                    int inactivityLimit = 14;
                     var lastLogon = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Convert.ToDouble(member.lastOnlineStatusChange));
                     var inactivityDuration = DateTime.UtcNow - lastLogon;
+                    
                     int.TryParse(threshold, out inactivityLimit);
-                    if (inactivityDuration.TotalDays > inactivityLimit && member.lastOnlineStatusChange != 0)
+                    if (inactivityLimit < 0)
+                    {
+                        inactivityLimit = ConfigValues.InactivityThreshold;
+                    }
+                    if (inactivityDuration.TotalDays > inactivityLimit && member.lastOnlineStatusChange != 0 && member.memberType != RuntimeGroupMemberType.Founder)
                     {
                         inactives.Add(member);
                         inactiveTimes.Add(inactivityDuration);
                     }
+
                 }
-                
-
-                Core.Discord.SendInactivityListMessage(ctx.Channel, clan, inactives, inactiveTimes, "Here's all the " + clan.details.Name + " users above " + threshold + " days of inactivity:");
-                await ThankUsage(ctx, clan, 100);
-
+                if (inactives.Count > 0)
+                {
+                    Core.Discord.SendInactivityListMessage(ctx.Channel, clan, inactives, inactiveTimes, "Here's all the " + clan.details.Name + " users above " + threshold + " days of inactivity:");
+                    await ThankUsage(ctx, clan, 100);
+                }
+                else
+                {
+                    DiscordEmbed message;
+                    if (inactivityLimit == ConfigValues.InactivityThreshold)
+                    {
+                        message = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "I found no " + clan.details.Name + " members above " + threshold + "days of inactivity!", "Try a lower threshold to see if there's users creeping up to " + ConfigValues.InactivityThreshold + " days!");
+                    }
+                    else
+                    {
+                        message = Core.Discord.CreateFancyMessage(clan.details.DiscordColour, "I found no " + clan.details.Name + " members above " + threshold + "days of inactivity!", null);
+                    }
+                    await Core.Discord.SendFancyMessage(ctx.Channel, message);
+                }
             }
         }
 

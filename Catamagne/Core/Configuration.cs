@@ -20,6 +20,7 @@ namespace Catamagne.Configuration
         public List<ulong?> AlertChannels;
         public List<ulong?> UpdatesChannels;
         public DiscordActivity DiscordActivity;
+        public int InactivityThreshold;
         public string[] Prefixes;
         public string FolderPath;
         [NonSerialized] public string ConfigFolder;
@@ -43,6 +44,7 @@ namespace Catamagne.Configuration
                 Name = "over Destiny...",
                 ActivityType = ActivityType.Watching,
             };
+            InactivityThreshold = 14;
             Prefixes = new string[] { "ct!" };
             FolderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Catamagne");
             ConfigFolder = Path.Combine(FolderPath, "Config");
