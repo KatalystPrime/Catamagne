@@ -340,7 +340,8 @@ namespace Catamagne.API
         public static async Task SelectiveUpdate(Clan clan, Changes changes, List<DiscordMessage> modifyMessages, Action<List<DiscordMessage>, TimeSpan, Changes> modifyMethod)
         {
             await Read(clan);
-            TimeSpan[] durations = new TimeSpan[(changes.addedUsers.Count / 5)];
+            int size = (int) MathF.Ceiling((float) changes.addedUsers.Count / 5);
+            TimeSpan[] durations = new TimeSpan[size];
             var workingList = clan.members.BungieUsers;
             int index = 0;
             foreach (User addedUser in changes.addedUsers)
